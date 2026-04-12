@@ -1,0 +1,98 @@
+{
+  "errors": {
+    "not_in_game": "Das ist nicht dein Spiel!",
+    "not_challenger": "Nur der herausgeforderte Spieler kann annehmen!",
+    "already_chose": "Du hast bereits **{choice}** gewählt!",
+    "cant_challenge_self": "Du kannst dich nicht selbst herausfordern!",
+    "cant_challenge_bot": "Du kannst keinen Bot herausfordern! Verwende stattdessen `/rps play`.",
+    "not_in_game_play_again": "Du warst nicht einmal im Spiel!",
+    "min_coins": "Du musst mindestens 1 Münze werfen!",
+    "max_coins": "Maximal 20 Münzen auf einmal!",
+    "dice_min_sides": "Ein Würfel muss mindestens 2 Seiten haben!",
+    "not_challenger_decline": "Nur der herausgeforderte Spieler kann ablehnen!"
+  },
+  "ui": {
+    "buttons": {
+      "accept_challenge": "Herausforderung annehmen",
+      "decline": "Ablehnen",
+      "rock": "🪨 Stein",
+      "paper": "📄 Papier",
+      "scissors": "✂️ Schere",
+      "play_again": "🔄 Nochmal spielen",
+      "joke_image": "🖼️ Bild",
+      "joke_another": "🔄 Noch einer"
+    },
+    "status": {
+      "waiting_opponent": "Du hast **{choice}** gewählt! Warte auf Gegner...",
+      "challenge_declined": "{user} hat die Herausforderung abgelehnt.",
+      "choose_move": "Wähle deinen Zug!"
+    }
+  },
+  "games": {
+    "rps": {
+      "challenge_title": "⚔️ **Schere-Stein-Papier Herausforderung!**",
+      "challenge_message": "{challenger} fordert {opponent} zu Schere-Stein-Papier heraus!\\n\\n{opponent_name}, nimmst du an?",
+      "battle_title": "⚔️ **Schere-Stein-Papier Kampf!**",
+      "battle_message": "{challenger} gegen {opponent}\\n\\nBeide Spieler: wählt euren Zug!",
+      "results_title": "⚔️ **Schere-Stein-Papier Kampfergebnisse!**",
+      "chose": "{user} hat **{choice}** gewählt",
+      "tie": "🤝 **Unentschieden!**",
+      "winner": "🎉 **{user} gewinnt!**",
+      "you_win": "Du gewinnst! 🎉",
+      "bot_wins": "Ich gewinne! 😈",
+      "your_choice": "Du hast **{choice}** gewählt. Ich habe **{bot_choice}** gewählt.\\n{result}"
+    },
+    "coinflip": {
+      "heads": "Kopf",
+      "tails": "Zahl",
+      "results": "🪙 **Ergebnisse:** {results}\\n**Zusammenfassung:** {heads} Kopf, {tails} Zahl"
+    },
+    "dice": {
+      "result": "🎲 Du hast eine **{result}** gewürfelt (1-{sides})!"
+    },
+    "eightball": {
+      "format": "🎱 **Frage:** {question}\\n**Antwort:** {answer}",
+      "responses": [
+        "Es ist sicher.",
+        "Es ist definitiv so.",
+        "Ohne Zweifel.",
+        "Ja - definitiv.",
+        "Du kannst dich darauf verlassen.",
+        "So wie ich es sehe, ja.",
+        "Höchstwahrscheinlich.",
+        "Gute Aussichten.",
+        "Ja.",
+        "Die Zeichen deuten auf ja.",
+        "Antwort verschwommen, versuche es nochmal.",
+        "Frage später nochmal.",
+        "Kann ich dir jetzt besser nicht sagen.",
+        "Kann jetzt nicht vorhersagen.",
+        "Konzentriere dich und frage nochmal.",
+        "Rechne nicht damit.",
+        "Meine Antwort ist nein.",
+        "Meine Quellen sagen nein.",
+        "Aussichten nicht so gut.",
+        "Sehr zweifelhaft."
+      ]
+    },
+    "joke": {
+      "no_jokes_voted": "Es wurde noch nicht über Witze abgestimmt! Sei der Erste!",
+      "leaderboard_title": "🏆 Bestbewertete Witze weltweit",
+      "leaderboard_footer": "Insgesamt weltweit abgegebene Stimmen: {total}"
+    },
+    "rps_leaderboard": {
+      "title": "🏆 Schere-Stein-Papier Rangliste - {server}",
+      "server_only": "Dieser Befehl funktioniert nur auf Servern!"
+    }
+  },
+  "fun": {
+    "ship": {
+      "title": "💗 **Beziehungs-Rechner** 💗",
+      "compatibility": "Kompatibilität: **{percentage}%** {emoji}"
+    },
+    "choose": {
+      "no_options": "Bitte gib einige Optionen an!",
+      "response": "🤔 Ich wähle... **{choice}**!"
+    }
+  }
+}

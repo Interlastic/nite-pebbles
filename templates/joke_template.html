@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joke Page</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Inter:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            border: 10px solid blue;
+            box-sizing: border-box;
+            background-color: white;
+            min-height: 400px;
+            /* Base height */
+        }
+
+        .main-text {
+            font-size: 48px;
+            text-align: center;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 40px;
+            font-family: '{{ font_family }}',
+            cursive;
+            color: #2c3e50;
+        }
+
+        .footer {
+            font-size: 14px;
+            color: #666;
+            padding: 20px;
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-text">
+        {{ joke_text }}
+    </div>
+    <div class="footer">
+        from @nite#7551
+    </div>
+</body>
+
+</html>

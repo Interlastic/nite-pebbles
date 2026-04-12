@@ -1,0 +1,8 @@
+{
+  "entries": [
+    {
+      "extension_file": "fun_commands",
+      "dependencies": ["aiohttp", "playwright", "Jinja2", "Pillow"]
+    }
+  ]
+}
