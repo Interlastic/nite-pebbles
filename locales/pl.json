@@ -1,0 +1,98 @@
+{
+  "errors": {
+    "not_in_game": "To nie twoja gra!",
+    "not_challenger": "Tylko wyzwany gracz może zaakceptować!",
+    "already_chose": "Już wybrałeś **{choice}**!",
+    "cant_challenge_self": "Nie możesz wyzwać samego siebie!",
+    "cant_challenge_bot": "Nie możesz wyzwać bota! Użyj zamiast tego `/rps play`.",
+    "not_in_game_play_again": "Nawet nie byłeś w grze!",
+    "min_coins": "Musisz rzucić co najmniej 1 monetą!",
+    "max_coins": "Maksymalnie 20 monet naraz!",
+    "dice_min_sides": "Kostka musi mieć co najmniej 2 strony!",
+    "not_challenger_decline": "Tylko wyzwany gracz może odrzucić!"
+  },
+  "ui": {
+    "buttons": {
+      "accept_challenge": "Akceptuj Wyzwanie",
+      "decline": "Odrzuć",
+      "rock": "🪨 Kamień",
+      "paper": "📄 Papier",
+      "scissors": "✂️ Nożyce",
+      "play_again": "🔄 Zagraj Ponownie",
+      "joke_image": "🖼️ Obraz",
+      "joke_another": "🔄 Kolejny"
+    },
+    "status": {
+      "waiting_opponent": "Wybrałeś **{choice}**! Oczekiwanie na przeciwnika...",
+      "challenge_declined": "{user} odrzucił wyzwanie.",
+      "choose_move": "Wybierz swój ruch!"
+    }
+  },
+  "games": {
+    "rps": {
+      "challenge_title": "⚔️ **Wyzwanie RPS!**",
+      "challenge_message": "{challenger} wyzywa {opponent} na Kamień Papier Nożyce!\\n\\n{opponent_name}, akceptujesz?",
+      "battle_title": "⚔️ **Bitwa RPS!**",
+      "battle_message": "{challenger} vs {opponent}\\n\\nObaj gracze: wybierzcie ruch!",
+      "results_title": "⚔️ **Wyniki Bitwy RPS!**",
+      "chose": "{user} wybrał **{choice}**",
+      "tie": "🤝 **Remis!**",
+      "winner": "🎉 **{user} wygrywa!**",
+      "you_win": "Wygrywasz! 🎉",
+      "bot_wins": "Wygrywam! 😈",
+      "your_choice": "Wybrałeś **{choice}**. Ja wybrałem **{bot_choice}**.\\n{result}"
+    },
+    "coinflip": {
+      "heads": "Orzeł",
+      "tails": "Reszka",
+      "results": "🪙 **Wyniki:** {results}\\n**Podsumowanie:** {heads} Orzeł, {tails} Reszka"
+    },
+    "dice": {
+      "result": "🎲 Wyrzuciłeś **{result}** (1-{sides})!"
+    },
+    "eightball": {
+      "format": "🎱 **Pytanie:** {question}\\n**Odpowiedź:** {answer}",
+      "responses": [
+        "To pewne.",
+        "Zdecydowanie tak.",
+        "Bez wątpienia.",
+        "Tak - zdecydowanie.",
+        "Możesz na tym polegać.",
+        "Tak to widzę.",
+        "Bardzo możliwe.",
+        "Wygląda dobrze.",
+        "Tak.",
+        "Znaki wskazują na tak.",
+        "Odpowiedź niejasna, spróbuj ponownie.",
+        "Zapytaj później.",
+        "Lepiej teraz nie mówić.",
+        "Nie mogę teraz przewidzieć.",
+        "Skup się i zapytaj ponownie.",
+        "Nie licz na to.",
+        "Moja odpowiedź to nie.",
+        "Moje źródła mówią nie.",
+        "Nie wygląda to dobrze.",
+        "Bardzo wątpliwe."
+      ]
+    },
+    "joke": {
+      "no_jokes_voted": "Jeszcze nie zagłosowano na żadne żarty! Bądź pierwszy!",
+      "leaderboard_title": "🏆 Najlepiej Oceniane Żarty Na Świecie",
+      "leaderboard_footer": "Łączna liczba głosów na świecie: {total}"
+    },
+    "rps_leaderboard": {
+      "title": "🏆 Ranking RPS - {server}",
+      "server_only": "Ta komenda działa tylko na serwerach!"
+    }
+  },
+  "fun": {
+    "ship": {
+      "title": "💗 **Kalkulator Relacji** 💗",
+      "compatibility": "Dopasowanie: **{percentage}%** {emoji}"
+    },
+    "choose": {
+      "no_options": "Podaj jakieś opcje!",
+      "response": "🤔 Wybieram... **{choice}**!"
+    }
+  }
+}

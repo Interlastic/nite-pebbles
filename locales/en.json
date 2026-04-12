@@ -1,0 +1,98 @@
+{
+  "errors": {
+    "not_in_game": "This isn't your game!",
+    "not_challenger": "Only the challenged player can accept!",
+    "already_chose": "You already chose **{choice}**!",
+    "cant_challenge_self": "You can't challenge yourself!",
+    "cant_challenge_bot": "You can't challenge a bot! Use `/rps play` instead.",
+    "not_in_game_play_again": "You weren't even in the game!",
+    "min_coins": "You need to flip at least 1 coin!",
+    "max_coins": "Maximum 20 coins at once!",
+    "dice_min_sides": "A die must have at least 2 sides!",
+    "not_challenger_decline": "Only the challenged player can decline!"
+  },
+  "ui": {
+    "buttons": {
+      "accept_challenge": "Accept Challenge",
+      "decline": "Decline",
+      "rock": "🪨 Rock",
+      "paper": "📄 Paper",
+      "scissors": "✂️ Scissors",
+      "play_again": "🔄 Play Again",
+      "joke_image": "🖼️ Image",
+      "joke_another": "🔄 Another"
+    },
+    "status": {
+      "waiting_opponent": "You chose **{choice}**! Waiting for opponent...",
+      "challenge_declined": "{user} declined the challenge.",
+      "choose_move": "Choose your move!"
+    }
+  },
+  "games": {
+    "rps": {
+      "challenge_title": "⚔️ **RPS Challenge!**",
+      "challenge_message": "{challenger} challenges {opponent} to Rock Paper Scissors!\\n\\n{opponent_name}, do you accept?",
+      "battle_title": "⚔️ **RPS Battle!**",
+      "battle_message": "{challenger} vs {opponent}\\n\\nBoth players: select your move!",
+      "results_title": "⚔️ **RPS Battle Results!**",
+      "chose": "{user} chose **{choice}**",
+      "tie": "🤝 **It's a tie!**",
+      "winner": "🎉 **{user} wins!**",
+      "you_win": "You win! 🎉",
+      "bot_wins": "I win! 😈",
+      "your_choice": "You chose **{choice}**. I chose **{bot_choice}**.\\n{result}"
+    },
+    "coinflip": {
+      "heads": "Heads",
+      "tails": "Tails",
+      "results": "🪙 **Results:** {results}\\n**Summary:** {heads} Heads, {tails} Tails"
+    },
+    "dice": {
+      "result": "🎲 You rolled a **{result}** (1-{sides})!"
+    },
+    "eightball": {
+      "format": "🎱 **Question:** {question}\\n**Answer:** {answer}",
+      "responses": [
+        "It is certain.",
+        "It is decidedly so.",
+        "Without a doubt.",
+        "Yes - definitely.",
+        "You may rely on it.",
+        "As I see it, yes.",
+        "Most likely.",
+        "Outlook good.",
+        "Yes.",
+        "Signs point to yes.",
+        "Reply hazy, try again.",
+        "Ask again later.",
+        "Better not tell you now.",
+        "Cannot predict now.",
+        "Concentrate and ask again.",
+        "Don't count on it.",
+        "My reply is no.",
+        "My sources say no.",
+        "Outlook not so good.",
+        "Very doubtful."
+      ]
+    },
+    "joke": {
+      "no_jokes_voted": "No jokes have been voted on yet! Be the first!",
+      "leaderboard_title": "🏆 Best Rated Jokes Worldwide",
+      "leaderboard_footer": "Total votes cast worldwide: {total}"
+    },
+    "rps_leaderboard": {
+      "title": "🏆 RPS Leaderboard - {server}",
+      "server_only": "This command only works in servers!"
+    }
+  },
+  "fun": {
+    "ship": {
+      "title": "💗 **Relationship Calculator** 💗",
+      "compatibility": "Compatibility: **{percentage}%** {emoji}"
+    },
+    "choose": {
+      "no_options": "Please provide some options!",
+      "response": "🤔 I choose... **{choice}**!"
+    }
+  }
+}

@@ -1,0 +1,6 @@
+# Ignore local test data
+.env
+test_db.json
+test_settings/
+__pycache__/
+*.log
