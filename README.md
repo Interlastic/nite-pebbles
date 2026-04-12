@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-# nite-pebbles
-
-Hi, nite is like cute
-=======
 # Nite Pebbles
 
 Nite Pebbles is the open-source extension library for NiteBot. It’s essentially the playground where we keep the fun commands, modular components, and those extra utilities that give the bot its personality.
@@ -190,4 +185,3 @@ While Nite Pebbles are open-source, it does rely on some closed-source component
 Anything unclear? Open an issue or DM me on Discord (DMs open): @interlastical
 
 > If your pebble or edit needs a custom emoji, DM me on Discord, I'll add it and give you the ID.
->>>>>>> c869c24
