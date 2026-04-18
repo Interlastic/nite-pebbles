@@ -226,7 +226,8 @@ class ModerationSettingsView(ui.LayoutView):
                 
                 img_val = self.cog.emojis.get(feat["emoji_key"], "")
                 if img_val.endswith(".png"):
-                    img_path = Path("/home/interlastic/nitebot/moderation-icons") / img_val
+                    base_path = Path(__file__).parent.parent
+                    img_path = base_path / "moderation-icons" / img_val
                     if img_path.exists():
                         filename = f"thumb_{feat['id']}.png"
                         self.files.append(discord.File(str(img_path), filename=filename))
@@ -491,7 +492,8 @@ class Moderation(commands.Cog):
             pass
 
     def _load_emojis(self):
-        emoji_path = Path("/home/interlastic/nitebot/moderation-icons/emojis.json")
+        base_path = Path(__file__).parent.parent
+        emoji_path = base_path / "moderation-icons" / "emojis.json"
         try:
             with open(emoji_path, "r") as f:
                 return json.load(f)
