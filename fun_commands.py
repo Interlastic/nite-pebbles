@@ -1,5 +1,5 @@
 import discord
-from discord import app_commands
+from discord import app_commands, ui
 from discord.ext import commands
 from typing import Literal, Optional
 import random
@@ -8,8 +8,8 @@ import aiohttp
 import asyncio
 import io
 import json
-from discord.ui import Button, View
 import math
+import pyfiglet
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 
@@ -27,6 +27,7 @@ DATA_DIR = Path(__file__).parent.parent
 PEBBLE_DIR = Path(__file__).parent
 JOKE_STATS_FILE = DATA_DIR / "joke_stats.json"
 RPS_STATS_FILE = DATA_DIR / "rps_stats.json"
+FONTS_INDEX_FILE = PEBBLE_DIR / "ASCII" / "taag-fonts-indexed.json"
 
 
 def load_joke_stats() -> dict:
@@ -524,12 +525,40 @@ class JokeImageView(discord.ui.View):
         )
 
 
+class ASCIIView(ui.LayoutView):
+    """View for displaying ASCII art using Components V2 TextDisplay."""
+
+    def __init__(self, ascii_text: str):
+        super().__init__()
+        # Discord Components V2 allows up to 4k chars in TextDisplay
+        self.add_item(ui.TextDisplay(content=f"```\n{ascii_text}```"))
+
+
 # --- Main Cog ---
 class FunCommands(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.joke_stats = load_joke_stats()
         self.rps_stats = load_rps_stats()
+        self.all_fonts = []
+        self._load_all_fonts()
+
+    def _load_all_fonts(self):
+        """Loads all fonts from TAAG fonts index file."""
+        if FONTS_INDEX_FILE.exists():
+            try:
+                with open(FONTS_INDEX_FILE, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    for category in data.get("byCategory", {}).values():
+                        self.all_fonts.extend(category)
+                # Remove duplicates and sort
+                self.all_fonts = sorted(list(set(self.all_fonts)))
+            except Exception as e:
+                print(f"[Error] Failed to load fonts: {e}")
+        
+        if not self.all_fonts:
+            # Fallback to pyfiglet's own fonts if file fails
+            self.all_fonts = sorted(pyfiglet.FigletFont.getFonts())
 
     # --- Joke Helpers ---
     def track_joke_vote(self, joke_id: str, joke_text: str, upvote: bool):
@@ -702,188 +731,6 @@ class FunCommands(commands.Cog):
             view=view,
             ephemeral=False,
         )
-
-    # --- ASCII Helpers ---
-    def _load_ascii_map(self):
-        map_path = PEBBLE_DIR / "ascii_map.json"
-        if map_path.exists():
-            try:
-                with open(map_path, "r", encoding="utf-8") as f:
-                    return json.load(f)
-            except Exception:
-                pass
-        return None
-
-    def _load_ascii_font(self):
-        font_path = PEBBLE_DIR / "ascii_font.json"
-        if font_path.exists():
-            try:
-                with open(font_path, "r", encoding="utf-8") as f:
-                    return json.load(f)
-            except Exception:
-                pass
-        return None
-
-    def text_to_ascii(self, text: str) -> str:
-        font = self._load_ascii_font()
-        if not font:
-            return "Error: ASCII font file not found."
-            
-        text = text.upper()
-        lines = ["", "", "", "", ""]
-        for char in text:
-            char_lines = font.get(char, ["???", "???", "???", "???", "???"])
-            for i in range(5):
-                lines[i] += char_lines[i] + " "
-        return "\n".join(lines)
-
-    def image_to_ascii(
-        self,
-        img_bytes: bytes,
-        width: int = 40,
-        theme: str = "Dark",
-        experimental: bool = False,
-    ) -> str:
-        if Image is None:
-            return "PIL not installed"
-        try:
-            ascii_map = self._load_ascii_map()
-            with Image.open(io.BytesIO(img_bytes)) as img:
-                # Handle transparency by pasting onto a background
-                if img.mode in ("RGBA", "LA") or (img.mode == "P" and "transparency" in img.info):
-                    bg_color = (255, 255, 255) if theme.lower() == "light" else (0, 0, 0)
-                    if img.mode == "LA":
-                        background = Image.new("L", img.size, bg_color[0])
-                    else:
-                        background = Image.new("RGB", img.size, bg_color)
-                    
-                    # Convert to RGBA to ensure we have an alpha mask
-                    img_rgba = img.convert("RGBA")
-                    background.paste(img_rgba, mask=img_rgba.split()[3])
-                    img = background
-                else:
-                    img = img.convert("RGB")
-
-                # Preprocessing for better ASCII
-                img = ImageOps.autocontrast(img)
-                enhancer = ImageEnhance.Sharpness(img)
-                img = enhancer.enhance(1.5)
-
-                # We need 2x2 blocks for 4-zone mapping, so we resize to width*2
-                target_width = width * 2
-                aspect_ratio = img.height / img.width
-                # Height factor 0.50-0.55 compensates for character aspect ratio
-                target_height = int(target_width * aspect_ratio * 0.50)
-                # Ensure height is even for 2x2 blocks
-                if target_height % 2 != 0:
-                    target_height += 1
-
-                img = img.resize((target_width, target_height)).convert("L")
-                pixels = img.load()
-
-                is_light = theme.lower() == "light"
-                ascii_str = ""
-
-                if ascii_map:
-                    chars = list(ascii_map.keys())
-                    profiles = [ascii_map[c] for c in chars]
-
-                    # Pre-calculate count for performance
-                    n_chars = len(chars)
-
-                    for y in range(0, target_height, 2):
-                        for x in range(0, target_width, 2):
-                            # Get 2x2 block
-                            s_tl = pixels[x, y]
-                            s_tr = pixels[x + 1, y]
-                            s_bl = pixels[x, y + 1]
-                            s_br = pixels[x + 1, y + 1]
-
-                            if is_light:
-                                # In light theme (black on white), dark pixels (0) = dense characters
-                                # So we keep or slightly shift to ensure dark=full ink
-                                s_tl, s_tr, s_bl, s_br = (
-                                    255 - s_tl,
-                                    255 - s_tr,
-                                    255 - s_bl,
-                                    255 - s_br,
-                                )
-
-                            # Optimized search
-                            best_char = " "
-
-                            if experimental:
-                                # Edge detection (Sobel-like for 2x2)
-                                gx = (s_tr + s_br) - (s_tl + s_bl)
-                                gy = (s_bl + s_br) - (s_tl + s_tr)
-                                mag = math.sqrt(gx**2 + gy**2)
-
-                                if mag > 40:  # Edge detected
-                                    angle = math.degrees(math.atan2(gy, gx))
-                                    # Normalize to 0-180
-                                    if angle < 0:
-                                        angle += 180
-
-                                    if angle < 22.5 or angle >= 157.5:
-                                        best_char = "|"
-                                    elif 22.5 <= angle < 67.5:
-                                        best_char = "\\"
-                                    elif 67.5 <= angle < 112.5:
-                                        best_char = "-"
-                                    elif 112.5 <= angle < 157.5:
-                                        best_char = "/"
-                                else:
-                                    # Fill mapping
-                                    # Use a smaller subset for "fills" to keep it clean
-                                    fill_chars = " ._,-=+;:cba!?0123456789$W#@░▒▓█"
-                                    avg = (s_tl + s_tr + s_bl + s_br) / 4
-                                    idx = int((avg / 256) * len(fill_chars))
-                                    best_char = fill_chars[
-                                        min(idx, len(fill_chars) - 1)
-                                    ]
-                            else:
-                                min_dist = float("inf")
-                                # Fast check for nearly empty space
-                                if s_tl < 10 and s_tr < 10 and s_bl < 10 and s_br < 10:
-                                    best_char = " "
-                                else:
-                                    for i in range(n_chars):
-                                        profile = profiles[i]
-                                        dist = (
-                                            (s_tl - profile[0]) ** 2
-                                            + (s_tr - profile[1]) ** 2
-                                            + (s_bl - profile[2]) ** 2
-                                            + (s_br - profile[3]) ** 2
-                                        )
-                                        if dist < min_dist:
-                                            min_dist = dist
-                                            best_char = chars[i]
-
-                            ascii_str += best_char
-                        ascii_str += "\n"
-                else:
-                    # Fallback remains unchanged but with preprocessing
-                    if is_light:
-                        chars = "█▓▒░@#W$9876543210?!abc;:+=-,._ "
-                    else:
-                        chars = " ._,-=+;:cba!?0123456789$W#@░▒▓█"
-
-                    for y in range(0, target_height, 2):
-                        for x in range(0, target_width, 2):
-                            avg = (
-                                pixels[x, y]
-                                + pixels[x + 1, y]
-                                + pixels[x, y + 1]
-                                + pixels[x + 1, y + 1]
-                            ) / 4
-                            index = int((avg / 256) * len(chars))
-                            index = min(index, len(chars) - 1)
-                            ascii_str += chars[index]
-                        ascii_str += "\n"
-
-                return ascii_str
-        except Exception:
-            return "Error generating ASCII"
 
     # --- Commands ---
 
@@ -1208,65 +1055,58 @@ class FunCommands(commands.Cog):
         await interaction.response.send_message(full_text[:2000], ephemeral=False)
 
     @message_group.command(
-        name="ascii", description="Convert text or an image to ASCII art"
+        name="ascii", description="Convert text to ASCII art"
     )
     @app_commands.describe(
         text="The text to convert",
-        image="The image to convert",
-        code_block="Whether to use a code block",
-        theme="ASCII theme (Light or Dark)",
-        experimental="Experimental edge-detection mode",
+        search="Search for a font (default: Standard)",
     )
     @app_commands.allowed_installs(users=True, guilds=True)
     @app_commands.allowed_contexts(dms=True, private_channels=True, guilds=True)
     async def ascii(
         self,
         interaction: discord.Interaction,
-        text: Optional[str] = None,
-        image: Optional[discord.Attachment] = None,
-        code_block: bool = True,
-        theme: Literal["Dark", "Light"] = "Dark",
-        experimental: bool = False,
+        text: str,
+        search: str = "Standard",
     ):
-        if not text and not image:
-            await interaction.response.send_message(
-                "Please provide either text or an image!", ephemeral=True
-            )
+        try:
+            # We use pyfiglet as requested
+            # Normalize common names that might have spaces to what pyfiglet expects if needed
+            font_name = search.lower().replace(" ", "_")
+            try:
+                f = pyfiglet.Figlet(font=font_name)
+            except pyfiglet.FontNotFound:
+                # Try the literal name too
+                try:
+                    f = pyfiglet.Figlet(font=search)
+                except pyfiglet.FontNotFound:
+                    # Fallback
+                    f = pyfiglet.Figlet(font="standard")
+            
+            result = f.renderText(text)
+        except Exception:
+            await interaction.response.send_message("Error generating ASCII.", ephemeral=True)
             return
 
-        result = ""
-        if image:
-            if not image.content_type or not image.content_type.startswith("image"):
-                await interaction.response.send_message(
-                    "The attachment must be an image!", ephemeral=True
-                )
-                return
-            await interaction.response.defer()
-            img_bytes = await image.read()
-            result = self.image_to_ascii(
-                img_bytes, theme=theme, experimental=experimental
-            )
-        else:
-            result = self.text_to_ascii(
-                text[:20]
-            )  # Limit text to prevent massive results
+        # Discord TextDisplay in V2 allows for 4k chars.
+        # If it exceeds, we truncate to keep it within limit.
+        if len(result) > 3900:
+            result = result[:3897] + "..."
 
-        # Format result
-        if code_block:
-            output = f"```\n{result}```"
-        else:
-            # Use leading dots to prevent space stripping
-            output = "\n".join([f".{line}" for line in result.split("\n")])
+        view = ASCIIView(result)
+        await interaction.response.send_message(view=view)
 
-        if len(output) > 2000:
-            output = output[:1997] + "..."
-            if code_block:
-                output += "```"
-
-        if interaction.response.is_done():
-            await interaction.followup.send(output)
-        else:
-            await interaction.response.send_message(output)
+    @ascii.autocomplete("search")
+    async def ascii_autocomplete_handler(
+        self, interaction: discord.Interaction, current: str
+    ) -> list[app_commands.Choice[str]]:
+        """Autocomplete for ASCII fonts."""
+        choices = [
+            app_commands.Choice(name=font, value=font)
+            for font in self.all_fonts
+            if current.lower() in font.lower()
+        ]
+        return choices[:25]
 
     @app_commands.command(
         name="ship", description="Calculate compatibility between two users"
