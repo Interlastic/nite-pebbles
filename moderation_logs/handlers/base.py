@@ -23,10 +23,10 @@ async def send_log_message(bot, guild_id, event_type, content_text, accessory_im
         channel = guild.get_channel(int(channel_id))
         if not channel:
             return
-try:
-    base_path = Path(__file__).parent.parent.parent.parent
-    emoji_path = base_path / "moderation-icons" / "emojis.json"
-    with open(emoji_path, "r") as f:
+
+        base_path = Path(__file__).parent.parent.parent.parent
+        emoji_path = base_path / "moderation-icons" / "emojis.json"
+        with open(emoji_path, "r") as f:
             emojis = json.load(f)
 
         emoji_val = emojis.get(event_type, "")
@@ -84,7 +84,6 @@ try:
         
         if not webhook:
             avatar_val = emojis.get("moderation_png", "moderation.png")
-            base_path = Path(__file__).parent.parent.parent.parent
             avatar_path = base_path / "moderation-icons" / avatar_val
             with open(avatar_path, "rb") as f:
                 webhook = await channel.create_webhook(name="Mod-Logs", avatar=f.read())
