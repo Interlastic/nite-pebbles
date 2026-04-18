@@ -116,7 +116,7 @@ async def handle_reaction_add(bot, reaction, user):
         from ..ui import LoggingFlags
         if not (settings.get("logging_flags_bitfield", 0) & LoggingFlags.REACTION_ADD): return
         lang = settings.get("language", "en")
-        await send_log_message(bot, user.guild.id, "emoji_add", get_string("moderation.logging.event_formats.reaction_add", lang, member=user.mention, emoji=str(reaction.emoji), url=reaction.message.jump_url), action_by=user)
+        await send_log_message(bot, user.guild.id, "reaction_add", get_string("moderation.logging.event_formats.reaction_add", lang, member=user.mention, emoji=str(reaction.emoji), url=reaction.message.jump_url), action_by=user)
     except:
         traceback.print_exc()
 
@@ -127,7 +127,7 @@ async def handle_reaction_remove(bot, reaction, user):
         from ..ui import LoggingFlags
         if not (settings.get("logging_flags_bitfield", 0) & LoggingFlags.REACTION_REMOVE): return
         lang = settings.get("language", "en")
-        await send_log_message(bot, user.guild.id, "emoji_remove", get_string("moderation.logging.event_formats.reaction_remove", lang, member=user.mention, emoji=str(reaction.emoji), url=reaction.message.jump_url), action_by=user)
+        await send_log_message(bot, user.guild.id, "reaction_remove", get_string("moderation.logging.event_formats.reaction_remove", lang, member=user.mention, emoji=str(reaction.emoji), url=reaction.message.jump_url), action_by=user)
     except:
         traceback.print_exc()
 
@@ -138,7 +138,7 @@ async def handle_reaction_clear(bot, message, reactions):
         from ..ui import LoggingFlags
         if not (settings.get("logging_flags_bitfield", 0) & LoggingFlags.REACTION_REMOVE): return
         lang = settings.get("language", "en")
-        await send_log_message(bot, message.guild.id, "emoji_remove", get_string("moderation.logging.event_formats.reaction_clear", lang, url=message.jump_url))
+        await send_log_message(bot, message.guild.id, "reaction_remove", get_string("moderation.logging.event_formats.reaction_clear", lang, url=message.jump_url))
     except:
         traceback.print_exc()
 
@@ -149,7 +149,7 @@ async def handle_reaction_clear_emoji(bot, reaction):
         from ..ui import LoggingFlags
         if not (settings.get("logging_flags_bitfield", 0) & LoggingFlags.REACTION_REMOVE): return
         lang = settings.get("language", "en")
-        await send_log_message(bot, reaction.message.guild.id, "emoji_remove", get_string("moderation.logging.event_formats.reaction_emoji_clear", lang, emoji=str(reaction.emoji), url=reaction.message.jump_url))
+        await send_log_message(bot, reaction.message.guild.id, "reaction_remove", get_string("moderation.logging.event_formats.reaction_emoji_clear", lang, emoji=str(reaction.emoji), url=reaction.message.jump_url))
     except:
         traceback.print_exc()
 
