@@ -260,8 +260,8 @@
         "sound_remove": "Soundboard Deleted"
       },
       "event_titles": {
-        "message_create": "Message Sent",
-        "message_add": "Message Edited",
+        "message_add": "Message Sent",
+        "message_update": "Message Edited",
         "message_remove": "Message Deleted",
         "member_add": "Member Joined",
         "member_remove": "Member Left",
@@ -295,7 +295,9 @@
         "message_unpin": "Message Unpinned",
         "bulk_message_delete": "Bulk Message Deletion",
         "poll_vote_add": "Vote Added",
-        "poll_vote_remove": "Vote Removed"
+        "poll_vote_remove": "Vote Removed",
+        "reaction_add": "Reacted on Message",
+        "reaction_remove": "Reaction Removed"
       },
       "event_formats": {
         "action_by": "**Action by**: {mention}",

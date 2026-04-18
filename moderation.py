@@ -464,7 +464,7 @@ class Moderation(commands.Cog):
                 if context_message:
                     ctx_content = context_message.clean_content
                     if len(ctx_content) > 100: ctx_content = ctx_content[:97] + "..."
-                    container_items.append(ui.TextDisplay(content=f"### Message that the Moderator {action_type[:-2]} you on:\n> {ctx_content}"))
+                    container_items.append(ui.TextDisplay(content=f"### Message that the Moderator {action_type} you on:\n> {ctx_content}"))
 
                 if last_messages:
                     history_text = "### Your last messages in the channel:\n" + "\n".join(reversed(last_messages))

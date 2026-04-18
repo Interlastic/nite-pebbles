@@ -260,8 +260,8 @@
         "sound_remove": "Soundboard usunięty"
       },
       "event_titles": {
-        "message_create": "Wiadomość wysłana",
-        "message_add": "Wiadomość edytowana",
+        "message_add": "Wiadomość wysłana",
+        "message_update": "Wiadomość edytowana",
         "message_remove": "Wiadomość usunięta",
         "member_add": "Członek dołączył",
         "member_remove": "Członek opuścił",
@@ -295,7 +295,9 @@
         "message_unpin": "Odpięto wiadomość",
         "bulk_message_delete": "Masowe usuwanie wiadomości",
         "poll_vote_add": "Głos dodany",
-        "poll_vote_remove": "Głos usunięty"
+        "poll_vote_remove": "Głos usunięty",
+        "reaction_add": "Reakcja na wiadomość",
+        "reaction_remove": "Usunięto reakcję"
       },
       "event_formats": {
         "action_by": "**Działanie przez**: {mention}",

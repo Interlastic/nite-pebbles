@@ -260,8 +260,8 @@
         "sound_remove": "Soundboard gelöscht"
       },
       "event_titles": {
-        "message_create": "Nachricht gesendet",
-        "message_add": "Nachricht bearbeitet",
+        "message_add": "Nachricht gesendet",
+        "message_update": "Nachricht bearbeitet",
         "message_remove": "Nachricht gelöscht",
         "member_add": "Mitglied beigetreten",
         "member_remove": "Mitglied verlassen",
@@ -295,7 +295,9 @@
         "message_unpin": "Anheftung aufgehoben",
         "bulk_message_delete": "Massen-Nachrichtenlöschung",
         "poll_vote_add": "Abstimmung hinzugefügt",
-        "poll_vote_remove": "Abstimmung entfernt"
+        "poll_vote_remove": "Abstimmung entfernt",
+        "reaction_add": "Auf Nachricht reagiert",
+        "reaction_remove": "Reaktion entfernt"
       },
       "event_formats": {
         "action_by": "**Aktion von**: {mention}",

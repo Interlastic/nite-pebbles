@@ -19,7 +19,7 @@ async def handle_message_create(bot, message):
         content += get_string("moderation.logging.event_formats.attachments", lang, urls=urls)
         
     await send_log_message(
-        bot, message.guild.id, "message_create",
+        bot, message.guild.id, "message_add",
         content,
         accessory_img=message.author.display_avatar.url
     )
@@ -71,7 +71,7 @@ async def handle_message_edit(bot, before, after):
 
     lang = settings.get("language", "en")
     await send_log_message(
-        bot, after.guild.id, "message_add",
+        bot, after.guild.id, "message_update",
         get_string("moderation.logging.event_formats.message_edit", lang, author=after.author.mention, channel=after.channel.mention, before=before.content, after=after.content),
         accessory_img=after.author.display_avatar.url
     )
