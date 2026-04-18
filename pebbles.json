@@ -2,7 +2,15 @@
   "entries": [
     {
       "extension_file": "fun_commands",
-      "dependencies": ["aiohttp", "playwright", "Jinja2", "Pillow"]
+      "dependencies": ["aiohttp", "playwright", "Jinja2", "Pillow", "pyfiglet"]
+    },
+    {
+      "extension_file": "moderation",
+      "dependencies": ["rapidfuzz"]
+    },
+    {
+      "extension_file": "moderation_logs.entry",
+      "dependencies": []
     }
   ]
 }
