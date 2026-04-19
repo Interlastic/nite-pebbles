@@ -119,7 +119,7 @@
         "title": "## Prefix Guide",
         "description": "View a list of all moderation prefix commands and how to use them.",
         "button": "View Guide",
-        "content": "# Moderation Prefix Guide\nUse `{prefix}[command]` to moderate users quickly.\n\n### Commands & Shortcuts:\n- `ban`: Ban a user\n- `kick` / `kk`: Kick a user\n- `timeout` / `to`: Timeout a user\n- `unban` / `uban`: Unban a user\n- `untimeout` / `uto`: Remove timeout\n\n### How to use:\n- **Standard**: `{prefix}timeout @user 1d Reason`\n- **Fuzzy**: `{prefix}timeout Aleks 1d Reason` (Shows a menu if multiple matches)\n- **Reply**: Reply to a message with `{prefix}timeout 1d Reason` to target that user.\n\n### Tips:\n- Time units: `s`, `m`, `h`, `d`, `w` (e.g. `3d` = 3 days).\n- You can use User IDs instead of mentions."
+        "content": "# Moderation Prefix Guide\nUse `{prefix}[command]` to moderate users quickly.\n\n### Commands & Shortcuts:\n- `ban`: Ban a user\n- `softban` / `sb`: Kick + delete messages\n- `kick` / `kk`: Kick a user\n- `timeout` / `to`: Timeout a user\n- `unban` / `uban`: Unban a user\n- `untimeout` / `uto`: Remove timeout\n\n### How to use:\n- **Standard**: `{prefix}timeout @user 1d Reason`\n- **Fuzzy**: `{prefix}timeout Aleks 1d Reason` (Shows a menu if multiple matches)\n- **Reply**: Reply to a message with `{prefix}timeout 1d Reason` to target that user.\n\n### Tips:\n- Time units: `s`, `m`, `h`, `d`, `w` (e.g. `3d` = 3 days).\n- You can use User IDs instead of mentions."
       },
       "dm_message": {
         "title": "## DM Message",
@@ -272,6 +272,7 @@
         "guild_update": "Guild Updated",
         "timeout": "Member Timeout",
         "ban": "Member Banned",
+        "softban": "Member Softbanned",
         "unban": "Member Unbanned",
         "kick": "Member Kicked",
         "bot_update": "Webhooks Updated",
@@ -311,6 +312,7 @@
         "member_remove": "**{name}** left the server.",
         "member_kick": "Member kicked: {member} (`{id}`)\nReason: **{reason}**",
         "member_ban": "Member banned: {member} (`{id}`)\\nReason: **{reason}**",
+        "member_softban": "Member softbanned: {member} (`{id}`)\\nReason: **{reason}**",
         "member_unban": "Member unbanned: {member} (`{id}`)\\nReason: **{reason}**",
         "member_timeout": "Member timed out until <t:{until}:f>\\nReason: **{reason}**",
         "member_untimeout": "Member timeout removed.\\nReason: **{reason}**",

@@ -119,7 +119,7 @@
         "title": "## Präfix-Leitfaden",
         "description": "Zeige eine Liste aller Moderations-Präfix-Befehle und deren Verwendung an.",
         "button": "Leitfaden anzeigen",
-        "content": "# Moderations-Präfix-Leitfaden\nVerwende `{prefix}[Befehl]`, um Mitglieder schnell zu moderieren.\n\n### Befehle & Kürzel:\n- `ban`: Mitglied bannen\n- `kick` / `kk`: Mitglied kicken\n- `timeout` / `to`: Mitglied stummschalten\n- `unban` / `uban`: Bann aufheben\n- `untimeout` / `uto`: Stummschaltung aufheben\n\n### Verwendung:\n- **Standard**: `{prefix}timeout @Mitglied 1d Grund`\n- **Fuzzy**: `{prefix}timeout Aleks 1d Grund` (Zeigt ein Menü bei mehreren Treffern)\n- **Antwort**: Antworte auf eine Nachricht mit `{prefix}timeout 1d Grund`, um dieses Mitglied zu wählen.\n\n### Tipps:\n- Zeiteinheiten: `s`, `m`, `h`, `d`, `w` (z.B. `3d` = 3 Tage).\n- Du kannst Benutzer-IDs anstelle von Erwähnungen verwenden."
+        "content": "# Moderations-Präfix-Leitfaden\nVerwende `{prefix}[Befehl]`, um Mitglieder schnell zu moderieren.\n\n### Befehle & Kürzel:\n- `ban`: Mitglied bannen\n- `softban` / `sb`: Kick + Nachrichten löschen\n- `kick` / `kk`: Mitglied kicken\n- `timeout` / `to`: Mitglied stummschalten\n- `unban` / `uban`: Bann aufheben\n- `untimeout` / `uto`: Stummschaltung aufheben\n\n### Verwendung:\n- **Standard**: `{prefix}timeout @Mitglied 1d Grund`\n- **Fuzzy**: `{prefix}timeout Aleks 1d Grund` (Zeigt ein Menü bei mehreren Treffern)\n- **Antwort**: Antworte auf eine Nachricht mit `{prefix}timeout 1d Grund`, um dieses Mitglied zu wählen.\n\n### Tipps:\n- Zeiteinheiten: `s`, `m`, `h`, `d`, `w` (z.B. `3d` = 3 Tage).\n- Du kannst Benutzer-IDs anstelle von Erwähnungen verwenden."
       },
       "dm_message": {
         "title": "## DM-Nachricht",
@@ -272,6 +272,7 @@
         "guild_update": "Server aktualisiert",
         "timeout": "Mitglied-Timeout",
         "ban": "Mitglied gebannt",
+        "softban": "Mitglied softgebannt",
         "unban": "Mitglied entbannt",
         "kick": "Mitglied gekickt",
         "bot_update": "Webhooks aktualisiert",
@@ -311,6 +312,7 @@
         "member_remove": "**{name}** hat den Server verlassen.",
         "member_kick": "Mitglied gekickt: {member} (`{id}`)\\nGrund: **{reason}**",
         "member_ban": "Mitglied gebannt: {member} (`{id}`)\\nGrund: **{reason}**",
+        "member_softban": "Mitglied softgebannt: {member} (`{id}`)\\nGrund: **{reason}**",
         "member_unban": "Mitglied entbannt: {member} (`{id}`)\\nGrund: **{reason}**",
         "member_timeout": "Mitglied stummgeschaltet bis <t:{until}:f>\\nGrund: **{reason}**",
         "member_untimeout": "Stummschaltung aufgehoben.\\nGrund: **{reason}**",

@@ -119,7 +119,7 @@
         "title": "## Przewodnik po prefiksach",
         "description": "Zobacz listę wszystkich komend moderacyjnych z prefiksem i sposób ich użycia.",
         "button": "Zobacz przewodnik",
-        "content": "# Przewodnik po prefiksach moderacji\nUżyj `{prefix}[komenda]`, aby szybko moderować członków.\n\n### Komendy i skróty:\n- `ban`: Zbanuj członka\n- `kick` / `kk`: Wyrzuć członka\n- `timeout` / `to`: Wycisz członka\n- `unban` / `uban`: Odbanuj członka\n- `untimeout` / `uto`: Zdejmij wyciszenie\n\n### Jak używać:\n- **Standardowo**: `{prefix}timeout @członek 1d Powód`\n- **Fuzzy**: `{prefix}timeout Aleks 1d Powód` (Pokazuje menu przy wielu dopasowaniach)\n- **Odpowiedź**: Odpowiedz na wiadomość wpisując `{prefix}timeout 1d Powód`, aby wybrać tego członka.\n\n### Wskazówki:\n- Jednostki czasu: `s`, `m`, `h`, `d`, `w` (np. `3d` = 3 dni).\n- Możesz używać ID użytkownika zamiast wzmianek."
+        "content": "# Przewodnik po prefiksach moderacji\nUżyj `{prefix}[komenda]`, aby szybko moderować członków.\n\n### Komendy i skróty:\n- `ban`: Zbanuj członka\n- `softban` / `sb`: Wyrzuć + usuń wiadomości\n- `kick` / `kk`: Wyrzuć członka\n- `timeout` / `to`: Wycisz członka\n- `unban` / `uban`: Odbanuj członka\n- `untimeout` / `uto`: Zdejmij wyciszenie\n\n### Jak używać:\n- **Standardowo**: `{prefix}timeout @członek 1d Powód`\n- **Fuzzy**: `{prefix}timeout Aleks 1d Powód` (Pokazuje menu przy wielu dopasowaniach)\n- **Odpowiedź**: Odpowiedz na wiadomość wpisując `{prefix}timeout 1d Powód`, aby wybrać tego członka.\n\n### Wskazówki:\n- Jednostki czasu: `s`, `m`, `h`, `d`, `w` (np. `3d` = 3 dni).\n- Możesz używać ID użytkownika zamiast wzmianek."
       },
       "dm_message": {
         "title": "## Wiadomość DM",
@@ -272,6 +272,7 @@
         "guild_update": "Serwer zaktualizowany",
         "timeout": "Timeout członka",
         "ban": "Członek zbanowany",
+        "softban": "Członek soft-zbanowany",
         "unban": "Członek odbanowany",
         "kick": "Członek wyrzucony",
         "bot_update": "Webhooki zaktualizowane",
@@ -311,6 +312,7 @@
         "member_remove": "**{name}** opuścił serwer.",
         "member_kick": "Członek wyrzucony: {member} (`{id}`)\\nPowód: **{reason}**",
         "member_ban": "Członek zbanowany: {member} (`{id}`)\\nPowód: **{reason}**",
+        "member_softban": "Członek soft-zbanowany: {member} (`{id}`)\\nPowód: **{reason}**",
         "member_unban": "Członek odbanowany: {member} (`{id}`)\\nPowód: **{reason}**",
         "member_timeout": "Członek wyciszony do <t:{until}:f>\\nPowód: **{reason}**",
         "member_untimeout": "Zdjęto wyciszenie.\\nPowód: **{reason}**",

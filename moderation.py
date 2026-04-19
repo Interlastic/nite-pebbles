@@ -339,6 +339,8 @@ class ModerationErrorView(ui.LayoutView):
         async def retry_callback(interaction):
             if action_type == "ban":
                 await cog.perform_ban(interaction, user, reason, extra_data, attempt + 1, edit=True)
+            elif action_type == "softban":
+                await cog.perform_softban(interaction, user, reason, extra_data, attempt + 1, edit=True)
             elif action_type == "kick":
                 await cog.perform_kick(interaction, user, reason, attempt + 1, edit=True)
             elif action_type == "timeout":
@@ -607,6 +609,48 @@ class Moderation(commands.Cog):
         except Exception as e:
             await self.send_mod_error(interaction, "ban", user, str(e), attempt, reason, delete_messages, edit)
 
+    @moderation_group.command(name="softban", description="Ban and instantly unban a user to clear their messages")
+    @app_commands.describe(user="The user to softban", reason="Reason for the softban", delete_messages="How much of their message history to delete")
+    @app_commands.choices(delete_messages=[
+        app_commands.Choice(name="Previous 24 hours", value="86400"),
+        app_commands.Choice(name="Previous 7 days", value="604800"),
+    ])
+    async def softban(self, interaction: discord.Interaction, user: discord.Member, reason: str = None, delete_messages: str = "86400"):
+        await self.perform_softban(interaction, user, reason, delete_messages)
+
+    async def perform_softban(self, interaction, user, reason, delete_messages="86400", attempt=1, edit=False):
+        if not edit: await interaction.response.defer(ephemeral=False)
+        
+        allowed, error = await self.check_hierarchy(interaction, user, "softban")
+        if not allowed: return await self.send_mod_error(interaction, "softban", user, error, attempt, reason, delete_messages, edit)
+        if not interaction.guild.me.guild_permissions.ban_members:
+            return await self.send_mod_error(interaction, "softban", user, "I do not have the required permissions to execute this.", attempt, reason, delete_messages, edit)
+
+        try:
+            # Try to notify user first
+            ctx_msg = None
+            if hasattr(interaction, "message_ref"):
+                ctx_msg = interaction.message_ref
+            elif isinstance(interaction, self.MockInteraction) and hasattr(interaction, "orig_message") and interaction.orig_message.reference:
+                ctx_msg = interaction.orig_message.reference.resolved
+
+            await self.notify_user_moderation(interaction, user, "softbanned", reason, context_message=ctx_msg)
+
+            audit_reason = self._get_audit_reason(interaction, reason)
+            # Ban
+            await interaction.guild.ban(user, reason=f"[SOFTBAN] {audit_reason}", delete_message_seconds=int(delete_messages))
+            # Unban
+            await interaction.guild.unban(user, reason=f"[SOFTBAN] Completed")
+            
+            view = ModerationSuccessView(self, self.emojis.get('ban', ''), "softbanned", user, self.sanitize(reason), interaction.user, attempt)
+            await self.do_mod_response(interaction, view, edit)
+            
+            # Log softban specifically
+            from .moderation_logs.handlers.base import send_log_message
+            await send_log_message(self.bot, interaction.guild.id, "softban", f"Member softbanned: {user.mention} (`{user.id}`)\nReason: **{reason or 'No reason provided'}**", accessory_img=user.display_avatar.url, action_by=interaction.user)
+        except Exception as e:
+            await self.send_mod_error(interaction, "softban", user, str(e), attempt, reason, delete_messages, edit)
+
     @moderation_group.command(name="unban", description="Unban a user from the server")
     @app_commands.describe(username="The user to unban (autocomplete)", reason="Reason for the unban")
     async def unban(self, interaction: discord.Interaction, username: str, reason: str = None):
@@ -782,18 +826,20 @@ class Moderation(commands.Cog):
                     "to": "timeout",
                     "kk": "kick",
                     "uban": "unban",
-                    "uto": "untimeout"
+                    "uto": "untimeout",
+                    "sb": "softban"
                 }
                 if cmd in shortcuts:
                     cmd = shortcuts[cmd]
 
                 # Check if cmd is a moderation command
-                mod_cmds = ["ban", "unban", "kick", "timeout", "untimeout"]
+                mod_cmds = ["ban", "unban", "kick", "timeout", "untimeout", "softban"]
                 if cmd not in mod_cmds: return
                 
                 # Check permissions
                 perms = message.author.guild_permissions
                 if cmd == "ban" and not perms.ban_members: return
+                if cmd == "softban" and not perms.ban_members: return
                 if cmd == "unban" and not perms.ban_members: return
                 if cmd == "kick" and not perms.kick_members: return
                 if cmd in ["timeout", "untimeout"] and not perms.moderate_members: return
@@ -862,6 +908,7 @@ class Moderation(commands.Cog):
                             # Show dropdown
                             action_func = {
                                 "ban": self.perform_ban,
+                                "softban": self.perform_softban,
                                 "unban": self.perform_unban,
                                 "kick": self.perform_kick,
                                 "timeout": self.perform_timeout,
@@ -899,6 +946,7 @@ class Moderation(commands.Cog):
                     mock_inter = self.MockInteraction(message, self.bot)
                     mock_inter.orig_message = message # Pass for context
                     if cmd == "ban": await self.perform_ban(mock_inter, target_user, reason, "0")
+                    elif cmd == "softban": await self.perform_softban(mock_inter, target_user, reason, "86400")
                     elif cmd == "unban": await self.perform_unban(mock_inter, target_user, reason)
                     elif cmd == "kick": await self.perform_kick(mock_inter, target_user, reason)
                     elif cmd == "timeout": await self.perform_timeout(mock_inter, target_user, duration, reason)
