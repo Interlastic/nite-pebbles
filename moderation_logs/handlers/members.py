@@ -62,7 +62,8 @@ async def handle_member_update(bot, before, after):
         if before.timed_out_until != after.timed_out_until and (flags & LoggingFlags.MEMBER_BAN_UNBAN):
             if after.guild.me.guild_permissions.view_audit_log:
                 async for entry in after.guild.audit_logs(limit=1, action=discord.AuditLogAction.member_update):
-                    if entry.target.id == after.id:
+                    time_diff = (utcnow() - entry.created_at).total_seconds()
+                    if entry.target.id == after.id and time_diff < 10:
                         action_by = entry.user
                         reason = entry.reason or "**No Reason**"
                         break
@@ -97,7 +98,8 @@ async def handle_member_update(bot, before, after):
 
         if after.guild.me.guild_permissions.view_audit_log:
             async for entry in after.guild.audit_logs(limit=1, action=discord.AuditLogAction.member_update):
-                if entry.target.id == after.id:
+                time_diff = (utcnow() - entry.created_at).total_seconds()
+                if entry.target.id == after.id and time_diff < 10:
                     action_by = entry.user
                     break
 
@@ -119,7 +121,8 @@ async def handle_member_remove(bot, member):
 
         if member.guild.me.guild_permissions.view_audit_log:
             async for entry in member.guild.audit_logs(limit=1, action=discord.AuditLogAction.kick):
-                if entry.target.id == member.id:
+                time_diff = (utcnow() - entry.created_at).total_seconds()
+                if entry.target.id == member.id and time_diff < 10:
                     action_by = entry.user
                     event_type = "kick"
                     content = get_string("moderation.logging.event_formats.member_kick", lang, member=member.mention, id=member.id, reason=entry.reason or "None")
