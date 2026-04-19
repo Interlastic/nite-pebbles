@@ -146,11 +146,35 @@ To make NiteBot load your extension on startup, add it to the `entries` list in 
   "entries": [
     {
       "extension_file": "my_extension",
-      "dependencies": ["some-pip-package"]
+      "name": "My Pebble Name",
+      "description": "A short summary of what this pebble does.",
+      "dependencies": ["some-pip-package"],
+      "credits": {
+        "Creators": [
+          { 
+            "name": "Your Name", 
+            "contributions": "Initial creation",
+            "github": "your_github_username",
+            "discord": "your_discord_id",
+            "custom": "Your custom status"
+          }
+        ],
+        "Contributers": []
+      }
     }
   ]
 }
 ```
+
+## Pebble Credits
+
+Nite Pebbles tracks contributions at a modular level. Every contributor is recognized for their specific work, which is visible in Discord via the `/help -> Credits` menu.
+
+To add or update credits, edit the `credits` object within `pebbles.json`. It supports:
+- **Creators**: Those who designed the initial logic and architecture.
+- **Contributers**: Those who added features, fixed bugs, or improved the UI.
+
+Each entry must include a `name` and a short summary of the `contributions`.
 
 ---
 
