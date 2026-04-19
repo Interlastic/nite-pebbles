@@ -41,6 +41,13 @@ class FuzzyUserSelect(ui.LayoutView):
         )
         self.add_item(container)
 
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        initiator = self.orig_message.author if self.orig_message else None
+        if initiator and interaction.user.id != initiator.id:
+            await interaction.response.send_message("This menu is not for you.", ephemeral=True)
+            return False
+        return True
+
     async def select_callback(self, interaction: discord.Interaction):
         user_id = int(interaction.data["values"][0])
         user = interaction.guild.get_member(user_id) or await self.cog.bot.fetch_user(user_id)
@@ -140,6 +147,12 @@ class ModerationSettingsView(ui.LayoutView):
         ]
         self.items_per_page = 5
         self.total_pages = (len(self.features) + self.items_per_page - 1) // self.items_per_page if self.features else 1
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.id != self.user.id:
+            await interaction.response.send_message("This menu is not for you.", ephemeral=True)
+            return False
+        return True
 
     async def build(self):
         try:
@@ -286,6 +299,7 @@ class ModerationSettingsView(ui.LayoutView):
 class ModerationSuccessView(ui.LayoutView):
     def __init__(self, cog, emoji, action_text, user, clean_reason, initiator, attempt=1, button_label=None, button_emoji=None):
         super().__init__(timeout=None)
+        self.initiator = initiator
         
         title = f"# {emoji} Successfully {action_text}"
         if attempt > 1:
@@ -318,9 +332,16 @@ class ModerationSuccessView(ui.LayoutView):
         container = ui.Container(*container_items, accent_colour=discord.Colour.red() if "ban" in action_text or "kick" in action_text else discord.Colour.orange())
         self.add_item(container)
 
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.id != self.initiator.id:
+            await interaction.response.send_message("This menu is not for you.", ephemeral=True)
+            return False
+        return True
+
 class ModerationErrorView(ui.LayoutView):
-    def __init__(self, cog, emoji, action_type, user, error_msg, attempt=1, reason=None, extra_data=None):
+    def __init__(self, cog, emoji, action_type, user, error_msg, initiator, attempt=1, reason=None, extra_data=None):
         super().__init__(timeout=None)
+        self.initiator = initiator
         
         title = f"# {emoji} Error"
         if attempt > 1:
@@ -372,6 +393,12 @@ class ModerationErrorView(ui.LayoutView):
             row.add_item(timeout_btn)
 
         self.add_item(row)
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.id != self.initiator.id:
+            await interaction.response.send_message("This menu is not for you.", ephemeral=True)
+            return False
+        return True
 
 class Moderation(commands.Cog):
     def __init__(self, bot):
@@ -803,7 +830,7 @@ class Moderation(commands.Cog):
             await self.send_mod_error(interaction, "untimeout", user, str(e), attempt, reason, edit=edit)
 
     async def send_mod_error(self, interaction, action_type, user, error_msg, attempt, reason, extra_data=None, edit=False):
-        view = ModerationErrorView(self, self.emojis.get('error', ''), action_type, user, error_msg, attempt, reason, extra_data)
+        view = ModerationErrorView(self, self.emojis.get('error', ''), action_type, user, error_msg, interaction.user, attempt, reason, extra_data)
         await self.do_mod_response(interaction, view, edit)
 
     @commands.Cog.listener()
