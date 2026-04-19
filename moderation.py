@@ -646,8 +646,11 @@ class Moderation(commands.Cog):
             await self.do_mod_response(interaction, view, edit)
             
             # Log softban specifically
-            from .moderation_logs.handlers.base import send_log_message
-            await send_log_message(self.bot, interaction.guild.id, "softban", f"Member softbanned: {user.mention} (`{user.id}`)\nReason: **{reason or 'No reason provided'}**", accessory_img=user.display_avatar.url, action_by=interaction.user)
+            try:
+                from moderation_logs.handlers.base import send_log_message
+                await send_log_message(self.bot, interaction.guild.id, "softban", f"Member softbanned: {user.mention} (`{user.id}`)\nReason: **{reason or 'No reason provided'}**", accessory_img=user.display_avatar.url, action_by=interaction.user)
+            except Exception as log_err:
+                print(f"[Moderation] Error logging softban: {log_err}")
         except Exception as e:
             await self.send_mod_error(interaction, "softban", user, str(e), attempt, reason, delete_messages, edit)
 
