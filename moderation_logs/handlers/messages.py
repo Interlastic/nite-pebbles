@@ -37,7 +37,9 @@ async def handle_message_delete(bot, message):
     reason = "**No Reason**"
     if message.guild.me.guild_permissions.view_audit_log:
         async for entry in message.guild.audit_logs(limit=1, action=discord.AuditLogAction.message_delete):
-            if entry.target.id == message.author.id:
+            # Check if entry is for this user and is recent (within 10 seconds)
+            time_diff = (datetime.datetime.now(datetime.timezone.utc) - entry.created_at).total_seconds()
+            if entry.target.id == message.author.id and time_diff < 10:
                 action_by = entry.user
                 reason = entry.reason or "**No Reason**"
                 break

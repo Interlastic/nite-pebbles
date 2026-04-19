@@ -1,6 +1,7 @@
 import discord
 from .base import send_log_message
 from locales import get_string
+from discord.utils import utcnow
 import traceback
 
 async def handle_member_ban(bot, guild, user):
