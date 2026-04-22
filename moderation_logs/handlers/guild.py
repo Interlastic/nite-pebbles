@@ -69,7 +69,18 @@ async def handle_role_create(bot, role):
                     reason = entry.reason or "**No Reason**"
                     break
 
-        await send_log_message(bot, role.guild.id, "role_add", get_string("moderation.logging.event_formats.role_create", lang, role=role.mention, id=role.id, reason=reason), action_by=action_by)
+        settings_list = []
+        settings_list.append(f"Color: **{role.color}**")
+        settings_list.append(f"Hoist: **{role.hoist}**")
+        settings_list.append(f"Mentionable: **{role.mentionable}**")
+        
+        # Simple permissions summary - count of enabled permissions
+        perm_count = sum(1 for name, value in role.permissions if value)
+        settings_list.append(f"Permissions: **{perm_count}** enabled")
+
+        settings_str = ", ".join(settings_list)
+
+        await send_log_message(bot, role.guild.id, "role_add", get_string("moderation.logging.event_formats.role_create", lang, role=role.mention, id=role.id, reason=reason, settings=settings_str), action_by=action_by)
     except:
         traceback.print_exc()
 
@@ -121,7 +132,7 @@ async def handle_role_update(bot, before, after):
                     reason = entry.reason or "**No Reason**"
                     break
 
-        content = "\n".join(changes)
+        content = f"Role: {after.mention}\n" + "\n".join(changes)
         content += f"\nReason: **{reason}**"
 
         await send_log_message(bot, after.guild.id, "role_update", content, action_by=action_by)

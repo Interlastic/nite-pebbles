@@ -12,7 +12,7 @@ async def handle_message_create(bot, message):
     if not (flags & LoggingFlags.MESSAGE_CREATE): return
     
     lang = settings.get("language", "en")
-    content = f"Message by {message.author.mention} in {message.channel.mention}\n**Content**: {message.content or '[No Content]'}"
+    content = get_string("moderation.logging.event_formats.message_create", lang, author=message.author.mention, channel=message.channel.mention, content=message.content or '[No Content]', url=message.jump_url)
     
     if message.attachments:
         urls = ", ".join([f"[{a.filename}]({a.url})" for a in message.attachments])
@@ -44,7 +44,7 @@ async def handle_message_delete(bot, message):
                 reason = entry.reason or "**No Reason**"
                 break
 
-    full_content = get_string("moderation.logging.event_formats.message_delete", lang, author=message.author.mention, channel=message.channel.mention, content=content_text)
+    full_content = get_string("moderation.logging.event_formats.message_delete", lang, author=message.author.mention, channel=message.channel.mention, content=content_text, url=message.channel.jump_url)
     full_content += f"\nReason: **{reason}**"
     
     if message.attachments:
@@ -74,7 +74,7 @@ async def handle_message_edit(bot, before, after):
     lang = settings.get("language", "en")
     await send_log_message(
         bot, after.guild.id, "message_update",
-        get_string("moderation.logging.event_formats.message_edit", lang, author=after.author.mention, channel=after.channel.mention, before=before.content, after=after.content),
+        get_string("moderation.logging.event_formats.message_edit", lang, author=after.author.mention, channel=after.channel.mention, before=before.content, after=after.content, url=after.jump_url),
         accessory_img=after.author.display_avatar.url
     )
 

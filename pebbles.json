@@ -1,27 +1,29 @@
 {
+  "people": {
+    "inter": {
+      "name": "Inter",
+      "github": "interlastic",
+      "discord": "1300502920613335162",
+      "custom": ""
+    }
+  },
   "entries": [
     {
       "extension_file": "fun_commands",
       "name": "Fun Commands",
-      "description": "Some fun commands to play around with",
+      "description": "",
       "dependencies": ["aiohttp", "playwright", "Jinja2", "Pillow", "pyfiglet"],
       "credits": {
         "Creators": [
           {
-            "name": "Inter",
-            "contributions": "Base",
-            "github": "interlastic",
-            "discord": "1300502920613335162",
-            "custom": "Hi"
+            "id": "inter",
+            "contributions": "Base"
           }
         ],
         "Contributers": [
           {
-            "name": "Inter",
-            "contributions": "Base",
-            "github": "interlastic",
-            "discord": "1300502920613335162",
-            "custom": "Hi"
+            "id": "inter",
+            "contributions": "Base"
           }
         ]
       }
@@ -29,25 +31,19 @@
     {
       "extension_file": "moderation",
       "name": "Moderation",
-      "description": "Moderation commands (e.g. ban) + menu for configuring moderation stuff",
+      "description": "",
       "dependencies": ["rapidfuzz"],
       "credits": {
         "Creators": [
           {
-            "name": "Inter",
-            "contributions": "Base",
-            "github": "interlastic",
-            "discord": "1300502920613335162",
-            "custom": ""
+            "id": "inter",
+            "contributions": "Base"
           }
         ],
         "Contributers": [
           {
-            "name": "Inter",
-            "contributions": "Base",
-            "github": "interlastic",
-            "discord": "1300502920613335162",
-            "custom": ""
+            "id": "inter",
+            "contributions": "Base"
           }
         ]
       }
@@ -55,25 +51,19 @@
     {
       "extension_file": "moderation_logs.entry",
       "name": "Moderation Logs",
-      "description": "Logs almost every event Discord sends to the bot about the server.",
+      "description": "",
       "dependencies": [],
       "credits": {
         "Creators": [
           {
-            "name": "Inter",
-            "contributions": "Base",
-            "github": "interlastic",
-            "discord": "1300502920613335162",
-            "custom": ""
+            "id": "inter",
+            "contributions": "Base"
           }
         ],
         "Contributers": [
           {
-            "name": "Inter",
-            "contributions": "Base",
-            "github": "interlastic",
-            "discord": "1300502920613335162",
-            "custom": ""
+            "id": "inter",
+            "contributions": "Base"
           }
         ]
       }
