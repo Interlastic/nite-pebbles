@@ -105,7 +105,13 @@ async def handle_automod_action(bot, execution):
         from ..ui import LoggingFlags
         if not (settings.get("logging_flags_bitfield", 0) & LoggingFlags.AUTO_MOD): return
         lang = settings.get("language", "en")
-        await send_log_message(bot, execution.guild.id, "moderation_swords", get_string("moderation.logging.event_formats.automod_execution", lang, rule=execution.rule_name, action=execution.action.type.name, user=execution.user.mention))
+        rule_name = "Unknown"
+        try:
+            rule = await execution.fetch_rule()
+            rule_name = rule.name
+        except:
+            rule_name = f"Rule {execution.rule_id}"
+        await send_log_message(bot, execution.guild.id, "moderation_swords", get_string("moderation.logging.event_formats.automod_execution", lang, rule=rule_name, action=execution.action.type.name, user=execution.user.mention))
     except:
         traceback.print_exc()
 
