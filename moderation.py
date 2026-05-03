@@ -575,6 +575,22 @@ class Moderation(commands.Cog):
 
     async def check_hierarchy(self, interaction, user, action_name):
         if not interaction.guild: return False, "This command can only be used in a server."
+        
+        # Fallback resolution if PrefixBridge failed to resolve a string
+        if isinstance(user, str):
+            try:
+                import re
+                uid_match = re.search(r'(\d{17,20})', user)
+                if uid_match:
+                    uid = int(uid_match.group(1))
+                    resolved = interaction.guild.get_member(uid) or self.bot.get_user(uid)
+                    if resolved:
+                        user = resolved
+            except: pass
+
+        if isinstance(user, str):
+            return False, f"Could not find user '{user}'. Please mention them or use their ID."
+
         if user.id == interaction.user.id: return False, f"You cannot {action_name} yourself."
         if user.id == self.bot.user.id: return False, f"I can't {action_name} myself!"
         if user.id == interaction.guild.owner_id: return False, f"You cannot {action_name} the server owner."
@@ -842,8 +858,7 @@ class Moderation(commands.Cog):
             if not settings.get("bot_enabled", True): return
             
             lang = settings.get("language", "en")
-            prefix = settings.get("moderation_prefix")
-            if not prefix: return
+            prefix = settings.get("prefix", ",")
             
             if message.content.startswith(prefix):
                 content = message.content[len(prefix):].strip()
