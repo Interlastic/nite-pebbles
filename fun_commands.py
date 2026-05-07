@@ -14,7 +14,7 @@ from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 
 # Local Pebble Utilities
-from utils import make_loading_bar
+from pebble_utils import make_loading_bar
 from image_renderer import html_to_png
 
 try:
