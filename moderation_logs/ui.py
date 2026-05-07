@@ -104,6 +104,9 @@ class PresetModal(ui.Modal):
 
     async def on_submit(self, interaction: discord.Interaction):
         try:
+            if not interaction.user.guild_permissions.manage_guild:
+                return await interaction.response.send_message("You do not have the required permissions to perform this action (Manage Server).", ephemeral=True)
+
             if not self.select.values:
                 return await interaction.response.defer()
 
@@ -225,6 +228,15 @@ class LoggingConfigView(ui.LayoutView):
                 ])
             ])
         ]
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.id != self.user.id:
+            await interaction.response.send_message("This menu is not for you.", ephemeral=True)
+            return False
+        if not interaction.user.guild_permissions.manage_guild:
+            await interaction.response.send_message("You do not have the required permissions to use this (Manage Server).", ephemeral=True)
+            return False
+        return True
 
     async def build(self):
         try:

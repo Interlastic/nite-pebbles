@@ -78,6 +78,9 @@ class PrefixEditModal(ui.Modal):
         self.add_item(self.prefix_input)
 
     async def on_submit(self, interaction: discord.Interaction):
+        if not interaction.user.guild_permissions.manage_guild:
+            return await interaction.response.send_message("You do not have the required permissions to perform this action (Manage Server).", ephemeral=True)
+
         settings = await self.cog.bot.server_settings.get_settings(self.guild_id)
         settings["moderation_prefix"] = self.prefix_input.value
         await self.cog.bot.server_settings.update_settings(self.guild_id, settings)
@@ -102,6 +105,9 @@ class DMMessageEditModal(ui.Modal):
         self.add_item(self.msg_input)
 
     async def on_submit(self, interaction: discord.Interaction):
+        if not interaction.user.guild_permissions.manage_guild:
+            return await interaction.response.send_message("You do not have the required permissions to perform this action (Manage Server).", ephemeral=True)
+
         settings = await self.cog.bot.server_settings.get_settings(self.guild_id)
         settings["moderation_dm_message"] = self.msg_input.value
         await self.cog.bot.server_settings.update_settings(self.guild_id, settings)
@@ -632,6 +638,10 @@ class Moderation(commands.Cog):
         
         allowed, error = await self.check_hierarchy(interaction, user, "ban")
         if not allowed: return await self.send_mod_error(interaction, "ban", user, error, attempt, reason, delete_messages, edit)
+        
+        if not interaction.user.guild_permissions.ban_members:
+            return await self.send_mod_error(interaction, "ban", user, "You do not have the required permissions to execute this command (Ban Members).", attempt, reason, delete_messages, edit)
+
         if not interaction.guild.me.guild_permissions.ban_members:
             return await self.send_mod_error(interaction, "ban", user, "I do not have the required permissions to execute this.", attempt, reason, delete_messages, edit)
 
@@ -666,6 +676,10 @@ class Moderation(commands.Cog):
         
         allowed, error = await self.check_hierarchy(interaction, user, "softban")
         if not allowed: return await self.send_mod_error(interaction, "softban", user, error, attempt, reason, delete_messages, edit)
+        
+        if not interaction.user.guild_permissions.ban_members:
+            return await self.send_mod_error(interaction, "softban", user, "You do not have the required permissions to execute this command (Ban Members).", attempt, reason, delete_messages, edit)
+
         if not interaction.guild.me.guild_permissions.ban_members:
             return await self.send_mod_error(interaction, "softban", user, "I do not have the required permissions to execute this.", attempt, reason, delete_messages, edit)
 
@@ -743,6 +757,10 @@ class Moderation(commands.Cog):
         if not edit: await interaction.response.defer(ephemeral=False)
 
         if not interaction.guild: return await self.send_mod_error(interaction, "unban", user, "This command can only be used in a server.", attempt, reason, edit=edit)
+        
+        if not interaction.user.guild_permissions.ban_members:
+            return await self.send_mod_error(interaction, "unban", user, "You do not have the required permissions to execute this command (Ban Members).", attempt, reason, edit=edit)
+
         if not interaction.guild.me.guild_permissions.ban_members:
             return await self.send_mod_error(interaction, "unban", user, "I do not have the required permissions to execute this.", attempt, reason, edit=edit)
 
@@ -775,6 +793,10 @@ class Moderation(commands.Cog):
         
         allowed, error = await self.check_hierarchy(interaction, user, "kick")
         if not allowed: return await self.send_mod_error(interaction, "kick", user, error, attempt, reason, edit=edit)
+        
+        if not interaction.user.guild_permissions.kick_members:
+            return await self.send_mod_error(interaction, "kick", user, "You do not have the required permissions to execute this command (Kick Members).", attempt, reason, edit=edit)
+
         if not interaction.guild.me.guild_permissions.kick_members:
             return await self.send_mod_error(interaction, "kick", user, "I do not have the required permissions to execute this.", attempt, reason, edit=edit)
 
@@ -813,6 +835,10 @@ class Moderation(commands.Cog):
         
         allowed, error = await self.check_hierarchy(interaction, user, "timeout")
         if not allowed: return await self.send_mod_error(interaction, "timeout", user, error, attempt, reason, duration, edit)
+        
+        if not interaction.user.guild_permissions.moderate_members:
+            return await self.send_mod_error(interaction, "timeout", user, "You do not have the required permissions to execute this command (Moderate Members).", attempt, reason, duration, edit)
+
         if not interaction.guild.me.guild_permissions.moderate_members:
             return await self.send_mod_error(interaction, "timeout", user, "I do not have the required permissions to execute this.", attempt, reason, duration, edit)
 
@@ -834,6 +860,10 @@ class Moderation(commands.Cog):
         if not edit: await interaction.response.defer(ephemeral=False)
 
         if not interaction.guild: return await self.send_mod_error(interaction, "untimeout", user, "This command can only be used in a server.", attempt, reason, edit=edit)
+        
+        if not interaction.user.guild_permissions.moderate_members:
+            return await self.send_mod_error(interaction, "untimeout", user, "You do not have the required permissions to execute this command (Moderate Members).", attempt, reason, edit=edit)
+
         if not interaction.guild.me.guild_permissions.moderate_members:
             return await self.send_mod_error(interaction, "untimeout", user, "I do not have the required permissions to execute this.", attempt, reason, edit=edit)
 
