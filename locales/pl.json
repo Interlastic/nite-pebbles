@@ -390,5 +390,102 @@
         "stage_delete": "Instancja Stage usunięta w {channel}"
       }
     }
+  },
+  "server_stats": {
+    "menu": {
+      "title": "Server Stats Configuration",
+      "description": "Automatically update server and channel names with live statistics.",
+      "how_it_works": "Nite updates channel and server names every **10 minutes** using templates with live stats.",
+      "status": "**Status**: {status}",
+      "server_name": "**Server Name Template**",
+      "server_name_preview": "Preview: `{name}`",
+      "managed_channels": "**Managed Channels**",
+      "no_channels": "No channels are being tracked yet.",
+      "missing_channels": "{count} channel(s) not found (kept in case they return)",
+      "page_indicator": "Page {current}/{total}",
+      "preview_title": "Preview"
+    },
+    "buttons": {
+      "main_dash": "Server Stats",
+      "toggle_on": "Enable",
+      "toggle_off": "Disable",
+      "edit_server_name": "Edit",
+      "clear_server_name": "Clear",
+      "add_channel": "Add Channel",
+      "edit": "Edit",
+      "remove": "Remove",
+      "prev_page": "◀",
+      "next_page": "▶",
+      "track_existing": "Track Existing Channel",
+      "create_new": "Create New Stat Channel",
+      "confirm_remove": "Yes, Remove",
+      "cancel": "Cancel",
+      "preview": "Preview",
+      "back": "← Back",
+      "done": "Done",
+      "stop_tracking": "Stop Tracking",
+      "stop_and_delete": "Stop Tracking + Delete Channel"
+    },
+    "modals": {
+      "server_name_title": "Edit Server Name Template",
+      "template_label": "Template",
+      "template_placeholder": "e.g. {members} | My Server",
+      "channel_template_title": "Edit Channel Template",
+      "stat_channel_title": "Create Stat Channel",
+      "template_help_placeholder": "{members}, {channels}, {boost_level}, {boost_count} — use {var,N} for decimal precision",
+      "template_label_text": "Template",
+      "template_label_desc": "{members}, {channels}, {boost_level}, {boost_count} | Use {members,1} for short format"
+    },
+    "wizard": {
+      "choose_mode_title": "Add a Channel",
+      "choose_mode_desc": "Choose how you want to add a channel:",
+      "track_existing_desc": "Select an existing channel to track. Its name will be updated with your template.",
+      "select_channel_placeholder": "Select a channel...",
+      "create_new_desc": "Create a new voice channel under the stats category.",
+      "template_help": "Available placeholders:\n{members} - Member count\n{channels} - Channel count\n{boost_level} - Server boost tier (0-3)\n{boost_count} - Number of boosts\n\nAdd ,N for decimal places: {members,1}\nExample: {members} Members",
+      "edit_title": "Edit Channel",
+      "current_template": "**Template:** `{template}`",
+      "current_preview": "**Current name:** `{name}`",
+      "category_info": "Channel will be created in: **{category}**",
+      "category_warning": "Warning: Using an existing category might conflict with other settings.",
+      "select_category": "Select category...",
+      "new_category_option": "Create new category",
+      "channel_type_label": "Channel Type",
+      "select_type_placeholder": "Select channel type...",
+      "category_name_label": "Category Name",
+      "remove_title": "Remove Channel",
+      "remove_desc": "Choose how to remove this channel from tracking. You can stop tracking it (keep the channel) or stop tracking and delete it from the server."
+    },
+    "status": {
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "not_set": "*Not set*"
+    },
+    "badges": {
+      "voice": "Voice",
+      "text": "Text",
+      "category": "Category",
+      "stage": "Stage",
+      "override": "Override",
+      "stat_channel": "Stat Channel",
+      "missing": "Not Found"
+    },
+    "warnings": {
+      "template_too_long": "This template may exceed Discord's 100-character limit when numbers grow large ({length} chars with ~1M members). Consider using {members,1} for shorter formatting.",
+      "template_empty": "This template renders to an empty string.",
+      "server_name_too_long": "This template may exceed Discord's 100-character server name limit ({length} chars at ~1M members)."
+    },
+    "preview": {
+      "server_name": "Server Name: `{name}`",
+      "channel": "{mention}: `{name}`",
+      "empty": "No templates configured."
+    },
+    "confirm": {
+      "remove_title": "Remove Channel",
+      "remove_desc": "Stop tracking **{name}**? The channel itself will not be deleted."
+    },
+    "conflict": {
+      "notify": "Hey! The {type} is currently controlled by nite-pebbles. Your change will be overridden on the next update cycle. To change this, open /dashboard and go to Server Stats."
+    }
   }
 }

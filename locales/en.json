@@ -134,6 +134,7 @@
       "placeholder": "e.g. Appeal at our website...",
       "success": "Moderation DM message updated!"
     },
+    "prefix_updated": "Moderation prefix set to: `{prefix}`",
     "fuzzy_select": {
       "title": "Multiple results found",
       "placeholder": "Select the correct user...",
@@ -141,6 +142,40 @@
     },
     "errors": {
       "generic": "An error occurred: {error}"
+    },
+    "success": {
+      "title": "# {emoji} Successfully {action_text}",
+      "description": "{user_name} was {action_text}.\nReason: **{reason}**\nExecuted by: {initiator_name}",
+      "reverse_tip": "To reverse this, use the button on the right"
+    },
+    "error": {
+      "title": "# {emoji} Error",
+      "description": "Failed to {action_type} {user_name}.\n{error_msg}",
+      "retry": "Try Again",
+      "ban_instead": "Ban Instead",
+      "kick_instead": "Kick Instead",
+      "timeout_instead": "Timeout Instead"
+    },
+    "dm": {
+      "title": "# You were {action_type} from {server_name}",
+      "unban_title": "# You were unbanned from {server_name}",
+      "context_title": "### Message that the Moderator {action_type} you on:",
+      "history_title": "### Your last messages in the channel:",
+      "details": "**Reason:** {reason}\n**Moderator:** {moderator_name}"
+    },
+    "actions": {
+      "ban": "ban",
+      "banned": "banned",
+      "softban": "softban",
+      "softbanned": "softbanned",
+      "kick": "kick",
+      "kicked": "kicked",
+      "timeout": "timeout",
+      "timed_out": "timed out",
+      "unban": "unban",
+      "unbanned": "unbanned",
+      "untimeout": "untimeout",
+      "un_timed_out": "un-timed out"
     },
     "logging": {
       "header": "Logging",
@@ -389,6 +424,91 @@
         "stage_update": "Stage topic changed: **{before}** -> **{after}**",
         "stage_delete": "Stage instance deleted in {channel}"
       }
+    }
+  },
+  "server_stats": {
+    "menu": {
+      "title": "Server Stats Configuration",
+      "description": "Automatically update server and channel names with live statistics.",
+      "status": "**Status**: {status}",
+      "server_name": "**Server Name Template**",
+      "channel_overrides": "**Channel Overrides**",
+      "stat_channels": "**Stat Channels**",
+      "preview_title": "Preview",
+      "how_it_works": "Nite updates channel and server names every **10 minutes** using templates with live stats.",
+      "managed_channels": "**Managed Channels**",
+      "no_channels": "No channels are being tracked yet.",
+      "missing_channels": "{count} channel(s) not found (kept in case they return)",
+      "page_indicator": "Page {current}/{total}"
+    },
+    "buttons": {
+      "main_dash": "Server Stats",
+      "toggle_on": "Enable",
+      "toggle_off": "Disable",
+      "edit_server_name": "Edit Server Name",
+      "clear_server_name": "Clear",
+      "manage_overrides": "Manage Overrides",
+      "add_stat_channel": "Create Stat Channel",
+      "preview": "Preview",
+      "back": "← Back",
+      "add_channel": "Add Channel",
+      "edit": "Edit",
+      "remove": "Remove",
+      "prev_page": "◀",
+      "next_page": "▶",
+      "track_existing": "Track Existing Channel",
+      "create_new": "Create New Stat Channel",
+      "confirm_remove": "Yes, Remove",
+      "stop_tracking": "Stop Tracking",
+      "stop_and_delete": "Stop Tracking + Delete Channel"
+    },
+    "modals": {
+      "server_name_title": "Edit Server Name Template",
+      "template_label": "Template",
+      "template_placeholder": "e.g. {members} | My Server",
+      "channel_template_title": "Edit Channel Template",
+      "stat_channel_title": "Create Stat Channel",
+      "template_label_text": "Template",
+      "template_label_desc": "{members}, {channels}, {boost_level}, {boost_count} | Use {members,1} for short format"
+    },
+    "status": {
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "not_set": "*Not set*"
+    },
+    "preview": {
+      "server_name": "Server Name: `{name}`",
+      "channel": "{mention}: `{name}`",
+      "empty": "No templates configured."
+    },
+    "conflict": {
+      "notify": "Hey! The {type} is currently controlled by nite-pebbles. Your change will be overridden on the next update cycle. To change this, open /dashboard and go to Server Stats."
+    },
+    "wizard": {
+      "choose_mode_title": "Add a Channel",
+      "choose_mode_desc": "Choose how you want to add a channel:",
+      "track_existing_desc": "Select an existing channel to track. Its name will be updated with your template.",
+      "create_new_desc": "Create a new voice channel under the stats category.",
+      "template_help": "Available placeholders:\n{members} - Member count\n{channels} - Channel count\n{boost_level} - Server boost tier (0-3)\n{boost_count} - Number of boosts\n\nAdd ,N for decimal places: {members,1}\nExample: {members} Members",
+      "edit_title": "Edit Channel",
+      "current_preview": "**Current name:** `{name}`",
+      "category_info": "Channel will be created in: **{category}**",
+      "category_warning": "Warning: Using an existing category might conflict with other settings.",
+      "category_name_label": "Category Name",
+      "channel_type_label": "Channel Type",
+      "remove_title": "Remove Channel",
+      "remove_desc": "Choose how to remove this channel from tracking. You can stop tracking it (keep the channel) or stop tracking and delete it from the server."
+    },
+    "warnings": {
+      "template_too_long": "This template may exceed Discord's 100-character limit when numbers grow large ({length} chars with ~1M members). Consider using {members,1} for shorter formatting.",
+      "template_empty": "This template renders to an empty string."
+    },
+    "badges": {
+      "voice": "Voice",
+      "text": "Text",
+      "category": "Category",
+      "override": "Override",
+      "missing": "Not Found"
     }
   }
 }
