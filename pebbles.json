@@ -67,6 +67,21 @@
           }
         ]
       }
+    },
+    {
+      "extension_file": "server_stats",
+      "name": "Server Stats",
+      "description": "Automatically update server and channel names with live statistics.",
+      "dependencies": [],
+      "credits": {
+        "Creators": [
+          {
+            "id": "inter",
+            "contributions": "Initial creation"
+          }
+        ],
+        "Contributers": []
+      }
     }
   ]
 }

@@ -393,99 +393,111 @@
   },
   "server_stats": {
     "menu": {
-      "title": "Server Stats Configuration",
-      "description": "Automatically update server and channel names with live statistics.",
-      "how_it_works": "Nite updates channel and server names every **10 minutes** using templates with live stats.",
+      "title": "Konfiguracja statystyk serwera",
+      "description": "Automatycznie aktualizuj nazwy serwerów i kanałów za pomocą statystyk na żywo.",
+      "how_it_works": "Nite aktualizuje nazwy kanałów i serwerów co **10 minut** przy użyciu szablonów ze statystykami na żywo.",
+      "timer_explanation": "*Aktualizacje odbywają się co 10 minut. To opóźnienie jest obowiązkowe, aby zapobiec blokadom API Discorda dla Twojego serwera.*",
+      "category_settings": "**Ustawienia kategorii**",
       "status": "**Status**: {status}",
-      "server_name": "**Server Name Template**",
-      "server_name_preview": "Preview: `{name}`",
-      "managed_channels": "**Managed Channels**",
-      "no_channels": "No channels are being tracked yet.",
-      "missing_channels": "{count} channel(s) not found (kept in case they return)",
-      "page_indicator": "Page {current}/{total}",
-      "preview_title": "Preview"
+      "server_name": "**Szablon nazwy serwera**",
+      "server_name_preview": "Podgląd: `{name}`",
+      "managed_channels": "**Zarządzane kanały**",
+      "no_channels": "Żadne kanały nie są jeszcze śledzone.",
+      "missing_channels": "Nie znaleziono {count} kanałów (zachowano na wypadek ich powrotu)",
+      "page_indicator": "Strona {current}/{total}",
+      "preview_title": "Podgląd"
     },
     "buttons": {
-      "main_dash": "Server Stats",
-      "toggle_on": "Enable",
-      "toggle_off": "Disable",
-      "edit_server_name": "Edit",
-      "clear_server_name": "Clear",
-      "add_channel": "Add Channel",
-      "edit": "Edit",
-      "remove": "Remove",
+      "main_dash": "Statystyki serwera",
+      "toggle_on": "Włącz",
+      "toggle_off": "Wyłącz",
+      "edit_server_name": "Edytuj",
+      "edit_category_name": "Edytuj nazwę kategorii",
+      "clear_server_name": "Wyczyść",
+      "add_channel": "Dodaj kanał",
+      "edit": "Edytuj",
+      "remove": "Usuń",
       "prev_page": "◀",
       "next_page": "▶",
-      "track_existing": "Track Existing Channel",
-      "create_new": "Create New Stat Channel",
-      "confirm_remove": "Yes, Remove",
-      "cancel": "Cancel",
-      "preview": "Preview",
-      "back": "← Back",
-      "done": "Done",
-      "stop_tracking": "Stop Tracking",
-      "stop_and_delete": "Stop Tracking + Delete Channel"
+      "track_existing": "Śledź istniejący kanał",
+      "create_new": "Utwórz nowy kanał statystyk",
+      "confirm_remove": "Tak, usuń",
+      "cancel": "Anuluj",
+      "preview": "Podgląd",
+      "back": "← Wstecz",
+      "done": "Gotowe",
+      "stop_tracking": "Zatrzymaj śledzenie",
+      "stop_and_delete": "Zatrzymaj śledzenie + usuń kanał"
     },
     "modals": {
-      "server_name_title": "Edit Server Name Template",
-      "template_label": "Template",
-      "template_placeholder": "e.g. {members} | My Server",
-      "channel_template_title": "Edit Channel Template",
-      "stat_channel_title": "Create Stat Channel",
-      "template_help_placeholder": "{members}, {channels}, {boost_level}, {boost_count} — use {var,N} for decimal precision",
-      "template_label_text": "Template",
-      "template_label_desc": "{members}, {channels}, {boost_level}, {boost_count} | Use {members,1} for short format"
+      "server_name_title": "Edytuj szablon nazwy serwera",
+      "category_name_title": "Edytuj nazwę kategorii",
+      "category_name_label": "Nazwa kategorii",
+      "category_name_placeholder": "np. STATYSTYKI SERWERA",
+      "category_name_success": "Nazwa kategorii statystyk została zaktualizowana!",
+      "template_label": "Szablon",
+      "template_placeholder": "np. {members} | Mój serwer",
+      "channel_template_title": "Edytuj szablon kanału",
+      "stat_channel_title": "Utwórz kanał statystyk",
+      "template_help_placeholder": "{members}, {channels}, {boost_level}, {boost_count} — użyj {var,N} dla miejsc po przecinku",
+      "template_label_text": "Szablon",
+      "template_label_desc": "{members}, {channels}, {boost_level}, {boost_count} | Użyj {members,1} dla formatu skróconego lub {members,raw} dla pełnej liczby"
     },
     "wizard": {
-      "choose_mode_title": "Add a Channel",
-      "choose_mode_desc": "Choose how you want to add a channel:",
-      "track_existing_desc": "Select an existing channel to track. Its name will be updated with your template.",
-      "select_channel_placeholder": "Select a channel...",
-      "create_new_desc": "Create a new voice channel under the stats category.",
-      "template_help": "Available placeholders:\n{members} - Member count\n{channels} - Channel count\n{boost_level} - Server boost tier (0-3)\n{boost_count} - Number of boosts\n\nAdd ,N for decimal places: {members,1}\nExample: {members} Members",
-      "edit_title": "Edit Channel",
-      "current_template": "**Template:** `{template}`",
-      "current_preview": "**Current name:** `{name}`",
-      "category_info": "Channel will be created in: **{category}**",
-      "category_warning": "Warning: Using an existing category might conflict with other settings.",
-      "select_category": "Select category...",
-      "new_category_option": "Create new category",
-      "channel_type_label": "Channel Type",
-      "select_type_placeholder": "Select channel type...",
-      "category_name_label": "Category Name",
-      "remove_title": "Remove Channel",
-      "remove_desc": "Choose how to remove this channel from tracking. You can stop tracking it (keep the channel) or stop tracking and delete it from the server."
+      "choose_mode_title": "Dodaj kanał",
+      "choose_mode_desc": "Wybierz sposób dodania kanału:",
+      "use_existing_category": "Użyj istniejącej: {name}",
+      "create_new_category": "Utwórz nową kategorię: {name}",
+      "track_existing_desc": "Wybierz istniejący kanał do śledzenia. Jego nazwa zostanie zaktualizowana zgodnie z Twoim szablonem.",
+      "select_channel_placeholder": "Wybierz kanał...",
+      "create_new_desc": "Utwórz nowy kanał głosowy w kategorii statystyk.",
+      "template_help": "Dostępne tagi:\n{members} - Liczba członków\n{channels} - Liczba kanałów\n{boost_level} - Poziom ulepszeń serwera (0-3)\n{boost_count} - Liczba ulepszeń\n\nDodaj ,N dla miejsc po przecinku: {members,1}\nDodaj ,raw dla pełnej liczby: {members,raw}\nPrzykład: {members} Członków",
+      "edit_title": "Edytuj kanał",
+      "current_template": "**Szablon:** `{template}`",
+      "current_preview": "**Aktualna nazwa:** `{name}`",
+      "category_info": "Kanał zostanie utworzony w: **{category}**",
+      "category_warning": "Ostrzeżenie: Użycie istniejącej kategorii może powodować konflikty z innymi ustawieniami.",
+      "select_category": "Wybierz kategorię...",
+      "new_category_option": "Utwórz nową kategorię",
+      "channel_type_label": "Typ kanału",
+      "select_type_placeholder": "Wybierz typ kanału...",
+      "category_name_label": "Nazwa kategorii",
+      "remove_title": "Usuń kanał",
+      "remove_desc": "Wybierz sposób usunięcia tego kanału ze śledzenia. Możesz zatrzymać śledzenie (zachować kanał) lub zatrzymać śledzenie i usunąć go z serwera."
     },
     "status": {
-      "enabled": "Enabled",
-      "disabled": "Disabled",
-      "not_set": "*Not set*"
+      "enabled": "Włączone",
+      "disabled": "Wyłączone",
+      "not_set": "*Nie ustawiono*"
     },
     "badges": {
-      "voice": "Voice",
-      "text": "Text",
-      "category": "Category",
-      "stage": "Stage",
-      "override": "Override",
-      "stat_channel": "Stat Channel",
-      "missing": "Not Found"
+      "voice": "Głosowy (Zalecane)",
+      "text": "Tekstowy",
+      "category": "Kategoria",
+      "stage": "Scena",
+      "override": "Nadpisanie",
+      "stat_channel": "Kanał statystyk",
+      "missing": "Nie znaleziono"
+    },
+    "audit_reasons": {
+      "category_rename": "Kategoria Statystyk Serwera zmieniona przez {user}"
     },
     "warnings": {
-      "template_too_long": "This template may exceed Discord's 100-character limit when numbers grow large ({length} chars with ~1M members). Consider using {members,1} for shorter formatting.",
-      "template_empty": "This template renders to an empty string.",
-      "server_name_too_long": "This template may exceed Discord's 100-character server name limit ({length} chars at ~1M members)."
+      "template_too_long": "Ten szablon może przekroczyć limit 100 znaków Discorda, gdy liczby wzrosną ({length} znaków przy ~1 mln członków). Rozważ użycie {members,1} dla krótszego formatowania.",
+      "template_empty": "Ten szablon generuje pusty ciąg znaków.",
+      "server_name_too_long": "Ten szablon może przekroczyć limit 100 znaków nazwy serwera Discorda ({length} znaków przy ~1 mln członków)."
     },
     "preview": {
-      "server_name": "Server Name: `{name}`",
+      "server_name": "Nazwa serwera: `{name}`",
       "channel": "{mention}: `{name}`",
-      "empty": "No templates configured."
+      "empty": "Brak skonfigurowanych szablonów."
     },
     "confirm": {
-      "remove_title": "Remove Channel",
-      "remove_desc": "Stop tracking **{name}**? The channel itself will not be deleted."
+      "remove_title": "Usuń kanał",
+      "remove_desc": "Zatrzymać śledzenie **{name}**? Sam kanał nie zostanie usunięty."
     },
     "conflict": {
-      "notify": "Hey! The {type} is currently controlled by nite-pebbles. Your change will be overridden on the next update cycle. To change this, open /dashboard and go to Server Stats."
+      "notify": "Hej! {type} jest obecnie kontrolowany przez nite-pebbles. Twoja zmiana zostanie nadpisana w następnym cyklu aktualizacji. Aby to zmienić, otwórz /dashboard i przejdź do Statystyk serwera."
     }
   }
 }

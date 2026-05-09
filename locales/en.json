@@ -436,6 +436,8 @@
       "stat_channels": "**Stat Channels**",
       "preview_title": "Preview",
       "how_it_works": "Nite updates channel and server names every **10 minutes** using templates with live stats.",
+      "timer_explanation": "*Updates occur every 10 minutes. This delay is mandatory to prevent Discord API rate-limiting of your server.*",
+      "category_settings": "**Category Settings**",
       "managed_channels": "**Managed Channels**",
       "no_channels": "No channels are being tracked yet.",
       "missing_channels": "{count} channel(s) not found (kept in case they return)",
@@ -446,6 +448,7 @@
       "toggle_on": "Enable",
       "toggle_off": "Disable",
       "edit_server_name": "Edit Server Name",
+      "edit_category_name": "Edit Category Name",
       "clear_server_name": "Clear",
       "manage_overrides": "Manage Overrides",
       "add_stat_channel": "Create Stat Channel",
@@ -464,12 +467,16 @@
     },
     "modals": {
       "server_name_title": "Edit Server Name Template",
+      "category_name_title": "Edit Category Name",
+      "category_name_label": "Category Name",
+      "category_name_placeholder": "e.g. SERVER STATS",
+      "category_name_success": "Stats category name updated!",
       "template_label": "Template",
       "template_placeholder": "e.g. {members} | My Server",
       "channel_template_title": "Edit Channel Template",
       "stat_channel_title": "Create Stat Channel",
       "template_label_text": "Template",
-      "template_label_desc": "{members}, {channels}, {boost_level}, {boost_count} | Use {members,1} for short format"
+      "template_label_desc": "{members}, {channels}, {boost_level}, {boost_count} | Use {members,1} for short format or {members,raw} for full number"
     },
     "status": {
       "enabled": "Enabled",
@@ -487,9 +494,11 @@
     "wizard": {
       "choose_mode_title": "Add a Channel",
       "choose_mode_desc": "Choose how you want to add a channel:",
+      "use_existing_category": "Use Existing: {name}",
+      "create_new_category": "Create New Category: {name}",
       "track_existing_desc": "Select an existing channel to track. Its name will be updated with your template.",
       "create_new_desc": "Create a new voice channel under the stats category.",
-      "template_help": "Available placeholders:\n{members} - Member count\n{channels} - Channel count\n{boost_level} - Server boost tier (0-3)\n{boost_count} - Number of boosts\n\nAdd ,N for decimal places: {members,1}\nExample: {members} Members",
+      "template_help": "Available placeholders:\n{members} - Member count\n{channels} - Channel count\n{boost_level} - Server boost tier (0-3)\n{boost_count} - Number of boosts\n\nAdd ,N for decimal places: {members,1}\nAdd ,raw for full number: {members,raw}\nExample: {members} Members",
       "edit_title": "Edit Channel",
       "current_preview": "**Current name:** `{name}`",
       "category_info": "Channel will be created in: **{category}**",
@@ -504,11 +513,14 @@
       "template_empty": "This template renders to an empty string."
     },
     "badges": {
-      "voice": "Voice",
+      "voice": "Voice (Recommended)",
       "text": "Text",
       "category": "Category",
       "override": "Override",
       "missing": "Not Found"
+    },
+    "audit_reasons": {
+      "category_rename": "Server Stats category renamed by {user}"
     }
   }
 }

@@ -28,7 +28,7 @@ def render_template_simulated(template, members=999999, channels=500, boost_leve
             val = stats[var]
             return format_number(val, precision)
         return match.group(0)
-    return re.sub(r"\{(\w+)(,(\d+))?\}", replacer, template)
+    return re.sub(r"\{(\w+)(,(\w+))?\}", replacer, template)
 
 def validate_template(template, guild):
     """Returns (warnings: list, errors: list)"""
@@ -149,7 +149,11 @@ class ServerStatsView(ui.LayoutView):
                 traceback.print_exc()
         edit_server_btn.callback = edit_server_callback
 
-        clear_server_btn = ui.Button(label=get_string("server_stats.buttons.clear_server_name", lang), style=discord.ButtonStyle.gray, disabled=not server_template)
+        clear_server_btn = ui.Button(
+            label=get_string("server_stats.buttons.clear_server_name", lang), 
+            style=discord.ButtonStyle.secondary if not enabled else discord.ButtonStyle.gray, 
+            disabled=not server_template or not enabled
+        )
         async def clear_server_callback(interaction):
             stats_config["server_name_template"] = None
             settings["server_stats"] = stats_config
@@ -162,6 +166,24 @@ class ServerStatsView(ui.LayoutView):
             ui.TextDisplay(content=get_string("server_stats.menu.server_name", lang)),
             ui.TextDisplay(content=server_name_display),
             ui.ActionRow(edit_server_btn, clear_server_btn)
+        ))
+
+        # Category Settings
+        category_name = stats_config.get("stats_category_name", "SERVER STATS")
+        edit_cat_btn = ui.Button(
+            label=get_string("server_stats.buttons.edit_category_name", lang), 
+            style=discord.ButtonStyle.secondary if not enabled else discord.ButtonStyle.blurple,
+            disabled=not enabled
+        )
+        async def edit_cat_callback(interaction):
+            modal = CategoryNameModal(self.server_settings, self.guild.id, category_name, lang, self)
+            await interaction.response.send_modal(modal)
+        edit_cat_btn.callback = edit_cat_callback
+
+        self.add_item(ui.Container(
+            ui.TextDisplay(content=get_string("server_stats.menu.category_settings", lang)),
+            ui.TextDisplay(content=f"**{category_name}**"),
+            ui.ActionRow(edit_cat_btn)
         ))
 
         # Managed Channels Pagination
@@ -230,7 +252,11 @@ class ServerStatsView(ui.LayoutView):
                     return cb
                 edit_btn.callback = await make_edit_cb(item)
                 
-                rm_btn = ui.Button(label=get_string("server_stats.buttons.remove", lang), style=discord.ButtonStyle.danger)
+                rm_btn = ui.Button(
+                    label=get_string("server_stats.buttons.remove", lang), 
+                    style=discord.ButtonStyle.secondary if not enabled else discord.ButtonStyle.danger,
+                    disabled=not enabled
+                )
                 async def make_rm_cb(ch_item):
                     async def cb(interaction):
                         view = RemoveConfirmView(self.bot, self.server_settings, self.guild, self.user, lang, self, ch_item)
@@ -423,9 +449,36 @@ class ChannelTypeCategoryWizard(ui.LayoutView):
         type_select.callback = type_cb
 
         # Category Select (only valid existing categories)
-        cat_options = [discord.SelectOption(label="Create New Category: " + self.category_name, value="new", default=(self.selected_category_id is None))]
+        existing_category = discord.utils.get(self.guild.categories, name=self.category_name)
+        
+        cat_options = []
+        if existing_category:
+            # If it exists, offer to use it
+            cat_options.append(discord.SelectOption(
+                label=get_string("server_stats.wizard.use_existing_category", self.lang, name=self.category_name), 
+                value=str(existing_category.id), 
+                default=(self.selected_category_id is None or str(self.selected_category_id) == str(existing_category.id))
+            ))
+            if self.selected_category_id is None:
+                self.selected_category_id = str(existing_category.id)
+        else:
+            # If it doesn't exist, offer to create it
+            cat_options.append(discord.SelectOption(
+                label=get_string("server_stats.wizard.create_new_category", self.lang, name=self.category_name), 
+                value="new", 
+                default=(self.selected_category_id is None)
+            ))
+
+        # Add other categories
         for cat in self.guild.categories[:24]:
-            cat_options.append(discord.SelectOption(label=cat.name, value=str(cat.id), default=(str(self.selected_category_id) == str(cat.id))))
+            if existing_category and cat.id == existing_category.id:
+                continue
+            cat_options.append(discord.SelectOption(
+                label=cat.name, 
+                value=str(cat.id), 
+                default=(str(self.selected_category_id) == str(cat.id))
+            ))
+            if len(cat_options) >= 25: break
         
         cat_select = ui.Select(placeholder=get_string("server_stats.wizard.category_name_label", self.lang), options=cat_options)
         async def cat_cb(interaction):
@@ -864,4 +917,54 @@ class ServerNameModal(ui.Modal):
                 await interaction.edit_original_response(view=self.parent_view)
         except Exception as e:
             print(f"[ServerStats] ServerNameModal on_submit error: {e}", flush=True)
+            traceback.print_exc()
+
+class CategoryNameModal(ui.Modal):
+    def __init__(self, server_settings, guild_id, current_val, lang, parent_view):
+        super().__init__(title=get_string("server_stats.modals.category_name_title", lang))
+        self.server_settings = server_settings
+        self.guild_id = guild_id
+        self.old_name = current_val
+        self.lang = lang
+        self.parent_view = parent_view
+        
+        self.name_input = ui.TextInput(
+            label=get_string("server_stats.modals.category_name_label", lang),
+            placeholder=get_string("server_stats.modals.category_name_placeholder", lang),
+            default=current_val,
+            min_length=1,
+            max_length=100,
+            required=True
+        )
+        self.add_item(self.name_input)
+
+    async def on_submit(self, interaction: discord.Interaction):
+        try:
+            if not interaction.user.guild_permissions.manage_guild:
+                return await interaction.response.send_message(get_string("errors.missing_permission", self.lang, permission="Manage Server"), ephemeral=True)
+
+            await interaction.response.defer(ephemeral=True)
+            
+            new_name = self.name_input.value.strip()
+            
+            # Find and rename Discord category if it exists
+            guild = interaction.guild
+            existing_cat = discord.utils.get(guild.categories, name=self.old_name)
+            if existing_cat:
+                try:
+                    audit_reason = get_string("server_stats.audit_reasons.category_rename", self.lang, user=interaction.user.name)
+                    await existing_cat.edit(name=new_name, reason=audit_reason)
+                except Exception as e:
+                    print(f"[ServerStats] Failed to rename category in Discord: {e}")
+
+            settings = await self.server_settings.get_settings(self.guild_id)
+            stats_config = settings.get("server_stats", {})
+            stats_config["stats_category_name"] = new_name
+            settings["server_stats"] = stats_config
+            await self.server_settings.update_settings(self.guild_id, settings)
+            
+            await self.parent_view.build()
+            await interaction.edit_original_response(view=self.parent_view)
+        except Exception as e:
+            print(f"[ServerStats] CategoryNameModal on_submit error: {e}", flush=True)
             traceback.print_exc()

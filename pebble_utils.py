@@ -224,6 +224,9 @@ def make_loading_bar(current: float, size=10):
 import re
 
 def format_number(val, precision=None):
+    if precision == "raw":
+        return str(val)
+        
     if val < 1000:
         return str(val)
     
@@ -255,10 +258,11 @@ def render_template(template, guild):
     
     def replacer(match):
         var = match.group(1)
-        precision = match.group(3)
+        precision = match.group(3) # group 3 is the value after the comma
+        
         if var in stats:
             val = stats[var]
             return format_number(val, precision)
         return match.group(0)
     
-    return re.sub(r"\{(\w+)(,(\d+))?\}", replacer, template)
+    return re.sub(r"\{(\w+)(,(\w+))?\}", replacer, template)
