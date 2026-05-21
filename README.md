@@ -60,14 +60,13 @@ await db.save_user_info(user_id, {
 
 ### Server Settings
 
-Handling guild-specific preferences is pretty straightforward. Any value submitted is saved in cache and disk.
+Handling guild-specific preferences is pretty straightforward. Any value submitted is saved in cache and disk. Note that the **language** setting is now primarily handled per-user via `/language`, but the server setting still acts as a fallback.
 
 ```python
 guild_id = interaction.guild.id
 
 # Pull all settings for the server
 settings = await self.bot.server_settings.get_settings(guild_id)
-lang = settings.get("language", "en")
 is_enabled = settings.get("my_feature_enabled", True)
 
 # Update and save a setting
@@ -77,16 +76,29 @@ await self.bot.server_settings.update_settings(guild_id, settings)
 
 ### Localization (i18n)
 
-Don't hardcode your strings. We want Nite to 'feel local' everywhere, so use the `locales` system. It currently supports English, German, and Polish.
+Don't hardcode your strings. We want Nite to 'feel local' everywhere, so use the `locales` system. It supports English, German, and Polish, and automatically respects the user's personal language preference or their Discord client language.
+
+#### The DRY Way (Recommended)
+Use `get_localized` to automatically resolve the best language for the user and fetch the string in one go.
 
 ```python
-from locales import get_string
+from locales import get_localized
 
-lang = await self.bot.server_settings.get_language(interaction.guild_id)
-message = get_string("fun.choose.response", lang, choice="Pizza")
-
+# Resolve and send localized message
+message = await get_localized(interaction, "fun.choose.response", choice="Pizza")
 await interaction.response.send_message(message)
 ```
+
+#### Manual Way
+If you need the language code for something else (like an AI prompt), use `resolve_locale`.
+
+```python
+from locales import resolve_locale, get_string
+
+lang = await resolve_locale(interaction)
+prompt = get_string("ai.system_prompt", lang)
+```
+
 > **Note**: Make sure your Pebble-specific keys are added to `nite-pebbles/locales/*.json`.
 >
 >  You might not know another used language. In that case, you are allowed to use AI. 
