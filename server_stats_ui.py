@@ -5,12 +5,7 @@ import traceback
 import math
 from pebble_utils import render_template, format_number
 
-# Import locale system
-try:
-    from locales import get_string
-except ImportError:
-    def get_string(key, lang="en", **kwargs):
-        return f"[{key}]"
+from locales import get_string, resolve_locale
 
 def render_template_simulated(template, members=999999, channels=500, boost_level=3, boost_count=99):
     if not template:

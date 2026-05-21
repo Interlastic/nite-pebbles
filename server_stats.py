@@ -3,7 +3,7 @@ from discord.ext import commands, tasks
 import asyncio
 from datetime import datetime, timedelta
 from pebble_utils import render_template
-from server_stats_ui import get_string
+from locales import get_string, resolve_locale
 
 class ServerStats(commands.Cog):
     def __init__(self, bot):
@@ -14,19 +14,34 @@ class ServerStats(commands.Cog):
     def cog_unload(self):
         self.update_stats.cancel()
 
-    @tasks.loop(minutes=10)
+    @tasks.loop(minutes=6)
     async def update_stats(self):
-        for guild in self.bot.guilds:
+        for guild_cached in self.bot.guilds:
             try:
-                await self.process_guild_updates(guild)
+                # 1. Fetch guild with counts
+                fetched = await self.bot.fetch_guild(guild_cached.id, with_counts=True)
+                
+                # 2. Fetch bot member for permissions
+                me = await guild_cached.fetch_member(self.bot.user.id)
+                
+                # 3. Get online count
+                online_count = getattr(fetched, 'approximate_presence_count', 0)
+                if online_count == 0:
+                    try:
+                        widget = await guild_cached.fetch_widget()
+                        online_count = widget.presence_count
+                    except:
+                        pass
+                
+                await self.process_guild_updates(guild_cached, fetched, me, online_count)
             except Exception as e:
-                print(f"[ServerStats] Error processing {guild.name}: {e}")
+                print(f"[ServerStats] Error processing {guild_cached.name}: {e}")
 
     @update_stats.before_loop
     async def before_update_stats(self):
         await self.bot.wait_until_ready()
 
-    async def process_guild_updates(self, guild):
+    async def process_guild_updates(self, guild, fetched, me, online_count):
         settings = await self.bot.server_settings.get_settings(guild.id)
         config = settings.get("server_stats", {})
         if not config.get("enabled", False):
@@ -35,7 +50,7 @@ class ServerStats(commands.Cog):
         # 1. Server Name
         template = config.get("server_name_template")
         if template:
-            new_name = render_template(template, guild)
+            new_name = render_template(template, fetched, online_count)
             if new_name and guild.name != new_name:
                 # Check throttle (2 per hour)
                 now = datetime.now()
@@ -45,7 +60,7 @@ class ServerStats(commands.Cog):
                 self.rename_throttle[guild.id] = history
                 
                 if len(history) < 2:
-                    if guild.me.guild_permissions.manage_guild:
+                    if me.guild_permissions.manage_guild:
                         await guild.edit(name=new_name, reason="Nite Server Stats Update")
                         self.rename_throttle[guild.id].append(now)
                     else:
@@ -58,19 +73,19 @@ class ServerStats(commands.Cog):
         for ch_id, ch_template in overrides.items():
             channel = guild.get_channel(int(ch_id))
             if channel:
-                await self.update_channel_name(channel, ch_template)
+                await self.update_channel_name(channel, ch_template, fetched, me, online_count)
 
         # 3. Stat Channels
         stat_channels = config.get("stat_channels", {})
         for ch_id, ch_template in stat_channels.items():
             channel = guild.get_channel(int(ch_id))
             if channel:
-                await self.update_channel_name(channel, ch_template)
+                await self.update_channel_name(channel, ch_template, fetched, me, online_count)
 
-    async def update_channel_name(self, channel, template):
-        new_name = render_template(template, channel.guild)
+    async def update_channel_name(self, channel, template, fetched, me, online_count):
+        new_name = render_template(template, fetched, online_count)
         if new_name and channel.name != new_name:
-            if channel.permissions_for(channel.guild.me).manage_channels:
+            if channel.permissions_for(me).manage_channels:
                 try:
                     await channel.edit(name=new_name, reason="Nite Server Stats Update")
                 except discord.HTTPException as e:
@@ -87,12 +102,20 @@ class ServerStats(commands.Cog):
         config = settings.get("server_stats", {})
         if not config.get("enabled", False) or not config.get("server_name_template"):
             return
+        
+        # In listener, we might not have online_count easily, but we can try to render with what we have
+        # This might cause false conflicts if {online} is used.
+        # For now, let's just render with 0 online and hope for the best, or skip if {online} in template.
+        template = config["server_name_template"]
+        if "{online}" in template:
+            return # Skip conflict check for templates with online count
 
-        expected_name = render_template(config["server_name_template"], after)
+        expected_name = render_template(template, after)
         if after.name != expected_name:
-            user = await self.get_audit_user(after, discord.AuditLogAction.guild_update, after.id)
+            me = after.me or await after.fetch_member(self.bot.user.id)
+            user = await self.get_audit_user(after, me, discord.AuditLogAction.guild_update, after.id)
             if user and user.id != self.bot.user.id:
-                await self.notify_conflict(after, user, "server name")
+                await self.notify_conflict(after, me, user, "server name")
 
     @commands.Cog.listener()
     async def on_guild_channel_update(self, before, after):
@@ -105,14 +128,18 @@ class ServerStats(commands.Cog):
         template = config.get("channel_overrides", {}).get(ch_id_str) or config.get("stat_channels", {}).get(ch_id_str)
         
         if template:
+            if "{online}" in template:
+                return
+
             expected_name = render_template(template, after.guild)
             if after.name != expected_name:
-                user = await self.get_audit_user(after.guild, discord.AuditLogAction.channel_update, after.id)
+                me = after.guild.me or await after.guild.fetch_member(self.bot.user.id)
+                user = await self.get_audit_user(after.guild, me, discord.AuditLogAction.channel_update, after.id)
                 if user and user.id != self.bot.user.id:
-                    await self.notify_conflict(after.guild, user, f"#{after.name} channel")
+                    await self.notify_conflict(after.guild, me, user, f"#{after.name} channel")
 
-    async def get_audit_user(self, guild, action, target_id):
-        if not guild.me.guild_permissions.view_audit_log:
+    async def get_audit_user(self, guild, me, action, target_id):
+        if not me.guild_permissions.view_audit_log:
             return None
         try:
             async for entry in guild.audit_logs(limit=5, action=action):
@@ -124,8 +151,8 @@ class ServerStats(commands.Cog):
             pass
         return None
 
-    async def notify_conflict(self, guild, user, target_type):
-        lang = await self.bot.server_settings.get_language(guild.id)
+    async def notify_conflict(self, guild, me, user, target_type):
+        lang = await resolve_locale(guild)
         msg = get_string("server_stats.conflict.notify", lang, type=target_type)
         
         # 1. DM
@@ -138,7 +165,7 @@ class ServerStats(commands.Cog):
         # 2. Private channel
         for channel in guild.text_channels:
             perms = channel.permissions_for(user)
-            bot_perms = channel.permissions_for(guild.me)
+            bot_perms = channel.permissions_for(me)
             if perms.read_messages and bot_perms.send_messages and not channel.permissions_for(guild.default_role).read_messages:
                 try:
                     await channel.send(f"{user.mention} {msg}")
@@ -148,7 +175,7 @@ class ServerStats(commands.Cog):
         
         # 3. Any channel
         for channel in guild.text_channels:
-            if channel.permissions_for(guild.me).send_messages:
+            if channel.permissions_for(me).send_messages:
                 try:
                     await channel.send(f"{user.mention} {msg}")
                     return
