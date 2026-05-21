@@ -134,6 +134,7 @@
       "placeholder": "np. Odwołaj się na naszej stronie...",
       "success": "Wiadomość DM moderacji została zaktualizowana!"
     },
+    "prefix_updated": "Prefiks moderacji ustawiony na: `{prefix}`",
     "fuzzy_select": {
       "title": "Znaleziono wiele wyników",
       "placeholder": "Wybierz odpowiedniego użytkownika...",
@@ -141,6 +142,40 @@
     },
     "errors": {
       "generic": "Wystąpił błąd: {error}"
+    },
+    "success": {
+      "title": "# {emoji} Pomyślnie {action_text}",
+      "description": "{user_name} został {action_text}.\nPowód: **{reason}**\nWykonane przez: {initiator_name}",
+      "reverse_tip": "Aby cofnąć to działanie, użyj przycisku po prawej stronie"
+    },
+    "error": {
+      "title": "# {emoji} Błąd",
+      "description": "Nie udało się wykonać akcji {action_type} na {user_name}.\n{error_msg}",
+      "retry": "Spróbuj ponownie",
+      "ban_instead": "Zbanuj zamiast tego",
+      "kick_instead": "Wyrzuć zamiast tego",
+      "timeout_instead": "Wycisz zamiast tego"
+    },
+    "dm": {
+      "title": "# Zostałeś {action_type} na serwerze {server_name}",
+      "unban_title": "# Zostałeś odbanowany na serwerze {server_name}",
+      "context_title": "### Wiadomość, za którą Moderator nałożył {action_type}:",
+      "history_title": "### Twoje ostatnie wiadomości na kanale:",
+      "details": "**Powód:** {reason}\n**Moderator:** {moderator_name}"
+    },
+    "actions": {
+      "ban": "zbanuj",
+      "banned": "zbanowany",
+      "softban": "softban",
+      "softbanned": "soft-zbanowany",
+      "kick": "wyrzuć",
+      "kicked": "wyrzucony",
+      "timeout": "wycisz",
+      "timed_out": "wyciszony",
+      "unban": "odbanuj",
+      "unbanned": "odbanowany",
+      "untimeout": "zdejmij wyciszenie",
+      "un_timed_out": "odciszony"
     },
     "logging": {
       "header": "Logowanie",
@@ -400,6 +435,8 @@
       "category_settings": "**Ustawienia kategorii**",
       "status": "**Status**: {status}",
       "server_name": "**Szablon nazwy serwera**",
+      "channel_overrides": "**Nadpisania kanałów**",
+      "stat_channels": "**Kanały statystyk**",
       "server_name_preview": "Podgląd: `{name}`",
       "managed_channels": "**Zarządzane kanały**",
       "no_channels": "Żadne kanały nie są jeszcze śledzone.",

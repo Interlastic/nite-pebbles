@@ -1,0 +1,260 @@
+{
+  "joke": {
+    "name": "witz",
+    "description": "Dad-Joke Befehle",
+    "parameters": {}
+  },
+  "joke random": {
+    "name": "zufällig",
+    "description": "Erhalte einen zufälligen Dad-Joke",
+    "parameters": {}
+  },
+  "joke leaderboard": {
+    "name": "bestenliste",
+    "description": "Sieh dir die weltweit am besten bewerteten Witze an",
+    "parameters": {}
+  },
+  "coinflip": {
+    "name": "münzwurf",
+    "description": "Wirf eine oder mehrere Münzen!",
+    "parameters": {
+      "count": {
+        "name": "anzahl",
+        "description": "Anzahl der zu werfenden Münzen (1-20)"
+      }
+    }
+  },
+  "rps": {
+    "name": "rps",
+    "description": "Schere-Stein-Papier-Befehle",
+    "parameters": {}
+  },
+  "rps play": {
+    "name": "spielen",
+    "description": "Spiele Schere, Stein, Papier gegen den Bot",
+    "parameters": {
+      "choice": {
+        "name": "wahl",
+        "description": "Dein Spielzug"
+      }
+    }
+  },
+  "rps challenge": {
+    "name": "herausfordern",
+    "description": "Fordere einen anderen Benutzer zu Schere, Stein, Papier heraus",
+    "parameters": {
+      "opponent": {
+        "name": "gegner",
+        "description": "Der zu fordernde Benutzer"
+      }
+    }
+  },
+  "rps leaderboard": {
+    "name": "bestenliste",
+    "description": "Sieh dir die RPS-Siegesserie-Bestenliste für diesen Server an",
+    "parameters": {}
+  },
+  "message": {
+    "name": "nachricht",
+    "description": "Befehle zum Bearbeiten von Nachrichten",
+    "parameters": {}
+  },
+  "message mock": {
+    "name": "verspotten",
+    "description": "TeXt In SpOnGeBoB-sChReIbWeIsE uMwaNdElN",
+    "parameters": {
+      "text": {
+        "name": "text",
+        "description": "Der zu verspottende Text"
+      }
+    }
+  },
+  "message reverse": {
+    "name": "umkehren",
+    "description": "u thcirhcaN enied erheK",
+    "parameters": {
+      "text": {
+        "name": "text",
+        "description": "Der umzukehrende Text"
+      }
+    }
+  },
+  "message epstein": {
+    "name": "epstein",
+    "description": "⬛fast⬛⬛⬛dateien⬛",
+    "parameters": {
+      "text": {
+        "name": "text",
+        "description": "Das ⬛⬛⬛ in ⬛⬛"
+      },
+      "chance": {
+        "name": "chance",
+        "description": "Chance, dass ein Wort durch ⬛ ersetzt wird"
+      }
+    }
+  },
+  "message ascii": {
+    "name": "ascii",
+    "description": "Text in ASCII-Art umwandeln",
+    "parameters": {
+      "text": {
+        "name": "text",
+        "description": "Der umzuwandelnde Text"
+      },
+      "search": {
+        "name": "suche",
+        "description": "Suche nach einer Schriftart (Standard: Standard)"
+      }
+    }
+  },
+  "8ball": {
+    "name": "8ball",
+    "description": "Frage die magische 8-Ball-Kugel",
+    "parameters": {
+      "question": {
+        "name": "frage",
+        "description": "Die Frage, die du stellen möchtest"
+      }
+    }
+  },
+  "dice": {
+    "name": "würfel",
+    "description": "Wirf einen Würfel",
+    "parameters": {
+      "sides": {
+        "name": "seiten",
+        "description": "Anzahl der Seiten (Standard 6)"
+      }
+    }
+  },
+  "ship": {
+    "name": "ship",
+    "description": "Berechne die Kompatibilität zwischen zwei Benutzern",
+    "parameters": {
+      "user1": {
+        "name": "benutzer1",
+        "description": "Erster Benutzer"
+      },
+      "user2": {
+        "name": "benutzer2",
+        "description": "Zweiter Benutzer"
+      }
+    }
+  },
+  "choose": {
+    "name": "wählen",
+    "description": "Wähle eine zufällige Option aus einer Liste",
+    "parameters": {
+      "options": {
+        "name": "optionen",
+        "description": "Optionen mit Kommas getrennt (z. B. Pizza, Burger, Sushi)"
+      }
+    }
+  },
+  "moderation": {
+    "name": "moderation",
+    "description": "Moderationsbezogene Befehle",
+    "parameters": {}
+  },
+  "moderation settings": {
+    "name": "einstellungen",
+    "description": "Öffne das Moderations-Einstellungsmenü",
+    "parameters": {}
+  },
+  "moderation ban": {
+    "name": "bannen",
+    "description": "Einen Benutzer vom Server bannen",
+    "parameters": {
+      "user": {
+        "name": "benutzer",
+        "description": "Der zu bannende Benutzer"
+      },
+      "reason": {
+        "name": "grund",
+        "description": "Grund für den Bann"
+      },
+      "delete_messages": {
+        "name": "nachrichten_löschen",
+        "description": "Wie viel seines Nachrichtenverlaufs gelöscht werden soll"
+      }
+    }
+  },
+  "moderation softban": {
+    "name": "softban",
+    "description": "Einen Benutzer bannen und sofort wieder entbannen, um seine Nachrichten zu löschen",
+    "parameters": {
+      "user": {
+        "name": "benutzer",
+        "description": "Der zu softbannende Benutzer"
+      },
+      "reason": {
+        "name": "grund",
+        "description": "Grund für den Softban"
+      },
+      "delete_messages": {
+        "name": "nachrichten_löschen",
+        "description": "Wie viel seines Nachrichtenverlaufs gelöscht werden soll"
+      }
+    }
+  },
+  "moderation unban": {
+    "name": "entbannen",
+    "description": "Einen Benutzer vom Server entbannen",
+    "parameters": {
+      "username": {
+        "name": "benutzername",
+        "description": "Der zu entbannende Benutzer (Autovervollständigung)"
+      },
+      "reason": {
+        "name": "grund",
+        "description": "Grund für die Entbannung"
+      }
+    }
+  },
+  "moderation kick": {
+    "name": "kicken",
+    "description": "Einen Benutzer vom Server kicken",
+    "parameters": {
+      "user": {
+        "name": "benutzer",
+        "description": "Der zu kickende Benutzer"
+      },
+      "reason": {
+        "name": "grund",
+        "description": "Grund für den Kick"
+      }
+    }
+  },
+  "moderation timeout": {
+    "name": "timeout",
+    "description": "Einen Benutzer auf dem Server stummschalten (Timeout)",
+    "parameters": {
+      "user": {
+        "name": "benutzer",
+        "description": "Der Benutzer, der stummgeschaltet werden soll"
+      },
+      "duration": {
+        "name": "dauer",
+        "description": "Dauer des Timeouts"
+      },
+      "reason": {
+        "name": "grund",
+        "description": "Grund für den Timeout"
+      }
+    }
+  },
+  "moderation untimeout": {
+    "name": "untimeout",
+    "description": "Timeout eines Benutzers aufheben",
+    "parameters": {
+      "user": {
+        "name": "benutzer",
+        "description": "Der Benutzer, dessen Timeout aufgehoben werden soll"
+      },
+      "reason": {
+        "name": "grund",
+        "description": "Grund für das Aufheben des Timeouts"
+      }
+    }
+  }
+}

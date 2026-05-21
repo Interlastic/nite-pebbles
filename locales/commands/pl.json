@@ -1,0 +1,260 @@
+{
+  "joke": {
+    "name": "żart",
+    "description": "Polecenia sucharów (Dad jokes)",
+    "parameters": {}
+  },
+  "joke random": {
+    "name": "losowy",
+    "description": "Pobierz losowy suchar",
+    "parameters": {}
+  },
+  "joke leaderboard": {
+    "name": "ranking",
+    "description": "Zobacz najlepiej oceniane żarty na świecie",
+    "parameters": {}
+  },
+  "coinflip": {
+    "name": "rzut_monetą",
+    "description": "Rzuć jedną lub więcej monetami!",
+    "parameters": {
+      "count": {
+        "name": "ilość",
+        "description": "Liczba monet do rzucenia (1-20)"
+      }
+    }
+  },
+  "rps": {
+    "name": "rps",
+    "description": "Polecenia Kamień, Papier, Nożyce",
+    "parameters": {}
+  },
+  "rps play": {
+    "name": "graj",
+    "description": "Zagraj w Kamień, Papier, Nożyce przeciwko botowi",
+    "parameters": {
+      "choice": {
+        "name": "wybór",
+        "description": "Twój ruch"
+      }
+    }
+  },
+  "rps challenge": {
+    "name": "wyzwij",
+    "description": "Wyzwij innego użytkownika na Kamień, Papier, Nożyce",
+    "parameters": {
+      "opponent": {
+        "name": "przeciwnik",
+        "description": "Użytkownik do wyzwania"
+      }
+    }
+  },
+  "rps leaderboard": {
+    "name": "ranking",
+    "description": "Zobacz ranking serii zwycięstw RPS na tym serwerze",
+    "parameters": {}
+  },
+  "message": {
+    "name": "wiadomość",
+    "description": "Polecenia edycji wiadomości",
+    "parameters": {}
+  },
+  "message mock": {
+    "name": "drwij",
+    "description": "KoNwErTuJ tEkSt Na WiElKiE i MaŁe LiTeRy",
+    "parameters": {
+      "text": {
+        "name": "tekst",
+        "description": "Tekst do przedrwienia"
+      }
+    }
+  },
+  "message reverse": {
+    "name": "odwróć",
+    "description": "ćśomodaiw ąjows ćórwdO",
+    "parameters": {
+      "text": {
+        "name": "tekst",
+        "description": "Tekst do odwrócenia"
+      }
+    }
+  },
+  "message epstein": {
+    "name": "epstein",
+    "description": "⬛prawie⬛⬛⬛pliki⬛",
+    "parameters": {
+      "text": {
+        "name": "tekst",
+        "description": "⬛⬛⬛ na ⬛⬛"
+      },
+      "chance": {
+        "name": "szansa",
+        "description": "Szansa na zastąpienie słowa przez ⬛"
+      }
+    }
+  },
+  "message ascii": {
+    "name": "ascii",
+    "description": "Konwertuj tekst na grafikę ASCII",
+    "parameters": {
+      "text": {
+        "name": "tekst",
+        "description": "Tekst do konwersji"
+      },
+      "search": {
+        "name": "szukaj",
+        "description": "Szukaj czcionki (domyślnie: Standard)"
+      }
+    }
+  },
+  "8ball": {
+    "name": "8ball",
+    "description": "Zadaj pytanie magicznej kuli 8",
+    "parameters": {
+      "question": {
+        "name": "pytanie",
+        "description": "Pytanie, które chcesz zadać"
+      }
+    }
+  },
+  "dice": {
+    "name": "kostka",
+    "description": "Rzuć kostką",
+    "parameters": {
+      "sides": {
+        "name": "ścianki",
+        "description": "Liczba ścianek (domyślnie 6)"
+      }
+    }
+  },
+  "ship": {
+    "name": "ship",
+    "description": "Oblicz dopasowanie (ship) między dwoma użytkownikami",
+    "parameters": {
+      "user1": {
+        "name": "użytkownik1",
+        "description": "Pierwszy użytkownik"
+      },
+      "user2": {
+        "name": "użytkownik2",
+        "description": "Drugi użytkownik"
+      }
+    }
+  },
+  "choose": {
+    "name": "wybierz",
+    "description": "Wybierz losową opcję z listy",
+    "parameters": {
+      "options": {
+        "name": "opcje",
+        "description": "Opcje oddzielone przecinkami (np. Pizza, Burger, Sushi)"
+      }
+    }
+  },
+  "moderation": {
+    "name": "moderacja",
+    "description": "Polecenia związane z moderacją",
+    "parameters": {}
+  },
+  "moderation settings": {
+    "name": "ustawienia",
+    "description": "Otwórz menu ustawień moderacji",
+    "parameters": {}
+  },
+  "moderation ban": {
+    "name": "banuj",
+    "description": "Zbanuj użytkownika na serwerze",
+    "parameters": {
+      "user": {
+        "name": "użytkownik",
+        "description": "Użytkownik do zbanowania"
+      },
+      "reason": {
+        "name": "powód",
+        "description": "Powód bana"
+      },
+      "delete_messages": {
+        "name": "usuń_wiadomości",
+        "description": "Ile historii jego wiadomości usunąć"
+      }
+    }
+  },
+  "moderation softban": {
+    "name": "softban",
+    "description": "Zbanuj i natychmiast odbanuj użytkownika, aby wyczyścić jego wiadomości",
+    "parameters": {
+      "user": {
+        "name": "użytkownik",
+        "description": "Użytkownik do softbana"
+      },
+      "reason": {
+        "name": "powód",
+        "description": "Powód softbana"
+      },
+      "delete_messages": {
+        "name": "usuń_wiadomości",
+        "description": "Ile historii jego wiadomości usunąć"
+      }
+    }
+  },
+  "moderation unban": {
+    "name": "odbanuj",
+    "description": "Odbanuj użytkownika na serwerze",
+    "parameters": {
+      "username": {
+        "name": "nazwa_użytkownika",
+        "description": "Użytkownik do odbanowania (autouzupełnianie)"
+      },
+      "reason": {
+        "name": "powód",
+        "description": "Powód odbanowania"
+      }
+    }
+  },
+  "moderation kick": {
+    "name": "wyrzuć",
+    "description": "Wyrzuć użytkownika z serwera",
+    "parameters": {
+      "user": {
+        "name": "użytkownik",
+        "description": "Użytkownik do wyrzucenia"
+      },
+      "reason": {
+        "name": "powód",
+        "description": "Powód wyrzucenia"
+      }
+    }
+  },
+  "moderation timeout": {
+    "name": "timeout",
+    "description": "Wycisz użytkownika na serwerze (timeout)",
+    "parameters": {
+      "user": {
+        "name": "użytkownik",
+        "description": "Użytkownik, który ma zostać wyciszony"
+      },
+      "duration": {
+        "name": "czas_trwania",
+        "description": "Czas trwania wyciszenia"
+      },
+      "reason": {
+        "name": "powód",
+        "description": "Powód wyciszenia"
+      }
+    }
+  },
+  "moderation untimeout": {
+    "name": "untimeout",
+    "description": "Zdejmij wyciszenie użytkownika",
+    "parameters": {
+      "user": {
+        "name": "użytkownik",
+        "description": "Użytkownik, któremu należy zdjąć wyciszenie"
+      },
+      "reason": {
+        "name": "powód",
+        "description": "Powód zdjęcia wyciszenia"
+      }
+    }
+  }
+}
