@@ -1,6 +1,6 @@
 import discord
 from discord import ui
-from locales import get_string
+from locales import get_string, resolve_locale
 from enum import IntFlag
 import traceback
 
@@ -241,7 +241,7 @@ class LoggingConfigView(ui.LayoutView):
     async def build(self):
         try:
             self.clear_items()
-            lang = await self.cog.bot.server_settings.get_language(self.guild.id)
+            lang = await resolve_locale(self.user)
             settings = await self.cog.bot.server_settings.get_settings(self.guild.id)
             self.flags = settings.get("logging_flags_bitfield", 0)
             self.enabled = settings.get("logging_enabled", False)

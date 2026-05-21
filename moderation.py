@@ -7,7 +7,7 @@ import traceback
 from pathlib import Path
 from datetime import timedelta
 from discord.utils import utcnow
-from locales import get_string
+from locales import get_string, resolve_locale, get_localized
 from rapidfuzz import process, fuzz
 
 class FuzzyUserSelect(ui.LayoutView):
@@ -63,31 +63,6 @@ class FuzzyUserSelect(ui.LayoutView):
         else:
             await self.action_func(interaction, user, self.reason, edit=True)
 
-class PrefixEditModal(ui.Modal):
-    def __init__(self, cog, guild_id):
-        super().__init__(title="Edit Moderation Prefix")
-        self.cog = cog
-        self.guild_id = guild_id
-        self.prefix_input = ui.TextInput(
-            label="Prefix",
-            placeholder="e.g. !, ., mod",
-            min_length=1,
-            max_length=10,
-            required=True
-        )
-        self.add_item(self.prefix_input)
-
-    async def on_submit(self, interaction: discord.Interaction):
-        lang = await self.cog.bot.server_settings.get_language(self.guild_id)
-        if not interaction.user.guild_permissions.manage_guild:
-            return await interaction.response.send_message(get_string("errors.missing_permission", lang, permission="Manage Server"), ephemeral=True)
-
-        settings = await self.cog.bot.server_settings.get_settings(self.guild_id)
-        settings["moderation_prefix"] = self.prefix_input.value
-        await self.cog.bot.server_settings.update_settings(self.guild_id, settings)
-        
-        await interaction.response.send_message(get_string("moderation.prefix_updated", lang, prefix=self.prefix_input.value), ephemeral=True)
-
 class DMMessageEditModal(ui.Modal):
     def __init__(self, cog, guild_id, lang):
         super().__init__(title=get_string("moderation.dm_modal.title", lang))
@@ -130,20 +105,6 @@ class ModerationSettingsView(ui.LayoutView):
                 "emoji_key": "logging_clipboard"
             },
             {
-                "id": "prefix",
-                "title_key": "moderation.features.prefix.title",
-                "desc_key": "moderation.features.prefix.description",
-                "btn_key": "moderation.features.prefix.button",
-                "emoji_key": "moderation_swords"
-            },
-            {
-                "id": "prefix_guide",
-                "title_key": "moderation.features.prefix_guide.title",
-                "desc_key": "moderation.features.prefix_guide.description",
-                "btn_key": "moderation.features.prefix_guide.button",
-                "emoji_key": "verification"
-            },
-            {
                 "id": "dm_message",
                 "title_key": "moderation.features.dm_message.title",
                 "desc_key": "moderation.features.dm_message.description",
@@ -155,7 +116,7 @@ class ModerationSettingsView(ui.LayoutView):
         self.total_pages = (len(self.features) + self.items_per_page - 1) // self.items_per_page if self.features else 1
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        lang = await self.cog.bot.server_settings.get_language(self.guild.id)
+        lang = await resolve_locale(interaction)
         if interaction.user.id != self.user.id:
             await interaction.response.send_message(get_string("errors.not_button_owner", lang), ephemeral=True)
             return False
@@ -165,7 +126,7 @@ class ModerationSettingsView(ui.LayoutView):
         try:
             self.clear_items()
             self.files = []
-            lang = await self.cog.bot.server_settings.get_language(self.guild.id)
+            lang = await resolve_locale(self.user)
             
             is_community = "COMMUNITY" in self.guild.features
             is_boosted = self.guild.premium_tier > 0
@@ -202,7 +163,7 @@ class ModerationSettingsView(ui.LayoutView):
                 
                 async def btn_callback(interaction, fid=feat["id"]):
                     try:
-                        lang_inner = await self.cog.bot.server_settings.get_language(interaction.guild_id)
+                        lang_inner = await resolve_locale(interaction)
                         if not interaction.user.guild_permissions.manage_guild:
                             return await interaction.response.send_message(
                                 get_string("errors.missing_permission", lang_inner, permission="Manage Server"),
@@ -214,14 +175,6 @@ class ModerationSettingsView(ui.LayoutView):
                             view = LoggingConfigView(self.cog, self.guild, self.user)
                             await view.build()
                             return await interaction.response.send_message(view=view, ephemeral=True)
-                        elif fid == "prefix":
-                            modal = PrefixEditModal(self.cog, self.guild.id)
-                            return await interaction.response.send_modal(modal)
-                        elif fid == "prefix_guide":
-                            settings = await self.cog.bot.server_settings.get_settings(self.guild.id)
-                            prefix = settings.get("moderation_prefix", "!")
-                            content = get_string("moderation.features.prefix_guide.content", lang_inner, prefix=prefix)
-                            return await interaction.response.send_message(content, ephemeral=True)
                         elif fid == "dm_message":
                             modal = DMMessageEditModal(self.cog, self.guild.id, lang_inner)
                             return await interaction.response.send_modal(modal)
@@ -231,7 +184,7 @@ class ModerationSettingsView(ui.LayoutView):
                             ephemeral=True
                         )
                     except Exception as e:
-                        lang_inner = await self.cog.bot.server_settings.get_language(interaction.guild_id)
+                        lang_inner = await resolve_locale(interaction)
                         await interaction.response.send_message(
                             get_string("moderation.errors.generic", lang_inner, error=str(e)),
                             ephemeral=True
@@ -275,7 +228,7 @@ class ModerationSettingsView(ui.LayoutView):
                     await self.build()
                     await interaction.response.edit_message(view=self, attachments=self.files)
                 except Exception as e:
-                    lang_inner = await self.cog.bot.server_settings.get_language(interaction.guild_id)
+                    lang_inner = await resolve_locale(interaction)
                     await interaction.response.send_message(
                         get_string("moderation.errors.generic", lang_inner, error=str(e)),
                         ephemeral=True
@@ -287,7 +240,7 @@ class ModerationSettingsView(ui.LayoutView):
                     await self.build()
                     await interaction.response.edit_message(view=self, attachments=self.files)
                 except Exception as e:
-                    lang_inner = await self.cog.bot.server_settings.get_language(interaction.guild_id)
+                    lang_inner = await resolve_locale(interaction)
                     await interaction.response.send_message(
                         get_string("moderation.errors.generic", lang_inner, error=str(e)),
                         ephemeral=True
@@ -578,7 +531,7 @@ class Moderation(commands.Cog):
             await view.build()
             await interaction.response.send_message(view=view, ephemeral=True, files=view.files)
         except Exception as e:
-            lang_inner = await self.bot.server_settings.get_language(interaction.guild.id)
+            lang_inner = await resolve_locale(interaction)
             await interaction.response.send_message(
                 get_string("moderation.errors.generic", lang_inner, error=str(e)),
                 ephemeral=True
@@ -644,7 +597,7 @@ class Moderation(commands.Cog):
     async def perform_ban(self, interaction, user, reason, delete_messages="0", attempt=1, edit=False):
         if not edit: await interaction.response.defer(ephemeral=False)
         
-        lang = await self.bot.server_settings.get_language(interaction.guild.id)
+        lang = await resolve_locale(interaction)
         allowed, error = await self.check_hierarchy(interaction, user, "ban")
         if not allowed: return await self.send_mod_error(interaction, "ban", user, error, attempt, reason, delete_messages, edit, lang=lang)
         
@@ -686,7 +639,7 @@ class Moderation(commands.Cog):
     async def perform_softban(self, interaction, user, reason, delete_messages="86400", attempt=1, edit=False):
         if not edit: await interaction.response.defer(ephemeral=False)
         
-        lang = await self.bot.server_settings.get_language(interaction.guild.id)
+        lang = await resolve_locale(interaction)
         allowed, error = await self.check_hierarchy(interaction, user, "softban")
         if not allowed: return await self.send_mod_error(interaction, "softban", user, error, attempt, reason, delete_messages, edit, lang=lang)
         
@@ -772,7 +725,7 @@ class Moderation(commands.Cog):
     async def perform_unban(self, interaction, user, reason, attempt=1, edit=False):
         if not edit: await interaction.response.defer(ephemeral=False)
 
-        lang = await self.bot.server_settings.get_language(interaction.guild.id)
+        lang = await resolve_locale(interaction)
         if not interaction.guild: return await self.send_mod_error(interaction, "unban", user, "This command can only be used in a server.", attempt, reason, edit=edit, lang=lang)
         
         if not interaction.user.guild_permissions.ban_members:
@@ -811,7 +764,7 @@ class Moderation(commands.Cog):
     async def perform_kick(self, interaction, user, reason, attempt=1, edit=False):
         if not edit: await interaction.response.defer(ephemeral=False)
         
-        lang = await self.bot.server_settings.get_language(interaction.guild.id)
+        lang = await resolve_locale(interaction)
         allowed, error = await self.check_hierarchy(interaction, user, "kick")
         if not allowed: return await self.send_mod_error(interaction, "kick", user, error, attempt, reason, edit=edit, lang=lang)
         
@@ -857,7 +810,7 @@ class Moderation(commands.Cog):
     async def perform_timeout(self, interaction, user, duration=3600, reason=None, attempt=1, edit=False):
         if not edit: await interaction.response.defer(ephemeral=False)
         
-        lang = await self.bot.server_settings.get_language(interaction.guild.id)
+        lang = await resolve_locale(interaction)
         allowed, error = await self.check_hierarchy(interaction, user, "timeout")
         if not allowed: return await self.send_mod_error(interaction, "timeout", user, error, attempt, reason, duration, edit, lang=lang)
         
@@ -887,7 +840,7 @@ class Moderation(commands.Cog):
     async def perform_untimeout(self, interaction, user, reason, attempt=1, edit=False):
         if not edit: await interaction.response.defer(ephemeral=False)
 
-        lang = await self.bot.server_settings.get_language(interaction.guild.id)
+        lang = await resolve_locale(interaction)
         if not interaction.guild: return await self.send_mod_error(interaction, "untimeout", user, "This command can only be used in a server.", attempt, reason, edit=edit, lang=lang)
         
         allowed, error = await self.check_hierarchy(interaction, user, "untimeout")
@@ -999,46 +952,45 @@ class Moderation(commands.Cog):
                         if cmd == "unban":
                             bans = [entry async for entry in message.guild.bans()]
                             choices = [entry.user for entry in bans]
+                            results = process.extract(search_query, choices, processor=lambda x: f"{x.display_name} {x.name} {x.id}" if not isinstance(x, str) else x, scorer=fuzz.WRatio, limit=25)
+                            results = [r for r in results if r[1] > 50]
                         else:
-                            # Ensure members are chunked if possible
-                            if not message.guild.chunked and message.guild.member_count < 2000:
-                                await message.guild.chunk()
-                            choices = message.guild.members
-                        
-                        results = process.extract(search_query, choices, processor=lambda x: f"{x.display_name} {x.name} {x.id}" if not isinstance(x, str) else x, scorer=fuzz.WRatio, limit=25)
-                        results = [r for r in results if r[1] > 50]
+                            # HTTP search
+                            data = await message.guild._state.http.request(
+                                discord.http.Route("GET", "/guilds/{guild_id}/members/search", guild_id=message.guild.id),
+                                params={"query": search_query, "limit": 25}
+                            )
+                            members = [discord.Member(data=d, guild=message.guild, state=message.guild._state) for d in data]
+                            results = [(m, 100.0, 0) for m in members]
                         
                         if not results:
                             return await message.channel.send("No user found.")
                         
-                        if len(results) == 1:
-                            target_user = results[0][0]
-                        else:
-                            # Show dropdown
-                            action_func = {
-                                "ban": self.perform_ban,
-                                "softban": self.perform_softban,
-                                "unban": self.perform_unban,
-                                "kick": self.perform_kick,
-                                "timeout": self.perform_timeout,
-                                "untimeout": self.perform_untimeout
-                            }[cmd]
-                            
-                            # Parse duration for timeout if present in remaining_args
-                            current_reason = remaining_args
-                            current_duration = 3600
-                            if cmd == "timeout" and remaining_args:
-                                rem_parts = remaining_args.split()
-                                for i, part in enumerate(rem_parts):
-                                    dur_seconds = self.parse_duration(part)
-                                    if dur_seconds:
-                                        current_duration = dur_seconds
-                                        current_reason = " ".join(rem_parts[:i] + rem_parts[i+1:])
-                                        break
-                            
-                            view = FuzzyUserSelect(self, results, action_func, current_reason, current_duration if cmd == "timeout" else None, lang=lang, orig_message=message)
-                            await message.channel.send(view=view)
-                            return
+                        # Show dropdown
+                        action_func = {
+                            "ban": self.perform_ban,
+                            "softban": self.perform_softban,
+                            "unban": self.perform_unban,
+                            "kick": self.perform_kick,
+                            "timeout": self.perform_timeout,
+                            "untimeout": self.perform_untimeout
+                        }[cmd]
+                        
+                        # Parse duration for timeout if present in remaining_args
+                        current_reason = remaining_args
+                        current_duration = 3600
+                        if cmd == "timeout" and remaining_args:
+                            rem_parts = remaining_args.split()
+                            for i, part in enumerate(rem_parts):
+                                dur_seconds = self.parse_duration(part)
+                                if dur_seconds:
+                                    current_duration = dur_seconds
+                                    current_reason = " ".join(rem_parts[:i] + rem_parts[i+1:])
+                                    break
+                        
+                        view = FuzzyUserSelect(self, results, action_func, current_reason, current_duration if cmd == "timeout" else None, lang=lang, orig_message=message)
+                        await message.channel.send(view=view)
+                        return
                     
                     # If we have target_user, parse duration and reason from remaining_args
                     reason = remaining_args
