@@ -11,7 +11,7 @@
     {
       "extension_file": "fun_commands",
       "name": "Fun Commands",
-      "description": "",
+      "description": "Fun Commands to lighten up the mood (I guess)",
       "dependencies": ["aiohttp", "playwright", "Jinja2", "Pillow", "pyfiglet"],
       "credits": {
         "Creators": [
@@ -31,7 +31,7 @@
     {
       "extension_file": "moderation",
       "name": "Moderation",
-      "description": "",
+      "description": "Moderation features (like banning)",
       "dependencies": ["rapidfuzz"],
       "credits": {
         "Creators": [
@@ -51,7 +51,7 @@
     {
       "extension_file": "moderation_logs.entry",
       "name": "Moderation Logs",
-      "description": "",
+      "description": "Logs events to a specific channel",
       "dependencies": [],
       "credits": {
         "Creators": [
