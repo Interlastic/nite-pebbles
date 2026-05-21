@@ -12,6 +12,7 @@ import math
 import pyfiglet
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
+from locales import get_string, get_list, resolve_locale, get_localized
 
 # Local Pebble Utilities
 from pebble_utils import make_loading_bar
@@ -78,7 +79,6 @@ class RPSChallengeView(discord.ui.View):
         self._localize_buttons()
 
     def _localize_buttons(self):
-        from locales import get_string
         for item in self.children:
             if hasattr(item, "custom_id"):
                 if item.custom_id == "rps_accept":
@@ -87,7 +87,6 @@ class RPSChallengeView(discord.ui.View):
                     item.label = get_string("ui.buttons.decline", self.lang)
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        from locales import get_string
         # Only challenger and opponent can interact
         if interaction.user.id not in [self.challenger.id, self.opponent.id]:
             await interaction.response.send_message(
@@ -104,7 +103,6 @@ class RPSChallengeView(discord.ui.View):
     async def accept_button(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
-        from locales import get_string
         if interaction.user.id != self.opponent.id:
             await interaction.response.send_message(
                 get_string("errors.not_challenger", self.lang), ephemeral=True
@@ -132,7 +130,6 @@ class RPSChallengeView(discord.ui.View):
     async def decline_button(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
-        from locales import get_string
         if interaction.user.id != self.opponent.id:
             await interaction.response.send_message(
                 get_string("errors.not_challenger_decline", self.lang), ephemeral=True
@@ -164,7 +161,6 @@ class RPSChoiceView(discord.ui.View):
         self._localize_buttons()
 
     def _localize_buttons(self):
-        from locales import get_string
         label_map = {
             "rps_rock": "ui.buttons.rock",
             "rps_paper": "ui.buttons.paper",
@@ -176,7 +172,6 @@ class RPSChoiceView(discord.ui.View):
 
     async def check_and_resolve(self, interaction: discord.Interaction):
         """Check if both players have chosen and resolve the game."""
-        from locales import get_string
         if len(self.choices) == 2:
             c1 = self.choices[self.parent.challenger.id]
             c2 = self.choices[self.parent.opponent.id]
@@ -267,7 +262,6 @@ class RPSChoiceView(discord.ui.View):
         await self.handle_choice(interaction, "Scissors")
 
     async def handle_choice(self, interaction: discord.Interaction, choice: str):
-        from locales import get_string
         user_id = interaction.user.id
 
         if user_id not in [self.parent.challenger.id, self.parent.opponent.id]:
@@ -304,7 +298,6 @@ class RPSSingleChoiceView(discord.ui.View):
         self._localize_buttons()
 
     def _localize_buttons(self):
-        from locales import get_string
         for item in self.children:
             if hasattr(item, "custom_id"):
                 if item.custom_id == "rps_single_rock":
@@ -357,7 +350,6 @@ class RPSPlayAgainView(discord.ui.View):
         self._localize_buttons()
 
     def _localize_buttons(self):
-        from locales import get_string
         for item in self.children:
             if hasattr(item, "custom_id") and item.custom_id == "rps_play_again":
                 item.label = get_string("ui.buttons.play_again", self.lang)
@@ -370,7 +362,6 @@ class RPSPlayAgainView(discord.ui.View):
     async def play_again(
         self, interaction: discord.Interaction, button: discord.ui.Button
     ):
-        from locales import get_string
         # Check if the user was part of the game
         if interaction.user.id != self.challenger.id and (
             self.opponent and interaction.user.id != self.opponent.id
@@ -424,7 +415,6 @@ class JokeView(discord.ui.View):
         self._localize_buttons()
 
     def _localize_buttons(self):
-        from locales import get_string
         for item in self.children:
             if hasattr(item, "custom_id"):
                 if item.custom_id == "joke_image":
@@ -641,7 +631,7 @@ class FunCommands(commands.Cog):
                         # Get language using bot.server_settings
                         lang = "en"
                         if interaction.guild:
-                            lang = await self.bot.server_settings.get_language(interaction.guild.id)
+                            lang = await resolve_locale(interaction)
                         else:
                             lang = str(interaction.locale).split("-")[0]
                             if lang not in ["en", "de"]:
@@ -696,7 +686,6 @@ class FunCommands(commands.Cog):
         self, interaction: discord.Interaction, choice: str, lang: str = "en"
     ):
         """Logic for resolving RPS vs bot."""
-        from locales import get_string
         bot_choice = random.choice(["Rock", "Paper", "Scissors"])
 
         if choice == bot_choice:
@@ -749,10 +738,7 @@ class FunCommands(commands.Cog):
     @app_commands.allowed_installs(users=True, guilds=True)
     @app_commands.allowed_contexts(dms=True, private_channels=True, guilds=True)
     async def joke_leaderboard(self, interaction: discord.Interaction):
-        from locales import get_string
-        lang = "en"
-        if interaction.guild:
-            lang = await self.bot.server_settings.get_language(interaction.guild.id)
+        lang = await resolve_locale(interaction)
 
         if not self.joke_stats:
             await interaction.response.send_message(
@@ -808,10 +794,7 @@ class FunCommands(commands.Cog):
     @app_commands.allowed_installs(users=True, guilds=True)
     @app_commands.allowed_contexts(dms=True, private_channels=True, guilds=True)
     async def coinflip(self, interaction: discord.Interaction, count: int = 1):
-        from locales import get_string
-        lang = "en"
-        if interaction.guild:
-            lang = await self.bot.server_settings.get_language(interaction.guild.id)
+        lang = await resolve_locale(interaction)
 
         if count < 1:
             await interaction.response.send_message(
@@ -871,9 +854,7 @@ class FunCommands(commands.Cog):
         interaction: discord.Interaction,
         choice: Literal["Rock", "Paper", "Scissors"],
     ):
-        lang = "en"
-        if interaction.guild:
-            lang = await self.bot.server_settings.get_language(interaction.guild.id)
+        lang = await resolve_locale(interaction)
         await self.resolve_single_rps(interaction, choice, lang)
 
     @rps_group.command(
@@ -885,10 +866,7 @@ class FunCommands(commands.Cog):
     async def rps_challenge(
         self, interaction: discord.Interaction, opponent: discord.User
     ):
-        from locales import get_string
-        lang = "en"
-        if interaction.guild:
-            lang = await self.bot.server_settings.get_language(interaction.guild.id)
+        lang = await resolve_locale(interaction)
 
         if opponent.id == interaction.user.id:
             await interaction.response.send_message(
@@ -923,10 +901,7 @@ class FunCommands(commands.Cog):
     @app_commands.allowed_installs(users=True, guilds=True)
     @app_commands.allowed_contexts(dms=False, private_channels=False, guilds=True)
     async def rps_leaderboard(self, interaction: discord.Interaction):
-        from locales import get_string
-        lang = "en"
-        if interaction.guild:
-            lang = await self.bot.server_settings.get_language(interaction.guild.id)
+        lang = await resolve_locale(interaction)
 
         if not interaction.guild:
             await interaction.response.send_message(
@@ -984,10 +959,7 @@ class FunCommands(commands.Cog):
     @app_commands.allowed_installs(users=True, guilds=True)
     @app_commands.allowed_contexts(dms=True, private_channels=True, guilds=True)
     async def eightball(self, interaction: discord.Interaction, question: str):
-        from locales import get_string, get_list
-        lang = "en"
-        if interaction.guild:
-            lang = await self.bot.server_settings.get_language(interaction.guild.id)
+        lang = await resolve_locale(interaction)
 
         responses = get_list("games.eightball.responses", lang)
         answer = random.choice(responses)
@@ -1003,10 +975,7 @@ class FunCommands(commands.Cog):
     @app_commands.allowed_installs(users=True, guilds=True)
     @app_commands.allowed_contexts(dms=True, private_channels=True, guilds=True)
     async def dice(self, interaction: discord.Interaction, sides: int = 6):
-        from locales import get_string
-        lang = "en"
-        if interaction.guild:
-            lang = await self.bot.server_settings.get_language(interaction.guild.id)
+        lang = await resolve_locale(interaction)
 
         if sides < 2:
             await interaction.response.send_message(
@@ -1117,7 +1086,6 @@ class FunCommands(commands.Cog):
     async def ship(
         self, interaction: discord.Interaction, user1: discord.User, user2: discord.User
     ):
-        from locales import get_string
         percentage = random.randint(0, 100)
         emoji = "💔"
         if percentage > 20:
@@ -1128,12 +1096,7 @@ class FunCommands(commands.Cog):
             emoji = "💖"
         if percentage == 100:
             emoji = "🔥"
-
-        lang = (
-            await self.bot.server_settings.get_language(interaction.guild_id)
-            if interaction.guild
-            else "en"
-        )
+        lang = await resolve_locale(interaction)
         await interaction.response.send_message(
             f"{get_string('fun.ship.title', lang)}\n"
             f"{user1.mention} x {user2.mention}\n"
@@ -1146,17 +1109,11 @@ class FunCommands(commands.Cog):
     @app_commands.allowed_installs(users=True, guilds=True)
     @app_commands.allowed_contexts(dms=True, private_channels=True, guilds=True)
     async def choose(self, interaction: discord.Interaction, options: str):
-        from locales import get_string
         if "," in options:
             choices_list = [opt.strip() for opt in options.split(",") if opt.strip()]
         else:
             choices_list = options.split()
-
-        lang = (
-            await self.bot.server_settings.get_language(interaction.guild_id)
-            if interaction.guild
-            else "en"
-        )
+        lang = await resolve_locale(interaction)
         if not choices_list:
             await interaction.response.send_message(
                 get_string("fun.choose.no_options", lang), ephemeral=True
