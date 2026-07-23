@@ -82,6 +82,21 @@
         ],
         "Contributers": []
       }
+    },
+    {
+      "extension_file": "leveling",
+      "name": "XP Leveling",
+      "description": "Per-server XP and leveling system with fully customizable curve, channel/role filters, multipliers, and level-role rewards.",
+      "dependencies": [],
+      "credits": {
+        "Creators": [
+          {
+            "id": "inter",
+            "contributions": "Initial creation"
+          }
+        ],
+        "Contributers": []
+      }
     }
   ]
 }

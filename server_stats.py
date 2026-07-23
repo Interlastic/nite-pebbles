@@ -50,7 +50,7 @@ class ServerStats(commands.Cog):
         # 1. Server Name
         template = config.get("server_name_template")
         if template:
-            new_name = render_template(template, fetched, online_count)
+            new_name = render_template(template, fetched, online_count, cached_guild=guild)
             if new_name and guild.name != new_name:
                 # Check throttle (2 per hour)
                 now = datetime.now()
@@ -83,7 +83,7 @@ class ServerStats(commands.Cog):
                 await self.update_channel_name(channel, ch_template, fetched, me, online_count)
 
     async def update_channel_name(self, channel, template, fetched, me, online_count):
-        new_name = render_template(template, fetched, online_count)
+        new_name = render_template(template, fetched, online_count, cached_guild=channel.guild)
         if new_name and channel.name != new_name:
             if channel.permissions_for(me).manage_channels:
                 try:
