@@ -500,14 +500,9 @@ class Moderation(commands.Cog):
         text = text.replace("\n", " ").replace("\r", "")
         return re.sub(r"([_*~\\`|])", r"\\\1", text)
 
-    moderation_group = app_commands.Group(
-        name="moderation", 
-        description="Moderation related commands",
-        default_permissions=discord.Permissions(moderate_members=True)
-    )
+    moderation_group = app_commands.Group(name="moderation", description="Moderation related commands")
 
     @moderation_group.command(name="settings", description="Open the moderation settings menu")
-    @app_commands.default_permissions(administrator=True)
     async def moderation_settings(self, interaction: discord.Interaction):
         try:
             settings = await self.bot.server_settings.get_settings(interaction.guild.id)
@@ -573,7 +568,6 @@ class Moderation(commands.Cog):
         return True, None
 
     @moderation_group.command(name="ban", description="Ban a user from the server")
-    @app_commands.default_permissions(ban_members=True)
     @app_commands.describe(user="The user to ban", reason="Reason for the ban", delete_messages="How much of their message history to delete")
     @app_commands.choices(delete_messages=[
         app_commands.Choice(name="Don't delete any", value="0"),
@@ -631,7 +625,6 @@ class Moderation(commands.Cog):
             await self.send_mod_error(interaction, "ban", user, str(e), attempt, reason, delete_messages, edit, lang=lang)
 
     @moderation_group.command(name="softban", description="Ban and instantly unban a user to clear their messages")
-    @app_commands.default_permissions(ban_members=True)
     @app_commands.describe(user="The user to softban", reason="Reason for the softban", delete_messages="How much of their message history to delete")
     @app_commands.choices(delete_messages=[
         app_commands.Choice(name="Previous 24 hours", value="86400"),
@@ -685,7 +678,6 @@ class Moderation(commands.Cog):
             await self.send_mod_error(interaction, "softban", user, str(e), attempt, reason, delete_messages, edit, lang=lang)
 
     @moderation_group.command(name="unban", description="Unban a user from the server")
-    @app_commands.default_permissions(ban_members=True)
     @app_commands.describe(username="The user to unban (autocomplete)", reason="Reason for the unban")
     async def unban(self, interaction: discord.Interaction, username: str, reason: str = None):
         settings = await self.bot.server_settings.get_settings(interaction.guild.id)
@@ -762,7 +754,6 @@ class Moderation(commands.Cog):
             await self.send_mod_error(interaction, "unban", user, str(e), attempt, reason, edit=edit, lang=lang)
 
     @moderation_group.command(name="kick", description="Kick a user from the server")
-    @app_commands.default_permissions(kick_members=True)
     @app_commands.describe(user="The user to kick", reason="Reason for the kick")
     async def kick(self, interaction: discord.Interaction, user: discord.Member, reason: str = None):
         settings = await self.bot.server_settings.get_settings(interaction.guild.id)
@@ -801,7 +792,6 @@ class Moderation(commands.Cog):
             await self.send_mod_error(interaction, "kick", user, str(e), attempt, reason, edit=edit, lang=lang)
 
     @moderation_group.command(name="timeout", description="Timeout a user in the server")
-    @app_commands.default_permissions(moderate_members=True)
     @app_commands.describe(user="The user to timeout", duration="Duration of the timeout", reason="Reason for the timeout")
     @app_commands.choices(duration=[
         app_commands.Choice(name="60 seconds", value=60),
@@ -840,7 +830,6 @@ class Moderation(commands.Cog):
             await self.send_mod_error(interaction, "timeout", user, str(e), attempt, reason, duration, edit, lang=lang)
 
     @moderation_group.command(name="untimeout", description="Remove timeout from a user")
-    @app_commands.default_permissions(moderate_members=True)
     @app_commands.describe(user="The user to untimeout", reason="Reason for removing timeout")
     async def untimeout(self, interaction: discord.Interaction, user: discord.Member, reason: str = None):
         settings = await self.bot.server_settings.get_settings(interaction.guild.id)
@@ -877,6 +866,7 @@ class Moderation(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
+        if not self.bot.intents.message_content: return
         if message.author.bot or not message.guild: return
         
         try:
