@@ -1,4 +1,5 @@
 import discord
+import asyncio
 from .base import send_log_message
 from locales import get_string
 import traceback
@@ -40,10 +41,15 @@ async def handle_guild_update(bot, before, after):
         action_by = None
         reason = "**No Reason**"
         if after.me.guild_permissions.view_audit_log:
-            async for entry in after.audit_logs(limit=1, action=discord.AuditLogAction.guild_update):
-                action_by = entry.user
-                reason = entry.reason or "**No Reason**"
-                break
+            await asyncio.sleep(0.5)
+            async for entry in after.audit_logs(limit=10, action=discord.AuditLogAction.guild_update):
+                if entry.target and entry.target.id == after.id:
+                    action_by = entry.user
+                    reason = entry.reason or "**No Reason**"
+                    break
+
+        if settings.get("logging_exclude_nite_stats", False) and (reason == "Nite Server Stats Update" or (action_by and action_by.id == bot.user.id)):
+            return
 
         content = "\n".join(changes)
         content += f"\nReason: **{reason}**"
