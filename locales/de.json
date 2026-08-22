@@ -180,7 +180,6 @@
     "logging": {
       "header": "Protokollierung",
       "enabled_label": "Aktiviert",
-      "exclude_stats_label": "Nite Server-Statistiken ausschließen",
       "channel_label": "Kanal",
       "preset_btn": "Preset wählen",
       "preset_modal_title": "Protokoll-Preset wählen",
@@ -436,8 +435,6 @@
       "category_settings": "**Kategorie-Einstellungen**",
       "status": "**Status**: {status}",
       "server_name": "**Servernamensvorlage**",
-      "channel_overrides": "**Kanal-Überschreibungen**",
-      "stat_channels": "**Statistik-Kanäle**",
       "server_name_preview": "Vorschau: `{name}`",
       "managed_channels": "**Verwaltete Kanäle**",
       "no_channels": "Es werden noch keine Kanäle verfolgt.",
@@ -452,8 +449,6 @@
       "edit_server_name": "Bearbeiten",
       "edit_category_name": "Kategoriename bearbeiten",
       "clear_server_name": "Löschen",
-      "manage_overrides": "Überschreibungen verwalten",
-      "add_stat_channel": "Statistik-Kanal erstellen",
       "add_channel": "Kanal hinzufügen",
       "edit": "Bearbeiten",
       "remove": "Entfernen",
@@ -538,117 +533,6 @@
     },
     "conflict": {
       "notify": "Hey! The {type} is currently controlled by nite-pebbles. Your change will be overridden on the next update cycle. To change this, open /dashboard and go to Server Stats."
-    }
-  },
-  "leveling": {
-    "rank": {
-      "title": "📊 {user}s Rang",
-      "body": "**Level:** {level}\n**Rang:** #{rank}\n**Gesamt-XP:** {total_xp}\n**Fortschritt:** {current} / {needed} XP\n{progress}\n**Nachrichten:** {messages}"
-    },
-    "leaderboard": {
-      "title": "🏆 Rangliste",
-      "empty": "Noch keine XP-Daten — Chatte, um XP zu verdienen!",
-      "prev": "◀ Zur\u00fcck",
-      "next": "Weiter ▶"
-    },
-    "level_up": {
-      "title": "Level Up!",
-      "message": "🎉 {user} hat gerade **Level {level}** erreicht!"
-    },
-    "give_xp": {
-      "title": "XP vergeben",
-      "desc": "{user} hat **{amount} XP** erhalten.\nNeuer Gesamtwert: **{new_total} XP** (Level {level})"
-    },
-    "set_level": {
-      "title": "Level gesetzt",
-      "desc": "Das Level von {user} wurde auf **{level}** gesetzt ({xp} Gesamt-XP)."
-    },
-    "reset_xp": {
-      "title": "XP zur\u00fcckgesetzt",
-      "user_desc": "XP f\u00fcr {user} zur\u00fcckgesetzt.",
-      "all_desc": "XP f\u00fcr alle Nutzer auf diesem Server zur\u00fcckgesetzt."
-    },
-    "error": {
-      "disabled_title": "Leveling deaktiviert",
-      "disabled": "Das Leveling-System ist auf diesem Server nicht aktiviert.",
-      "no_data_title": "Keine Daten",
-      "no_data": "**{user}** hat noch keine XP verdient.",
-      "no_perm_title": "Keine Berechtigung"
-    },
-    "settings": {
-      "title": "⚙️ Leveling-Einstellungen",
-      "enabled_yes": "✅ Aktiviert",
-      "enabled_no": "❌ Deaktiviert",
-      "toggle_enable": "Leveling aktivieren",
-      "toggle_disable": "Leveling deaktivieren",
-      "overview_desc": "**Status:** {enabled}\n**XP-Bereich:** {xp_min}\u2013{xp_max} pro Nachricht\n**Abk\u00fchlzeit:** {cooldown}s\n**Formel:** `{formula}`\n\n**Ben\u00f6tigte XP (Level 1\u21925):** {sample_xp}",
-      "nav_prev": "◀ Zur\u00fcck",
-      "nav_next": "Weiter ▶",
-      "page_overview": "\u00dcbersicht",
-      "page_xp": "XP-Konfiguration",
-      "page_channels": "Kan\u00e4le",
-      "page_roles": "Rollen",
-      "page_level_roles": "Level-Rollen",
-      "page_announcements": "Ankündigungen",
-      "page_formula": "Formel",
-      "xp_title": "⚡ XP-Konfiguration",
-      "xp_desc": "**Min. XP pro Nachricht:** {xp_min}\n**Max. XP pro Nachricht:** {xp_max}\n**Abk\u00fchlzeit:** {cooldown} Sekunden\n**Mindest-Nachrichtenl\u00e4nge:** {min_length} Zeichen",
-      "xp_edit_btn": "XP-Einstellungen bearbeiten",
-      "channels_title": "📋 Kanalfilter",
-      "channels_desc": "**Modus:** {mode}\n\n**Kan\u00e4le:**\n{channels}",
-      "channel_mode_blacklist": "Blacklist (XP \u00fcberall au\u00dfer gelisteten Kan\u00e4len)",
-      "channel_mode_whitelist": "Whitelist (XP nur in gelisteten Kan\u00e4len)",
-      "channel_mode_toggle": "Modus: {mode}",
-      "channel_edit_btn": "Kanalliste bearbeiten",
-      "channel_list_empty": "*Keine \u2014 alle Kan\u00e4le gelten*",
-      "roles_title": "🎭 Rolleneinstellungen",
-      "roles_desc": "**Ignorierte Rollen** (kein XP-Gewinn):\n{ignored}\n\n**XP-Multiplikatoren:**\n{multipliers}",
-      "roles_edit_ignored": "Ignorierte Rollen bearbeiten",
-      "roles_edit_mult": "Multiplikatoren bearbeiten",
-      "roles_none": "*Keine*",
-      "level_roles_title": "🏅 Level-Rollenbelohnungen",
-      "level_roles_desc": "Rollen, die automatisch vergeben werden, wenn ein Nutzer ein Level erreicht:\n{roles}",
-      "level_roles_edit": "Level-Rollen bearbeiten",
-      "level_roles_empty": "*Keine konfiguriert*",
-      "announce_title": "📢 Ankündigungen",
-      "announce_desc": "**Level-Up-Ankündigungsmodus:** {mode}",
-      "announce_mode_disabled": "Deaktiviert",
-      "announce_mode_current": "Aktueller Kanal",
-      "announce_mode_custom": "Benutzerdefinierter Kanal",
-      "announce_mode_dm": "Nutzer per DM benachrichtigen",
-      "announce_cycle_btn": "Modus: {mode} (klicken zum Wechseln)",
-      "announce_channel_btn": "Kanal festlegen",
-      "formula_title": "📐 Level-Kurven-Formel",
-      "formula_desc": "**Aktuelle Formel:** `{formula}`\n\nVerwende `level` als Variable. Das Ergebnis ist die XP, die ben\u00f6tigt wird, um von einem Level zum n\u00e4chsten aufzusteigen.\n\n**Ben\u00f6tigte XP pro Level:**\n{curve}",
-      "formula_edit_btn": "Formel bearbeiten",
-      "formula_reset_btn": "Auf Standard zur\u00fccksetzen"
-    },
-    "modal": {
-      "xp_title": "XP-Einstellungen bearbeiten",
-      "xp_min_label": "Mindest-XP pro Nachricht",
-      "xp_max_label": "H\u00f6chst-XP pro Nachricht",
-      "cooldown_label": "Abk\u00fchlzeit (Sekunden)",
-      "min_length_label": "Mindest-Nachrichtenl\u00e4nge (Zeichen)",
-      "invalid_number": "Bitte g\u00fcltige Zahlen eingeben.",
-      "channel_title": "Kanalliste bearbeiten",
-      "channel_label": "Kanal-IDs (durch Leerzeichen oder Komma getrennt)",
-      "channel_placeholder": "z.B. 123456789 987654321",
-      "ignored_roles_title": "Ignorierte Rollen bearbeiten",
-      "ignored_roles_label": "Rollen-IDs (durch Leerzeichen oder Komma getrennt)",
-      "roles_placeholder": "z.B. 123456789 987654321",
-      "multipliers_title": "XP-Multiplikatoren bearbeiten",
-      "multipliers_label": "Format: rollen_id:multiplikator (eine pro Zeile)",
-      "multipliers_placeholder": "z.B.\n123456789:1.5\n987654321:2.0",
-      "level_roles_title": "Level-Rollenbelohnungen bearbeiten",
-      "level_roles_label": "Format: level:rollen_id,rollen_id (eine pro Zeile)",
-      "level_roles_placeholder": "z.B.\n5:123456789\n10:987654321,111111111",
-      "announce_channel_title": "Ankündigungskanal festlegen",
-      "announce_channel_label": "Kanal-ID",
-      "announce_channel_placeholder": "z.B. 123456789",
-      "formula_title": "Level-Formel bearbeiten",
-      "formula_label": "Formel (max. 50 Zeichen, 'level' als Variable)",
-      "formula_placeholder": "z.B. 100 * level ** 1.5",
-      "formula_fallback_warning": "⚠️ Deine Formel konnte nicht validiert werden — sie f\u00e4llt auf die Standardkurve zur\u00fcck (`100 * level ** 1.5`). \u00dcberpr\u00fcfe, ob du nur `level` als Variable und Standard-Rechenoperatoren verwendest."
     }
   }
 }

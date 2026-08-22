@@ -3,7 +3,6 @@ from discord import app_commands, ui
 from discord.ext import commands
 from typing import Literal, Optional
 import random
-from ui_templates import template
 import os
 import aiohttp
 import asyncio
@@ -754,9 +753,11 @@ class FunCommands(commands.Cog):
             reverse=True,
         )[:10]
 
-        title = get_string("games.joke.leaderboard_title", lang)
-        message = ""
-        
+        embed = discord.Embed(
+            title=get_string("games.joke.leaderboard_title", lang),
+            color=discord.Color.gold(),
+        )
+
         for i, (joke_id, data) in enumerate(sorted_jokes, 1):
             joke_preview = data["text"][:400]
             upvotes = data.get("upvotes", 0)
@@ -772,16 +773,21 @@ class FunCommands(commands.Cog):
                 bar = make_loading_bar(percentage)
                 value_text += f"\n{bar}"
 
-            message += f"**#{i} • {upvotes} 👍 {downvotes} 👎 (Score: {score:+d})**\n{value_text}\n\n"
+            embed.add_field(
+                name=f"#{i} • {upvotes} 👍 {downvotes} 👎 (Score: {score:+d})",
+                value=value_text,
+                inline=False,
+            )
 
         total_votes = sum(
             j.get("upvotes", 0) + j.get("downvotes", 0)
             for j in self.joke_stats.values()
         )
-        footer = get_string("games.joke.leaderboard_footer", lang, total=total_votes)
-        
-        view = template.message(title=title, message=message, footer=footer)
-        await interaction.response.send_message(view=view)
+        embed.set_footer(
+            text=get_string("games.joke.leaderboard_footer", lang, total=total_votes)
+        )
+
+        await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="coinflip", description="Flip one or more coins!")
     @app_commands.describe(count="Number of coins to flip (1-20)")
@@ -918,10 +924,12 @@ class FunCommands(commands.Cog):
             reverse=True,
         )[:10]
 
-        title = get_string(
-            "games.rps_leaderboard.title", lang, server=interaction.guild.name
+        embed = discord.Embed(
+            title=get_string(
+                "games.rps_leaderboard.title", lang, server=interaction.guild.name
+            ),
+            color=discord.Color.blue(),
         )
-        message = ""
 
         for i, (user_id, stats) in enumerate(sorted_users, 1):
             mention = f"<@{user_id}>"
@@ -942,10 +950,9 @@ class FunCommands(commands.Cog):
                 )
                 value_text += f"\n{make_loading_bar(win_pct)}"
 
-            message += f"**Rank #{i}**\n{value_text}\n\n"
+            embed.add_field(name=f"Rank #{i}", value=value_text, inline=False)
 
-        view = template.message(title=title, message=message)
-        await interaction.response.send_message(view=view, allowed_mentions=discord.AllowedMentions.none())
+        await interaction.response.send_message(embed=embed, allowed_mentions=discord.AllowedMentions.none())
 
     @app_commands.command(name="8ball", description="Ask the magic 8-ball a question")
     @app_commands.describe(question="The question you want to ask")

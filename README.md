@@ -103,52 +103,6 @@ prompt = get_string("ai.system_prompt", lang)
 >
 >  You might not know another used language. In that case, you are allowed to use AI. 
 
-### UI Templates (Components V2)
-
-To keep NiteBot looking clean, consistent, and native, we enforce strict usage of Discord Components V2 (`discord.ui.LayoutView`). **Do not use `discord.Embed`**! Instead, use the centralized `ui_templates` module.
-
-The templates provide standardized `LayoutView` objects for various states, complete with consistent colors and emojis. They also support an optional `image_url` parameter and native subtext footers.
-
-```python
-from ui_templates import template
-
-# 1. Success Message
-view = template.success(
-    title="Operation Successful",
-    message="Your data was saved.",
-    footer="Saved just now"
-)
-
-# 2. Error Message (with optional try_again callback)
-async def on_retry(interaction):
-    await interaction.response.send_message("Retrying...")
-
-view = template.error(
-    title="Failed to Save",
-    message="Database connection lost.",
-    try_again_callback=on_retry
-)
-
-# 3. Warning Message
-view = template.warning("Storage Low", "You have used 95% of your quota.")
-
-# 4. Standard Message (supports an image_url which displays natively as an accessory)
-view = template.message(
-    title="Daily Report",
-    message="Here is your stats summary.",
-    image_url="https://mingalabs.com/assets/Nite%20bot/banner2.png"
-)
-
-# 5. Loading State
-view = template.loading(estimated_time="~5s", footer="Fetching data")
-
-# Need to add your own custom buttons? 
-# Since templates return a standard LayoutView, you can append items directly!
-view.add_item(my_custom_action_row)
-
-await interaction.response.send_message(view=view)
-```
-
 ### Image Rendering
 
 If you need to render a specific image using HTML and CSS, you can convert your code into a PNG using the built-in browser renderer. Rendering can take a while, like ~1-2 seconds for small templates.

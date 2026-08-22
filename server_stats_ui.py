@@ -1,7 +1,6 @@
 import discord
 from discord import ui
 import re
-from ui_templates import template
 import traceback
 import math
 from pebble_utils import render_template, format_number
@@ -53,7 +52,7 @@ class ServerStatsButton(ui.Button):
             if not interaction.user.guild_permissions.manage_guild:
                 return await interaction.response.send_message("You do not have the required permissions to use this (Manage Server).", ephemeral=True)
                 
-            await interaction.response.defer(ephemeral=True)
+            await interaction.response.defer()
             view = ServerStatsView(self.bot, self.server_settings, interaction.guild, interaction.user)
             await view.build()
             await interaction.followup.send(view=view, ephemeral=True)
@@ -69,7 +68,7 @@ class ServerStatsView(ui.LayoutView):
         self.guild = guild
         self.user = user
         self.page = page
-        self.ITEMS_PER_PAGE = 3
+        self.ITEMS_PER_PAGE = 4
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self.user.id:
@@ -129,6 +128,8 @@ class ServerStatsView(ui.LayoutView):
             await self.show_preview(interaction, stats_config, lang)
         preview_btn.callback = preview_callback
 
+        self.add_item(ui.ActionRow(toggle_btn, preview_btn))
+
         # Server Name Template Section
         server_template = stats_config.get("server_name_template")
         server_name_display = f"`{server_template}`" if server_template else get_string("server_stats.status.not_set", lang)
@@ -156,6 +157,12 @@ class ServerStatsView(ui.LayoutView):
             await interaction.response.edit_message(view=self)
         clear_server_btn.callback = clear_server_callback
 
+        self.add_item(ui.Container(
+            ui.TextDisplay(content=get_string("server_stats.menu.server_name", lang)),
+            ui.TextDisplay(content=server_name_display),
+            ui.ActionRow(edit_server_btn, clear_server_btn)
+        ))
+
         # Category Settings
         category_name = stats_config.get("stats_category_name", "SERVER STATS")
         edit_cat_btn = ui.Button(
@@ -168,18 +175,10 @@ class ServerStatsView(ui.LayoutView):
             await interaction.response.send_modal(modal)
         edit_cat_btn.callback = edit_cat_callback
 
-        settings_children = [
-            ui.TextDisplay(content=f"### {get_string('server_stats.menu.title', lang)}\n**Status:** {status_str}"),
-            ui.ActionRow(toggle_btn, preview_btn),
-            ui.TextDisplay(content=f"\n**{get_string('server_stats.menu.server_name', lang)}**\n{server_name_display}"),
-            ui.ActionRow(edit_server_btn, clear_server_btn),
-            ui.TextDisplay(content=f"\n**{get_string('server_stats.menu.category_settings', lang)}**\n**{category_name}**"),
-            ui.ActionRow(edit_cat_btn)
-        ]
-
         self.add_item(ui.Container(
-            *settings_children,
-            accent_colour=discord.Color.green() if enabled else discord.Color.red()
+            ui.TextDisplay(content=get_string("server_stats.menu.category_settings", lang)),
+            ui.TextDisplay(content=f"**{category_name}**"),
+            ui.ActionRow(edit_cat_btn)
         ))
 
         # Managed Channels Pagination
@@ -209,19 +208,8 @@ class ServerStatsView(ui.LayoutView):
             await interaction.response.edit_message(view=view)
         add_channel_btn.callback = add_channel_callback
 
-        title_text = get_string("server_stats.menu.managed_channels", lang) + f" ({total_items})"
-        
-        missing_count = 0
-        for item in page_items:
-            channel = self.guild.get_channel(int(item["id"]))
-            if not channel:
-                missing_count += 1
-                
-        if missing_count > 0:
-            title_text += "\n" + get_string("server_stats.menu.missing_channels", lang, count=missing_count)
-
         managed_children = [
-            ui.TextDisplay(content=title_text)
+            ui.TextDisplay(content=get_string("server_stats.menu.managed_channels", lang) + f" ({total_items})")
         ]
         
         if not all_channels:
@@ -229,8 +217,10 @@ class ServerStatsView(ui.LayoutView):
             managed_children.append(ui.ActionRow(add_channel_btn))
             self.add_item(ui.Container(*managed_children))
         else:
+            missing_count = 0
+            
             managed_container_children = [
-                ui.TextDisplay(content=title_text)
+                ui.TextDisplay(content=get_string("server_stats.menu.managed_channels", lang) + f" ({total_items})"),
             ]
             
             for item in page_items:
@@ -272,22 +262,14 @@ class ServerStatsView(ui.LayoutView):
 
                 managed_container_children.append(ui.TextDisplay(content=f"**{name_display}** | `{badge}`\n`{item['template']}`"))
                 managed_container_children.append(ui.ActionRow(edit_btn, rm_btn))
+            
+            if missing_count > 0:
+                managed_container_children.append(ui.TextDisplay(content=get_string("server_stats.menu.missing_channels", lang, count=missing_count)))
                 
             managed_container_children.append(ui.ActionRow(add_channel_btn))
+            
             self.add_item(ui.Container(*managed_container_children))
             
-            try:
-                from extraDashboards import BackToMainDashButton
-                back_btn = BackToMainDashButton()
-            except ImportError:
-                back_btn = ui.Button(label=get_string("server_stats.buttons.back", lang), style=discord.ButtonStyle.secondary)
-                
-            async def back_callback(interaction):
-                from dashboard import updateDashboard
-                await interaction.response.defer()
-                await updateDashboard(interaction.message, self.server_settings, self.bot)
-            back_btn.callback = back_callback
-
             if total_pages > 1:
                 prev_btn = ui.Button(label=get_string("server_stats.buttons.prev_page", lang), style=discord.ButtonStyle.secondary, disabled=(self.page <= 1))
                 async def prev_cb(interaction):
@@ -305,40 +287,51 @@ class ServerStatsView(ui.LayoutView):
                     await interaction.response.edit_message(view=self)
                 next_btn.callback = next_cb
                 
-                self.add_item(ui.ActionRow(prev_btn, page_indicator, next_btn, back_btn))
-            else:
-                self.add_item(ui.ActionRow(back_btn))
+                self.add_item(ui.ActionRow(prev_btn, page_indicator, next_btn))
+
+        # Back Row
+        try:
+            from extraDashboards import BackToMainDashButton
+            back_btn = BackToMainDashButton()
+        except ImportError:
+            back_btn = ui.Button(label=get_string("server_stats.buttons.back", lang), style=discord.ButtonStyle.secondary)
+            
+        async def back_callback(interaction):
+            from dashboard import updateDashboard
+            await interaction.response.defer()
+            await updateDashboard(interaction.message, self.server_settings, self.bot)
+        back_btn.callback = back_callback
+
+        self.add_item(ui.ActionRow(back_btn))
 
     async def show_preview(self, interaction, stats_config, lang):
-        title = get_string("server_stats.menu.preview_title", lang)
-        message = ""
+        embed = discord.Embed(title=get_string("server_stats.menu.preview_title", lang), color=discord.Color.blue())
         
         server_template = stats_config.get("server_name_template")
         if server_template:
             rendered = render_template(server_template, self.guild)
-            message += f"**{get_string('server_stats.menu.server_name', lang)}**\n{get_string('server_stats.preview.server_name', lang, name=rendered)}\n\n"
+            embed.add_field(name=get_string("server_stats.menu.server_name", lang), value=get_string("server_stats.preview.server_name", lang, name=rendered), inline=False)
         
         overrides = stats_config.get("channel_overrides", {})
         if overrides:
             lines = []
-            for ch_id, ch_template in overrides.items():
-                rendered = render_template(ch_template, self.guild)
+            for ch_id, template in overrides.items():
+                rendered = render_template(template, self.guild)
                 lines.append(get_string("server_stats.preview.channel", lang, mention=f"<#{ch_id}>", name=rendered))
-            message += f"**{get_string('server_stats.menu.channel_overrides', lang)}**\n" + "\n".join(lines) + "\n\n"
+            embed.add_field(name=get_string("server_stats.menu.channel_overrides", lang), value="\n".join(lines), inline=False)
             
         stat_channels = stats_config.get("stat_channels", {})
         if stat_channels:
             lines = []
-            for ch_id, ch_template in stat_channels.items():
-                rendered = render_template(ch_template, self.guild)
+            for ch_id, template in stat_channels.items():
+                rendered = render_template(template, self.guild)
                 lines.append(get_string("server_stats.preview.channel", lang, mention=f"<#{ch_id}>", name=rendered))
-            message += f"**{get_string('server_stats.menu.stat_channels', lang)}**\n" + "\n".join(lines) + "\n\n"
+            embed.add_field(name=get_string("server_stats.menu.stat_channels", lang), value="\n".join(lines), inline=False)
             
-        if not message:
-            message = get_string("server_stats.preview.empty", lang)
+        if not embed.fields:
+            embed.description = get_string("server_stats.preview.empty", lang)
             
-        view = template.message(title=title, message=message)
-        await interaction.response.send_message(view=view, ephemeral=True)
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
 
 class ChannelCreationWizard(ui.LayoutView):
@@ -641,25 +634,27 @@ class NewChannelTemplateModal(ui.Modal):
             await interaction.followup.send(f"Error creating channel: {e}", ephemeral=True)
 
     async def show_validation_warnings(self, interaction, warnings, errors):
-        message = ""
+        container = ui.Container(
+            ui.TextDisplay(content="## Template Validation"),
+            accent_colour=discord.Color.red()
+        )
         for w in warnings:
             if w[0] == "template_too_long":
-                message += get_string("server_stats.warnings.template_too_long", self.lang, length=w[1]) + "\n"
+                container.add_item(ui.TextDisplay(content=get_string("server_stats.warnings.template_too_long", self.lang, length=w[1])))
         for e in errors:
             if e == "template_empty":
-                message += get_string("server_stats.warnings.template_empty", self.lang) + "\n"
+                container.add_item(ui.TextDisplay(content=get_string("server_stats.warnings.template_empty", self.lang)))
                 
-        view = template.warning(title="Template Validation", message=message)
-        
         ok_btn = ui.Button(label="OK", style=discord.ButtonStyle.secondary)
         async def ok_cb(i):
             await self.root_view.build()
             await i.response.edit_message(view=self.root_view)
         ok_btn.callback = ok_cb
-        row = ui.ActionRow(ok_btn)
-        view.add_item(row)
+        container.add_item(ui.ActionRow(ok_btn))
         
-        await interaction.edit_original_response(view=view)
+        warn_view = ui.LayoutView(timeout=None)
+        warn_view.add_item(container)
+        await interaction.edit_original_response(view=warn_view)
 
 class ChannelTemplateModal(ui.Modal):
     """Unified modal for editing a channel's template. Works for both overrides and stat channels."""

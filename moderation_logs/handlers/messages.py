@@ -12,7 +12,11 @@ async def handle_message_create(bot, message):
     if not (flags & LoggingFlags.MESSAGE_CREATE): return
     
     lang = settings.get("language", "en")
-    content = get_string("moderation.logging.event_formats.message_create", lang, author=message.author.mention, channel=message.channel.mention, content=message.content or '[No Content]', url=message.jump_url)
+    if bot.intents.message_content:
+        content = get_string("moderation.logging.event_formats.message_create", lang, author=message.author.mention, channel=message.channel.mention, content=(message.content or "[No Content]"), url=message.jump_url)
+    else:
+        full_text = get_string("moderation.logging.event_formats.message_create", lang, author=message.author.mention, channel=message.channel.mention, content="", url=message.jump_url)
+        content = full_text.split("\n")[0]
     
     if message.attachments:
         urls = ", ".join([f"[{a.filename}]({a.url})" for a in message.attachments])
@@ -32,7 +36,6 @@ async def handle_message_delete(bot, message):
     if not (flags & LoggingFlags.MESSAGE_DELETE): return
 
     lang = settings.get("language", "en")
-    content_text = message.content or "[No Content]"
     action_by = None
     reason = "**No Reason**"
     if message.guild.me.guild_permissions.view_audit_log:
@@ -44,7 +47,12 @@ async def handle_message_delete(bot, message):
                 reason = entry.reason or "**No Reason**"
                 break
 
-    full_content = get_string("moderation.logging.event_formats.message_delete", lang, author=message.author.mention, channel=message.channel.mention, content=content_text, url=message.channel.jump_url)
+    if bot.intents.message_content:
+        full_content = get_string("moderation.logging.event_formats.message_delete", lang, author=message.author.mention, channel=message.channel.mention, content=(message.content or "[No Content]"), url=message.channel.jump_url)
+    else:
+        base_text = get_string("moderation.logging.event_formats.message_delete", lang, author=message.author.mention, channel=message.channel.mention, content="", url=message.channel.jump_url)
+        full_content = base_text.split("\n")[0]
+        
     full_content += f"\nReason: **{reason}**"
     
     if message.attachments:
@@ -69,12 +77,18 @@ async def handle_message_edit(bot, before, after):
     flags = settings.get("logging_flags_bitfield", 0)
     if not (flags & LoggingFlags.MESSAGE_EDIT): return
 
-    if before.content == after.content: return
+    if before.content == after.content and bot.intents.message_content: return
 
     lang = settings.get("language", "en")
+    if bot.intents.message_content:
+        log_text = get_string("moderation.logging.event_formats.message_edit", lang, author=after.author.mention, channel=after.channel.mention, before=(before.content or "[No Content]"), after=(after.content or "[No Content]"), url=after.jump_url)
+    else:
+        full_text = get_string("moderation.logging.event_formats.message_edit", lang, author=after.author.mention, channel=after.channel.mention, before="", after="", url=after.jump_url)
+        log_text = full_text.split("\n")[0]
+
     await send_log_message(
         bot, after.guild.id, "message_update",
-        get_string("moderation.logging.event_formats.message_edit", lang, author=after.author.mention, channel=after.channel.mention, before=before.content, after=after.content, url=after.jump_url),
+        log_text,
         accessory_img=after.author.display_avatar.url
     )
 
@@ -97,7 +111,12 @@ async def handle_bulk_message_delete(bot, messages):
         if msg.attachments:
             attachments = " [Attachments: " + ", ".join([a.url for a in msg.attachments]) + "]"
         
-        line = f"[{timestamp}] {msg.author} ({msg.author.id}): {msg.content or '[No Content]'}{attachments}\n"
+        if bot.intents.message_content:
+            msg_content = f": {msg.content or '[No Content]'}"
+        else:
+            msg_content = ""
+            
+        line = f"[{timestamp}] {msg.author} ({msg.author.id}){msg_content}{attachments}\n"
         
         if len(log_content.encode('utf-8')) + len(line.encode('utf-8')) > 300 * 1024:
             break

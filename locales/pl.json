@@ -180,7 +180,6 @@
     "logging": {
       "header": "Logowanie",
       "enabled_label": "Włączone",
-      "exclude_stats_label": "Wyklucz statystyki serwera Nite",
       "channel_label": "Kanał",
       "preset_btn": "Wybierz Preset",
       "preset_modal_title": "Wybierz Preset Logowania",
@@ -452,8 +451,6 @@
       "edit_server_name": "Edytuj",
       "edit_category_name": "Edytuj nazwę kategorii",
       "clear_server_name": "Wyczyść",
-      "manage_overrides": "Zarządzaj nadpisaniami",
-      "add_stat_channel": "Utwórz kanał statystyk",
       "add_channel": "Dodaj kanał",
       "edit": "Edytuj",
       "remove": "Usuń",
@@ -538,117 +535,6 @@
     },
     "conflict": {
       "notify": "Hej! {type} jest obecnie kontrolowany przez nite-pebbles. Twoja zmiana zostanie nadpisana w następnym cyklu aktualizacji. Aby to zmienić, otwórz /dashboard i przejdź do Statystyk serwera."
-    }
-  },
-  "leveling": {
-    "rank": {
-      "title": "📊 Rang {user}",
-      "body": "**Poziom:** {level}\n**Ranga:** #{rank}\n**Łączne XP:** {total_xp}\n**Postęp:** {current} / {needed} XP\n{progress}\n**Wiadomości:** {messages}"
-    },
-    "leaderboard": {
-      "title": "🏆 Tablica wyników",
-      "empty": "Brak danych XP — zacznij pisząć na czacie!",
-      "prev": "◀ Poprzednia",
-      "next": "Następna ▶"
-    },
-    "level_up": {
-      "title": "Nowy poziom!",
-      "message": "🎉 {user} osiągnął właśnie **Poziom {level}**!"
-    },
-    "give_xp": {
-      "title": "XP dodane",
-      "desc": "Przyznano {user} **{amount} XP**.\nŁączna suma: **{new_total} XP** (Poziom {level})"
-    },
-    "set_level": {
-      "title": "Poziom ustawiony",
-      "desc": "Ustawiono poziom {user} na **{level}** ({xp} łącznych XP)."
-    },
-    "reset_xp": {
-      "title": "XP zresetowane",
-      "user_desc": "Zresetowano XP dla {user}.",
-      "all_desc": "Zresetowano XP dla wszystkich użytkowników na tym serwerze."
-    },
-    "error": {
-      "disabled_title": "System poziomów wyłączony",
-      "disabled": "System poziomów nie jest włączony na tym serwerze.",
-      "no_data_title": "Brak danych",
-      "no_data": "**{user}** nie zdobył jeszcze żadnych XP.",
-      "no_perm_title": "Brak uprawnień"
-    },
-    "settings": {
-      "title": "⚙️ Ustawienia poziomów",
-      "enabled_yes": "✅ Włączony",
-      "enabled_no": "❌ Wyłączony",
-      "toggle_enable": "Włącz system poziomów",
-      "toggle_disable": "Wyłącz system poziomów",
-      "overview_desc": "**Status:** {enabled}\n**Zakres XP:** {xp_min}–{xp_max} na wiadomość\n**Czas oczekiwania:** {cooldown}s\n**Formuła:** `{formula}`\n\n**Wymagane XP (Poz. 1→5):** {sample_xp}",
-      "nav_prev": "◀ Wstecz",
-      "nav_next": "Dalej ▶",
-      "page_overview": "Przegląd",
-      "page_xp": "Konfiguracja XP",
-      "page_channels": "Kanały",
-      "page_roles": "Role",
-      "page_level_roles": "Role poziomów",
-      "page_announcements": "Ogłoszenia",
-      "page_formula": "Formuła",
-      "xp_title": "⚡ Konfiguracja XP",
-      "xp_desc": "**Min. XP na wiadomość:** {xp_min}\n**Maks. XP na wiadomość:** {xp_max}\n**Czas oczekiwania:** {cooldown} sekund\n**Minimalna długość wiadomości:** {min_length} znaków",
-      "xp_edit_btn": "Edytuj ustawienia XP",
-      "channels_title": "📋 Filtry kanałów",
-      "channels_desc": "**Tryb:** {mode}\n\n**Kanały:**\n{channels}",
-      "channel_mode_blacklist": "Czarna lista (XP wszędzie poza wymienionymi)",
-      "channel_mode_whitelist": "Biała lista (XP tylko w wymienionych kanałach)",
-      "channel_mode_toggle": "Tryb: {mode}",
-      "channel_edit_btn": "Edytuj listę kanałów",
-      "channel_list_empty": "*Brak — obowiązują wszystkie kanały*",
-      "roles_title": "🎭 Ustawienia rół",
-      "roles_desc": "**Ignorowane role** (brak XP):\n{ignored}\n\n**Mnożniki XP:**\n{multipliers}",
-      "roles_edit_ignored": "Edytuj ignorowane role",
-      "roles_edit_mult": "Edytuj mnożniki",
-      "roles_none": "*Brak*",
-      "level_roles_title": "🏅 Nagrody rół za poziomy",
-      "level_roles_desc": "Role przyznawane automatycznie po osiągnięciu poziomu:\n{roles}",
-      "level_roles_edit": "Edytuj role poziomów",
-      "level_roles_empty": "*Nic nie skonfigurowano*",
-      "announce_title": "📢 Ogłoszenia",
-      "announce_desc": "**Tryb ogłoszeń o nowym poziomie:** {mode}",
-      "announce_mode_disabled": "Wyłączone",
-      "announce_mode_current": "Bieżący kanał",
-      "announce_mode_custom": "Niestandardowy kanał",
-      "announce_mode_dm": "Wiadomość prywatna",
-      "announce_cycle_btn": "Tryb: {mode} (kliknij, aby zmienić)",
-      "announce_channel_btn": "Ustaw kanał",
-      "formula_title": "📐 Formuła krzywej poziomów",
-      "formula_desc": "**Aktualna formuła:** `{formula}`\n\nUżyj `level` jako zmiennej. Wynik to XP potrzebne do przejścia na następny poziom.\n\n**Wymagane XP na poziom:**\n{curve}",
-      "formula_edit_btn": "Edytuj formułę",
-      "formula_reset_btn": "Przywróć domyślne"
-    },
-    "modal": {
-      "xp_title": "Edytuj ustawienia XP",
-      "xp_min_label": "Minimalne XP na wiadomość",
-      "xp_max_label": "Maksymalne XP na wiadomość",
-      "cooldown_label": "Czas oczekiwania (sekundy)",
-      "min_length_label": "Minimalna długość wiadomości (znaki)",
-      "invalid_number": "Proszę podać poprawne liczby.",
-      "channel_title": "Edytuj listę kanałów",
-      "channel_label": "ID kanałów (oddzielone spacją lub przecinkiem)",
-      "channel_placeholder": "np. 123456789 987654321",
-      "ignored_roles_title": "Edytuj ignorowane role",
-      "ignored_roles_label": "ID rół (oddzielone spacją lub przecinkiem)",
-      "roles_placeholder": "np. 123456789 987654321",
-      "multipliers_title": "Edytuj mnożniki XP",
-      "multipliers_label": "Format: id_roli:mnożnik (po jednym w linii)",
-      "multipliers_placeholder": "np.\n123456789:1.5\n987654321:2.0",
-      "level_roles_title": "Edytuj nagrody rół za poziomy",
-      "level_roles_label": "Format: poziom:id_roli,id_roli (po jednym w linii)",
-      "level_roles_placeholder": "np.\n5:123456789\n10:987654321,111111111",
-      "announce_channel_title": "Ustaw kanał ogłoszeń",
-      "announce_channel_label": "ID kanału",
-      "announce_channel_placeholder": "np. 123456789",
-      "formula_title": "Edytuj formułę poziomów",
-      "formula_label": "Formuła (maks. 50 znaków, użyj 'level' jako zmiennej)",
-      "formula_placeholder": "np. 100 * level ** 1.5",
-      "formula_fallback_warning": "⚠️ Formuła nie mogła zostać zweryfikowana — zostanie użyta domyślna krzywa (`100 * level ** 1.5`). Sprawdź, czy używasz tylko `level` jako zmiennej i standardowych operatorów matematycznych."
     }
   }
 }

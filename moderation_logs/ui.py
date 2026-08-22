@@ -141,7 +141,6 @@ class LoggingConfigView(ui.LayoutView):
         self.page = page
         self.flags = 0
         self.enabled = False
-        self.exclude_stats = False
         self.channel_id = None
         
         self.pages = [
@@ -246,7 +245,6 @@ class LoggingConfigView(ui.LayoutView):
             settings = await self.cog.bot.server_settings.get_settings(self.guild.id)
             self.flags = settings.get("logging_flags_bitfield", 0)
             self.enabled = settings.get("logging_enabled", False)
-            self.exclude_stats = settings.get("logging_exclude_nite_stats", False)
             self.channel_id = settings.get("logging_channel")
 
             container_children = [
@@ -272,27 +270,6 @@ class LoggingConfigView(ui.LayoutView):
             container_children.append(ui.Section(
                 ui.TextDisplay(content=f"### {get_string('moderation.logging.enabled_label', lang)}"),
                 accessory=en_btn
-            ))
-
-            exclude_stats_btn = ui.Button(
-                label="ON" if self.exclude_stats else "OFF",
-                style=discord.ButtonStyle.success if self.exclude_stats else discord.ButtonStyle.secondary
-            )
-            async def exclude_stats_callback(interaction):
-                try:
-                    self.exclude_stats = not self.exclude_stats
-                    settings["logging_exclude_nite_stats"] = self.exclude_stats
-                    await self.cog.bot.server_settings.update_settings(self.guild.id, settings)
-                    await self.build()
-                    await interaction.response.edit_message(view=self)
-                except Exception as e:
-                    print(f"[Moderation Logs] Exclude Stats Toggle Error: {e}")
-                    traceback.print_exc()
-            exclude_stats_btn.callback = exclude_stats_callback
-
-            container_children.append(ui.Section(
-                ui.TextDisplay(content=f"### {get_string('moderation.logging.exclude_stats_label', lang)}"),
-                accessory=exclude_stats_btn
             ))
 
             container_children.append(ui.TextDisplay(content=f"### {get_string('moderation.logging.channel_label', lang)}"))

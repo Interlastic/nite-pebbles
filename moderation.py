@@ -2,7 +2,6 @@ import discord
 from discord.ext import commands
 from discord import app_commands, ui
 import json
-from ui_templates import template
 import re
 import traceback
 from pathlib import Path
@@ -20,6 +19,7 @@ class FuzzyUserSelect(ui.LayoutView):
         self.reason = reason
         self.duration = duration
         self.delete_messages = delete_messages
+        self.lang = lang
         self.orig_message = orig_message
 
         options = []
@@ -257,101 +257,111 @@ class ModerationSettingsView(ui.LayoutView):
         except Exception as e:
             traceback.print_exc()
 
-def ModerationSuccessView(cog, emoji, action_text_key, user, clean_reason, initiator, attempt=1, button_label=None, button_emoji=None, lang="en"):
-    action_text = get_string(f"moderation.actions.{action_text_key}", lang)
-    title = get_string("moderation.success.title", lang, emoji="", action_text=action_text).replace("#", "").strip()
-    if attempt > 1:
-        title += f" (Attempt {attempt})"
+class ModerationSuccessView(ui.LayoutView):
+    def __init__(self, cog, emoji, action_text_key, user, clean_reason, initiator, attempt=1, button_label=None, button_emoji=None, lang="en"):
+        super().__init__(timeout=None)
+        self.initiator = initiator
+        
+        action_text = get_string(f"moderation.actions.{action_text_key}", lang)
+        title = get_string("moderation.success.title", lang, emoji=emoji, action_text=action_text)
+        if attempt > 1:
+            title += f" (Attempt {attempt})"
 
-    message = get_string("moderation.success.description", lang, user_name=user.display_name, action_text=action_text, reason=clean_reason, initiator_name=initiator.display_name)
-    if button_label:
-        message += "\n\n" + get_string("moderation.success.reverse_tip", lang)
+        container_items = [
+            ui.TextDisplay(content=title),
+            ui.Section(
+                ui.TextDisplay(content=get_string("moderation.success.description", lang, user_name=user.display_name, action_text=action_text, reason=clean_reason, initiator_name=initiator.display_name)),
+                accessory=ui.Thumbnail(user.display_avatar.url)
+            )
+        ]
 
-    is_error = "ban" in action_text_key or "kick" in action_text_key
-    if is_error:
-        view = template.error(title=title, message=message, image_url=user.display_avatar.url)
-    else:
-        view = template.success(title=title, message=message, image_url=user.display_avatar.url)
+        if button_label:
+            container_items.append(ui.Separator(visible=True))
+            
+            btn = ui.Button(label=button_label, style=discord.ButtonStyle.gray, emoji=button_emoji)
+            async def btn_callback(interaction):
+                if button_label == "Unban":
+                    await cog.perform_unban(interaction, user, "Action reversed via button", edit=True)
+                elif button_label == "Remove Timeout":
+                    await cog.perform_untimeout(interaction, user, "Action reversed via button", edit=True)
+            btn.callback = btn_callback
 
-    if button_label:
+            container_items.append(ui.Section(
+                ui.TextDisplay(content=get_string("moderation.success.reverse_tip", lang)),
+                accessory=btn
+            ))
+
+        container = ui.Container(*container_items, accent_colour=discord.Colour.red() if "ban" in action_text_key or "kick" in action_text_key else discord.Colour.orange())
+        self.add_item(container)
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.id != self.initiator.id:
+            await interaction.response.send_message("This menu is not for you.", ephemeral=True)
+            return False
+        return True
+
+class ModerationErrorView(ui.LayoutView):
+    def __init__(self, cog, emoji, action_type, user, error_msg, initiator, attempt=1, reason=None, extra_data=None, lang="en"):
+        super().__init__(timeout=None)
+        self.initiator = initiator
+        
+        title = get_string("moderation.error.title", lang, emoji=emoji)
+        if attempt > 1:
+            title += f" (Attempt {attempt})"
+
+        action_type_text = get_string(f"moderation.actions.{action_type}", lang)
+        container = ui.Container(
+            ui.TextDisplay(content=title),
+            ui.TextDisplay(content=get_string("moderation.error.description", lang, action_type=action_type_text, user_name=user.display_name, error_msg=error_msg)),
+            accent_colour=discord.Colour.orange()
+        )
+        self.add_item(container)
+        
         row = ui.ActionRow()
-        btn = ui.Button(label=button_label, style=discord.ButtonStyle.gray, emoji=button_emoji)
-        async def btn_callback(interaction):
-            if button_label == "Unban":
-                await cog.perform_unban(interaction, user, "Action reversed via button", edit=True)
-            elif button_label == "Remove Timeout":
-                await cog.perform_untimeout(interaction, user, "Action reversed via button", edit=True)
-        btn.callback = btn_callback
-        row.add_item(btn)
-        view.add_item(row)
+        
+        retry_btn = ui.Button(label=get_string("moderation.error.retry", lang), style=discord.ButtonStyle.gray, emoji=cog.emojis.get(action_type))
+        async def retry_callback(interaction):
+            if action_type == "ban":
+                await cog.perform_ban(interaction, user, reason, extra_data, attempt + 1, edit=True)
+            elif action_type == "softban":
+                await cog.perform_softban(interaction, user, reason, extra_data, attempt + 1, edit=True)
+            elif action_type == "kick":
+                await cog.perform_kick(interaction, user, reason, attempt + 1, edit=True)
+            elif action_type == "timeout":
+                await cog.perform_timeout(interaction, user, extra_data, reason, attempt + 1, edit=True)
+            elif action_type == "unban":
+                await cog.perform_unban(interaction, user, reason, attempt + 1, edit=True)
+        retry_btn.callback = retry_callback
+        row.add_item(retry_btn)
 
-    async def interaction_check(interaction: discord.Interaction) -> bool:
-        if interaction.user.id != initiator.id:
+        if action_type != "ban":
+            ban_btn = ui.Button(label=get_string("moderation.error.ban_instead", lang), style=discord.ButtonStyle.gray, emoji=cog.emojis.get("ban"))
+            async def ban_callback(interaction):
+                await cog.perform_ban(interaction, user, reason, "0", 1, edit=True)
+            ban_btn.callback = ban_callback
+            row.add_item(ban_btn)
+
+        if action_type != "kick":
+            kick_btn = ui.Button(label=get_string("moderation.error.kick_instead", lang), style=discord.ButtonStyle.gray, emoji=cog.emojis.get("kick"))
+            async def kick_callback(interaction):
+                await cog.perform_kick(interaction, user, reason, 1, edit=True)
+            kick_btn.callback = kick_callback
+            row.add_item(kick_btn)
+
+        if action_type != "timeout":
+            timeout_btn = ui.Button(label=get_string("moderation.error.timeout_instead", lang), style=discord.ButtonStyle.gray, emoji=cog.emojis.get("timeout"))
+            async def timeout_callback(interaction):
+                await cog.perform_timeout(interaction, user, 3600, reason, 1, edit=True)
+            timeout_btn.callback = timeout_callback
+            row.add_item(timeout_btn)
+
+        self.add_item(row)
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.id != self.initiator.id:
             await interaction.response.send_message("This menu is not for you.", ephemeral=True)
             return False
         return True
-    
-    view.interaction_check = interaction_check
-    return view
-
-def ModerationErrorView(cog, emoji, action_type, user, error_msg, initiator, attempt=1, reason=None, extra_data=None, lang="en"):
-    title = get_string("moderation.error.title", lang, emoji="").replace("#", "").strip()
-    if attempt > 1:
-        title += f" (Attempt {attempt})"
-
-    action_type_text = get_string(f"moderation.actions.{action_type}", lang)
-    message = get_string("moderation.error.description", lang, action_type=action_type_text, user_name=user.display_name, error_msg=error_msg)
-
-    view = template.error(title=title, message=message)
-    
-    row = ui.ActionRow()
-    
-    retry_btn = ui.Button(label=get_string("moderation.error.retry", lang), style=discord.ButtonStyle.gray, emoji=cog.emojis.get(action_type))
-    async def retry_callback(interaction):
-        if action_type == "ban":
-            await cog.perform_ban(interaction, user, reason, extra_data, attempt + 1, edit=True)
-        elif action_type == "softban":
-            await cog.perform_softban(interaction, user, reason, extra_data, attempt + 1, edit=True)
-        elif action_type == "kick":
-            await cog.perform_kick(interaction, user, reason, attempt + 1, edit=True)
-        elif action_type == "timeout":
-            await cog.perform_timeout(interaction, user, extra_data, reason, attempt + 1, edit=True)
-        elif action_type == "unban":
-            await cog.perform_unban(interaction, user, reason, attempt + 1, edit=True)
-    retry_btn.callback = retry_callback
-    row.add_item(retry_btn)
-
-    if action_type != "ban":
-        ban_btn = ui.Button(label=get_string("moderation.error.ban_instead", lang), style=discord.ButtonStyle.gray, emoji=cog.emojis.get("ban"))
-        async def ban_callback(interaction):
-            await cog.perform_ban(interaction, user, reason, "0", 1, edit=True)
-        ban_btn.callback = ban_callback
-        row.add_item(ban_btn)
-
-    if action_type != "kick":
-        kick_btn = ui.Button(label=get_string("moderation.error.kick_instead", lang), style=discord.ButtonStyle.gray, emoji=cog.emojis.get("kick"))
-        async def kick_callback(interaction):
-            await cog.perform_kick(interaction, user, reason, 1, edit=True)
-        kick_btn.callback = kick_callback
-        row.add_item(kick_btn)
-
-    if action_type != "timeout":
-        timeout_btn = ui.Button(label=get_string("moderation.error.timeout_instead", lang), style=discord.ButtonStyle.gray, emoji=cog.emojis.get("timeout"))
-        async def timeout_callback(interaction):
-            await cog.perform_timeout(interaction, user, 3600, reason, 1, edit=True)
-        timeout_btn.callback = timeout_callback
-        row.add_item(timeout_btn)
-
-    view.add_item(row)
-
-    async def interaction_check(interaction: discord.Interaction) -> bool:
-        if interaction.user.id != initiator.id:
-            await interaction.response.send_message("This menu is not for you.", ephemeral=True)
-            return False
-        return True
-    
-    view.interaction_check = interaction_check
-    return view
 
 class Moderation(commands.Cog):
     def __init__(self, bot):
@@ -422,13 +432,15 @@ class Moderation(commands.Cog):
             server_name = interaction.guild.name
             moderator_name = interaction.user.display_name
             
+            container_items = []
+            
             if action_type_key == "unbanned":
                 title = get_string("moderation.dm.unban_title", lang, server_name=server_name)
             else:
                 title = get_string("moderation.dm.title", lang, action_type=action_type, server_name=server_name)
-            title = title.replace("#", "").strip()
                 
-            message = ""
+            container_items.append(ui.TextDisplay(content=title))
+
             if action_type_key != "unbanned":
                 # Fetch last 10 messages from user in this channel
                 last_messages = []
@@ -446,27 +458,32 @@ class Moderation(commands.Cog):
                 if context_message:
                     ctx_content = context_message.clean_content
                     if len(ctx_content) > 100: ctx_content = ctx_content[:97] + "..."
-                    message += get_string("moderation.dm.context_title", lang, action_type=action_type) + f"\n> {ctx_content}\n\n"
+                    container_items.append(ui.TextDisplay(content=get_string("moderation.dm.context_title", lang, action_type=action_type) + f"\n> {ctx_content}"))
 
                 if last_messages:
                     history_text = get_string("moderation.dm.history_title", lang) + "\n" + "\n".join(reversed(last_messages))
-                    message += history_text + "\n\n"
+                    container_items.append(ui.TextDisplay(content=history_text))
 
+            container_items.append(ui.Separator(visible=True))
+            
             details_text = get_string("moderation.dm.details", lang, reason=(reason or "No reason provided"), moderator_name=moderator_name)
             if custom_msg:
                 details_text += f"\n\n{custom_msg}"
-            message += details_text
 
-            is_error = action_type_key in ["kicked", "banned", "softbanned"]
-            if is_error:
-                view = template.error(title=title, message=message, image_url=interaction.guild.icon.url if interaction.guild.icon else interaction.user.display_avatar.url)
-            else:
-                view = template.success(title=title, message=message, image_url=interaction.guild.icon.url if interaction.guild.icon else interaction.user.display_avatar.url)
+            container_items.append(ui.Section(
+                ui.TextDisplay(content=details_text),
+                accessory=ui.Thumbnail(interaction.guild.icon.url if interaction.guild.icon else interaction.user.display_avatar.url)
+            ))
 
-            return await user.send(view=view)
+            view = ui.LayoutView()
+            accent = discord.Colour.red() if action_type_key in ["kicked", "banned", "softbanned"] else discord.Colour.green()
+            container = ui.Container(*container_items, accent_colour=accent)
+            view.add_item(container)
+
+            await user.send(view=view)
         except Exception as e:
             # We don't care if DM fails
-            return None
+            pass
 
     def _load_emojis(self):
         base_path = Path(__file__).parent.parent
@@ -484,14 +501,9 @@ class Moderation(commands.Cog):
         text = text.replace("\n", " ").replace("\r", "")
         return re.sub(r"([_*~\\`|])", r"\\\1", text)
 
-    moderation_group = app_commands.Group(
-        name="moderation", 
-        description="Moderation related commands",
-        default_permissions=discord.Permissions(moderate_members=True)
-    )
+    moderation_group = app_commands.Group(name="moderation", description="Moderation related commands")
 
     @moderation_group.command(name="settings", description="Open the moderation settings menu")
-    @app_commands.default_permissions(administrator=True)
     async def moderation_settings(self, interaction: discord.Interaction):
         try:
             settings = await self.bot.server_settings.get_settings(interaction.guild.id)
@@ -527,7 +539,7 @@ class Moderation(commands.Cog):
             )
 
     async def check_hierarchy(self, interaction, user, action_name):
-        if not interaction.guild: return False, "This command can only be used in a server.", user
+        if not interaction.guild: return False, "This command can only be used in a server."
         
         # Fallback resolution if PrefixBridge failed to resolve a string
         if isinstance(user, str):
@@ -536,57 +548,27 @@ class Moderation(commands.Cog):
                 uid_match = re.search(r'(\d{17,20})', user)
                 if uid_match:
                     uid = int(uid_match.group(1))
-                    try:
-                        resolved = await interaction.guild.fetch_member(uid)
-                    except:
-                        resolved = interaction.guild.get_member(uid) or self.bot.get_user(uid)
+                    resolved = interaction.guild.get_member(uid) or self.bot.get_user(uid)
                     if resolved:
                         user = resolved
             except: pass
 
         if isinstance(user, str):
-            return False, f"Could not find user '{user}'. Please mention them or use their ID.", user
+            return False, f"Could not find user '{user}'. Please mention them or use their ID."
 
-        # Resolve User to Member if they are in the guild
-        if not isinstance(user, discord.Member) and hasattr(user, "id"):
-            try:
-                resolved_member = await interaction.guild.fetch_member(user.id)
-                if resolved_member:
-                    user = resolved_member
-            except:
-                resolved_member = interaction.guild.get_member(user.id)
-                if resolved_member:
-                    user = resolved_member
-
-        # Check if user can be moderated in kick/timeout/untimeout/softban (must be a guild member)
-        if action_name in ["kick", "timeout", "untimeout", "softban"] and not isinstance(user, discord.Member):
-            return False, f"That user is not a member of this server, so you cannot {action_name} them.", user
-
-        # Check if already banned for ban/softban
-        if action_name in ["ban", "softban"]:
-            try:
-                ban_entry = await interaction.guild.fetch_ban(user)
-                if ban_entry:
-                    return False, "That user is already banned from this server.", user
-            except discord.NotFound:
-                pass
-            except Exception:
-                pass
-
-        if user.id == interaction.user.id: return False, f"You cannot {action_name} yourself.", user
-        if user.id == self.bot.user.id: return False, f"I can't {action_name} myself!", user
-        if user.id == interaction.guild.owner_id: return False, f"You cannot {action_name} the server owner.", user
+        if user.id == interaction.user.id: return False, f"You cannot {action_name} yourself."
+        if user.id == self.bot.user.id: return False, f"I can't {action_name} myself!"
+        if user.id == interaction.guild.owner_id: return False, f"You cannot {action_name} the server owner."
         
         if hasattr(user, "top_role"):
             if user.top_role >= interaction.user.top_role and interaction.user.id != interaction.guild.owner_id:
-                return False, "Your highest role is not above the target user's, so you cannot moderate them.", user
+                return False, "Your highest role is not above the target user's, so you cannot moderate them."
             if user.top_role >= interaction.guild.me.top_role:
-                return False, "The target user's highest role is equal to or higher than mine, so I cannot moderate them.", user
+                return False, "The target user's highest role is equal to or higher than mine, so I cannot moderate them."
         
-        return True, None, user
+        return True, None
 
     @moderation_group.command(name="ban", description="Ban a user from the server")
-    @app_commands.default_permissions(ban_members=True)
     @app_commands.describe(user="The user to ban", reason="Reason for the ban", delete_messages="How much of their message history to delete")
     @app_commands.choices(delete_messages=[
         app_commands.Choice(name="Don't delete any", value="0"),
@@ -617,9 +599,8 @@ class Moderation(commands.Cog):
         if not edit: await interaction.response.defer(ephemeral=False)
         
         lang = await resolve_locale(interaction)
-        allowed, error, resolved_user = await self.check_hierarchy(interaction, user, "ban")
+        allowed, error = await self.check_hierarchy(interaction, user, "ban")
         if not allowed: return await self.send_mod_error(interaction, "ban", user, error, attempt, reason, delete_messages, edit, lang=lang)
-        user = resolved_user
         
         if not interaction.user.guild_permissions.ban_members:
             return await self.send_mod_error(interaction, "ban", user, "You do not have the required permissions to execute this command (Ban Members).", attempt, reason, delete_messages, edit, lang=lang)
@@ -635,25 +616,16 @@ class Moderation(commands.Cog):
             elif isinstance(interaction, self.MockInteraction) and hasattr(interaction, "orig_message") and interaction.orig_message.reference:
                 ctx_msg = interaction.orig_message.reference.resolved
 
-            dm_msg = await self.notify_user_moderation(interaction, user, "banned", reason, context_message=ctx_msg)
+            await self.notify_user_moderation(interaction, user, "banned", reason, context_message=ctx_msg)
 
-            try:
-                audit_reason = self._get_audit_reason(interaction, reason)
-                await interaction.guild.ban(user, reason=audit_reason, delete_message_seconds=int(delete_messages))
-                view = ModerationSuccessView(self, self.emojis.get('ban', ''), "banned", user, self.sanitize(reason), interaction.user, attempt, "Unban", self.emojis.get('unban'), lang=lang)
-                await self.do_mod_response(interaction, view, edit)
-            except Exception as e:
-                if dm_msg:
-                    try:
-                        await dm_msg.delete()
-                    except:
-                        pass
-                raise e
+            audit_reason = self._get_audit_reason(interaction, reason)
+            await interaction.guild.ban(user, reason=audit_reason, delete_message_seconds=int(delete_messages))
+            view = ModerationSuccessView(self, self.emojis.get('ban', ''), "banned", user, self.sanitize(reason), interaction.user, attempt, "Unban", self.emojis.get('unban'), lang=lang)
+            await self.do_mod_response(interaction, view, edit)
         except Exception as e:
             await self.send_mod_error(interaction, "ban", user, str(e), attempt, reason, delete_messages, edit, lang=lang)
 
     @moderation_group.command(name="softban", description="Ban and instantly unban a user to clear their messages")
-    @app_commands.default_permissions(ban_members=True)
     @app_commands.describe(user="The user to softban", reason="Reason for the softban", delete_messages="How much of their message history to delete")
     @app_commands.choices(delete_messages=[
         app_commands.Choice(name="Previous 24 hours", value="86400"),
@@ -669,9 +641,8 @@ class Moderation(commands.Cog):
         if not edit: await interaction.response.defer(ephemeral=False)
         
         lang = await resolve_locale(interaction)
-        allowed, error, resolved_user = await self.check_hierarchy(interaction, user, "softban")
+        allowed, error = await self.check_hierarchy(interaction, user, "softban")
         if not allowed: return await self.send_mod_error(interaction, "softban", user, error, attempt, reason, delete_messages, edit, lang=lang)
-        user = resolved_user
         
         if not interaction.user.guild_permissions.ban_members:
             return await self.send_mod_error(interaction, "softban", user, "You do not have the required permissions to execute this command (Ban Members).", attempt, reason, delete_messages, edit, lang=lang)
@@ -687,36 +658,27 @@ class Moderation(commands.Cog):
             elif isinstance(interaction, self.MockInteraction) and hasattr(interaction, "orig_message") and interaction.orig_message.reference:
                 ctx_msg = interaction.orig_message.reference.resolved
 
-            dm_msg = await self.notify_user_moderation(interaction, user, "softbanned", reason, context_message=ctx_msg)
+            await self.notify_user_moderation(interaction, user, "softbanned", reason, context_message=ctx_msg)
 
+            audit_reason = self._get_audit_reason(interaction, reason)
+            # Ban
+            await interaction.guild.ban(user, reason=f"[SOFTBAN] {audit_reason}", delete_message_seconds=int(delete_messages))
+            # Unban
+            await interaction.guild.unban(user, reason=f"[SOFTBAN] Completed")
+            
+            view = ModerationSuccessView(self, self.emojis.get('ban', ''), "softbanned", user, self.sanitize(reason), interaction.user, attempt, lang=lang)
+            await self.do_mod_response(interaction, view, edit)
+            
+            # Log softban specifically
             try:
-                audit_reason = self._get_audit_reason(interaction, reason)
-                # Ban
-                await interaction.guild.ban(user, reason=f"[SOFTBAN] {audit_reason}", delete_message_seconds=int(delete_messages))
-                # Unban
-                await interaction.guild.unban(user, reason=f"[SOFTBAN] Completed")
-                
-                view = ModerationSuccessView(self, self.emojis.get('ban', ''), "softbanned", user, self.sanitize(reason), interaction.user, attempt, lang=lang)
-                await self.do_mod_response(interaction, view, edit)
-                
-                # Log softban specifically
-                try:
-                    from moderation_logs.handlers.base import send_log_message
-                    await send_log_message(self.bot, interaction.guild.id, "softban", f"Member softbanned: {user.mention} (`{user.id}`)\nReason: **{reason or 'No reason provided'}**", accessory_img=user.display_avatar.url, action_by=interaction.user)
-                except Exception as log_err:
-                    print(f"[Moderation] Error logging softban: {log_err}")
-            except Exception as e:
-                if dm_msg:
-                    try:
-                        await dm_msg.delete()
-                    except:
-                        pass
-                raise e
+                from moderation_logs.handlers.base import send_log_message
+                await send_log_message(self.bot, interaction.guild.id, "softban", f"Member softbanned: {user.mention} (`{user.id}`)\nReason: **{reason or 'No reason provided'}**", accessory_img=user.display_avatar.url, action_by=interaction.user)
+            except Exception as log_err:
+                print(f"[Moderation] Error logging softban: {log_err}")
         except Exception as e:
             await self.send_mod_error(interaction, "softban", user, str(e), attempt, reason, delete_messages, edit, lang=lang)
 
     @moderation_group.command(name="unban", description="Unban a user from the server")
-    @app_commands.default_permissions(ban_members=True)
     @app_commands.describe(username="The user to unban (autocomplete)", reason="Reason for the unban")
     async def unban(self, interaction: discord.Interaction, username: str, reason: str = None):
         settings = await self.bot.server_settings.get_settings(interaction.guild.id)
@@ -781,27 +743,18 @@ class Moderation(commands.Cog):
             elif isinstance(interaction, self.MockInteraction) and hasattr(interaction, "orig_message") and interaction.orig_message.reference:
                 ctx_msg = interaction.orig_message.reference.resolved
 
-            dm_msg = await self.notify_user_moderation(interaction, user, "unbanned", reason, context_message=ctx_msg)
+            await self.notify_user_moderation(interaction, user, "unbanned", reason, context_message=ctx_msg)
 
-            try:
-                audit_reason = self._get_audit_reason(interaction, reason)
-                await interaction.guild.unban(user, reason=audit_reason)
-                view = ModerationSuccessView(self, self.emojis.get('unban', ''), "unbanned", user, self.sanitize(reason), interaction.user, attempt, lang=lang)
-                await self.do_mod_response(interaction, view, edit)
-            except Exception as e:
-                if dm_msg:
-                    try:
-                        await dm_msg.delete()
-                    except:
-                        pass
-                raise e
+            audit_reason = self._get_audit_reason(interaction, reason)
+            await interaction.guild.unban(user, reason=audit_reason)
+            view = ModerationSuccessView(self, self.emojis.get('unban', ''), "unbanned", user, self.sanitize(reason), interaction.user, attempt, lang=lang)
+            await self.do_mod_response(interaction, view, edit)
         except discord.NotFound:
             await self.send_mod_error(interaction, "unban", user, "That user is not banned.", attempt, reason, edit=edit, lang=lang)
         except Exception as e:
             await self.send_mod_error(interaction, "unban", user, str(e), attempt, reason, edit=edit, lang=lang)
 
     @moderation_group.command(name="kick", description="Kick a user from the server")
-    @app_commands.default_permissions(kick_members=True)
     @app_commands.describe(user="The user to kick", reason="Reason for the kick")
     async def kick(self, interaction: discord.Interaction, user: discord.Member, reason: str = None):
         settings = await self.bot.server_settings.get_settings(interaction.guild.id)
@@ -813,9 +766,8 @@ class Moderation(commands.Cog):
         if not edit: await interaction.response.defer(ephemeral=False)
         
         lang = await resolve_locale(interaction)
-        allowed, error, resolved_user = await self.check_hierarchy(interaction, user, "kick")
+        allowed, error = await self.check_hierarchy(interaction, user, "kick")
         if not allowed: return await self.send_mod_error(interaction, "kick", user, error, attempt, reason, edit=edit, lang=lang)
-        user = resolved_user
         
         if not interaction.user.guild_permissions.kick_members:
             return await self.send_mod_error(interaction, "kick", user, "You do not have the required permissions to execute this command (Kick Members).", attempt, reason, edit=edit, lang=lang)
@@ -831,25 +783,16 @@ class Moderation(commands.Cog):
             elif isinstance(interaction, self.MockInteraction) and hasattr(interaction, "orig_message") and interaction.orig_message.reference:
                 ctx_msg = interaction.orig_message.reference.resolved
 
-            dm_msg = await self.notify_user_moderation(interaction, user, "kicked", reason, context_message=ctx_msg)
+            await self.notify_user_moderation(interaction, user, "kicked", reason, context_message=ctx_msg)
 
-            try:
-                audit_reason = self._get_audit_reason(interaction, reason)
-                await interaction.guild.kick(user, reason=audit_reason)
-                view = ModerationSuccessView(self, self.emojis.get('kick', ''), "kicked", user, self.sanitize(reason), interaction.user, attempt, lang=lang)
-                await self.do_mod_response(interaction, view, edit)
-            except Exception as e:
-                if dm_msg:
-                    try:
-                        await dm_msg.delete()
-                    except:
-                        pass
-                raise e
+            audit_reason = self._get_audit_reason(interaction, reason)
+            await interaction.guild.kick(user, reason=audit_reason)
+            view = ModerationSuccessView(self, self.emojis.get('kick', ''), "kicked", user, self.sanitize(reason), interaction.user, attempt, lang=lang)
+            await self.do_mod_response(interaction, view, edit)
         except Exception as e:
             await self.send_mod_error(interaction, "kick", user, str(e), attempt, reason, edit=edit, lang=lang)
 
     @moderation_group.command(name="timeout", description="Timeout a user in the server")
-    @app_commands.default_permissions(moderate_members=True)
     @app_commands.describe(user="The user to timeout", duration="Duration of the timeout", reason="Reason for the timeout")
     @app_commands.choices(duration=[
         app_commands.Choice(name="60 seconds", value=60),
@@ -869,9 +812,8 @@ class Moderation(commands.Cog):
         if not edit: await interaction.response.defer(ephemeral=False)
         
         lang = await resolve_locale(interaction)
-        allowed, error, resolved_user = await self.check_hierarchy(interaction, user, "timeout")
+        allowed, error = await self.check_hierarchy(interaction, user, "timeout")
         if not allowed: return await self.send_mod_error(interaction, "timeout", user, error, attempt, reason, duration, edit, lang=lang)
-        user = resolved_user
         
         if not interaction.user.guild_permissions.moderate_members:
             return await self.send_mod_error(interaction, "timeout", user, "You do not have the required permissions to execute this command (Moderate Members).", attempt, reason, duration, edit, lang=lang)
@@ -889,7 +831,6 @@ class Moderation(commands.Cog):
             await self.send_mod_error(interaction, "timeout", user, str(e), attempt, reason, duration, edit, lang=lang)
 
     @moderation_group.command(name="untimeout", description="Remove timeout from a user")
-    @app_commands.default_permissions(moderate_members=True)
     @app_commands.describe(user="The user to untimeout", reason="Reason for removing timeout")
     async def untimeout(self, interaction: discord.Interaction, user: discord.Member, reason: str = None):
         settings = await self.bot.server_settings.get_settings(interaction.guild.id)
@@ -903,9 +844,8 @@ class Moderation(commands.Cog):
         lang = await resolve_locale(interaction)
         if not interaction.guild: return await self.send_mod_error(interaction, "untimeout", user, "This command can only be used in a server.", attempt, reason, edit=edit, lang=lang)
         
-        allowed, error, resolved_user = await self.check_hierarchy(interaction, user, "untimeout")
+        allowed, error = await self.check_hierarchy(interaction, user, "untimeout")
         if not allowed: return await self.send_mod_error(interaction, "untimeout", user, error, attempt, reason, edit=edit, lang=lang)
-        user = resolved_user
 
         if not interaction.user.guild_permissions.moderate_members:
             return await self.send_mod_error(interaction, "untimeout", user, "You do not have the required permissions to execute this command (Moderate Members).", attempt, reason, edit=edit, lang=lang)
@@ -927,6 +867,7 @@ class Moderation(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
+        if not self.bot.intents.message_content: return
         if message.author.bot or not message.guild: return
         
         try:

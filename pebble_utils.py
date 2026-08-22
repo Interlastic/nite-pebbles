@@ -245,17 +245,14 @@ def format_number(val, precision=None):
     else:
         return f"{res:g}{unit}"
 
-def render_template(template, guild, online_count=0, cached_guild=None):
+def render_template(template, guild, online_count=0):
     if not template:
         return None
-    
-    # Use cached_guild for channels if provided, otherwise fallback to guild
-    channels_source = cached_guild if cached_guild else guild
     
     stats = {
         "members": getattr(guild, 'approximate_member_count', 0) or getattr(guild, 'member_count', 0) or 0,
         "online": online_count,
-        "channels": len(channels_source.channels) if hasattr(channels_source, 'channels') else 0,
+        "channels": len(guild.channels) if hasattr(guild, 'channels') else 0,
         "boost_level": getattr(guild, 'premium_tier', 0) or 0,
         "boost_count": getattr(guild, 'premium_subscription_count', 0) or 0
     }

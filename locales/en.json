@@ -180,7 +180,6 @@
     "logging": {
       "header": "Logging",
       "enabled_label": "Enabled",
-      "exclude_stats_label": "Exclude Nite Server Stats",
       "channel_label": "Channel",
       "preset_btn": "Choose Preset",
       "preset_modal_title": "Select Logging Preset",
@@ -522,117 +521,6 @@
     },
     "audit_reasons": {
       "category_rename": "Server Stats category renamed by {user}"
-    }
-  },
-  "leveling": {
-    "rank": {
-      "title": "📊 {user}'s Rank",
-      "body": "**Level:** {level}\n**Rank:** #{rank}\n**Total XP:** {total_xp}\n**Progress:** {current} / {needed} XP\n{progress}\n**Messages:** {messages}"
-    },
-    "leaderboard": {
-      "title": "🏆 Leaderboard",
-      "empty": "No XP data yet — start chatting to earn XP!",
-      "prev": "◀ Previous",
-      "next": "Next ▶"
-    },
-    "level_up": {
-      "title": "Level Up!",
-      "message": "🎉 {user} just reached **Level {level}**!"
-    },
-    "give_xp": {
-      "title": "XP Given",
-      "desc": "Gave {user} **{amount} XP**.\nNew total: **{new_total} XP** (Level {level})"
-    },
-    "set_level": {
-      "title": "Level Set",
-      "desc": "Set {user}'s level to **{level}** ({xp} total XP)."
-    },
-    "reset_xp": {
-      "title": "XP Reset",
-      "user_desc": "Reset XP for {user}.",
-      "all_desc": "Reset XP for all users in this server."
-    },
-    "error": {
-      "disabled_title": "Leveling Disabled",
-      "disabled": "The leveling system is not enabled on this server.",
-      "no_data_title": "No Data",
-      "no_data": "**{user}** hasn't earned any XP yet.",
-      "no_perm_title": "No Permission"
-    },
-    "settings": {
-      "title": "⚙️ Leveling Settings",
-      "enabled_yes": "✅ Enabled",
-      "enabled_no": "❌ Disabled",
-      "toggle_enable": "Enable Leveling",
-      "toggle_disable": "Disable Leveling",
-      "overview_desc": "**Status:** {enabled}\n**XP Range:** {xp_min}–{xp_max} per message\n**Cooldown:** {cooldown}s\n**Formula:** `{formula}`\n\n**XP needed (Lvl 1→5):** {sample_xp}",
-      "nav_prev": "◀ Back",
-      "nav_next": "Next ▶",
-      "page_overview": "Overview",
-      "page_xp": "XP Config",
-      "page_channels": "Channels",
-      "page_roles": "Roles",
-      "page_level_roles": "Level Roles",
-      "page_announcements": "Announcements",
-      "page_formula": "Formula",
-      "xp_title": "⚡ XP Configuration",
-      "xp_desc": "**Min XP per message:** {xp_min}\n**Max XP per message:** {xp_max}\n**Cooldown:** {cooldown} seconds\n**Min message length:** {min_length} characters",
-      "xp_edit_btn": "Edit XP Settings",
-      "channels_title": "📋 Channel Filters",
-      "channels_desc": "**Mode:** {mode}\n\n**Channels:**\n{channels}",
-      "channel_mode_blacklist": "Blacklist (XP everywhere except listed)",
-      "channel_mode_whitelist": "Whitelist (XP only in listed channels)",
-      "channel_mode_toggle": "Mode: {mode}",
-      "channel_edit_btn": "Edit Channel List",
-      "channel_list_empty": "*None — all channels apply*",
-      "roles_title": "🎭 Role Settings",
-      "roles_desc": "**Ignored Roles** (no XP gain):\n{ignored}\n\n**XP Multipliers:**\n{multipliers}",
-      "roles_edit_ignored": "Edit Ignored Roles",
-      "roles_edit_mult": "Edit Multipliers",
-      "roles_none": "*None*",
-      "level_roles_title": "🏅 Level Role Rewards",
-      "level_roles_desc": "Roles automatically assigned when a user reaches a level:\n{roles}",
-      "level_roles_edit": "Edit Level Roles",
-      "level_roles_empty": "*None configured*",
-      "announce_title": "📢 Announcements",
-      "announce_desc": "**Level-up announcement mode:** {mode}",
-      "announce_mode_disabled": "Disabled",
-      "announce_mode_current": "Current Channel",
-      "announce_mode_custom": "Custom Channel",
-      "announce_mode_dm": "DM User",
-      "announce_cycle_btn": "Mode: {mode} (click to cycle)",
-      "announce_channel_btn": "Set Custom Channel",
-      "formula_title": "📐 Level Curve Formula",
-      "formula_desc": "**Current Formula:** `{formula}`\n\nUse `level` as the variable. The result is the XP required to advance from one level to the next.\n\n**XP Required per Level:**\n{curve}",
-      "formula_edit_btn": "Edit Formula",
-      "formula_reset_btn": "Reset to Default"
-    },
-    "modal": {
-      "xp_title": "Edit XP Settings",
-      "xp_min_label": "Minimum XP per message",
-      "xp_max_label": "Maximum XP per message",
-      "cooldown_label": "Cooldown (seconds)",
-      "min_length_label": "Minimum message length (chars)",
-      "invalid_number": "Please enter valid numbers.",
-      "channel_title": "Edit Channel List",
-      "channel_label": "Channel IDs (space or comma separated)",
-      "channel_placeholder": "e.g. 123456789 987654321",
-      "ignored_roles_title": "Edit Ignored Roles",
-      "ignored_roles_label": "Role IDs (space or comma separated)",
-      "roles_placeholder": "e.g. 123456789 987654321",
-      "multipliers_title": "Edit XP Multipliers",
-      "multipliers_label": "Format: role_id:multiplier (one per line)",
-      "multipliers_placeholder": "e.g.\n123456789:1.5\n987654321:2.0",
-      "level_roles_title": "Edit Level Role Rewards",
-      "level_roles_label": "Format: level:role_id,role_id (one per line)",
-      "level_roles_placeholder": "e.g.\n5:123456789\n10:987654321,111111111",
-      "announce_channel_title": "Set Announcement Channel",
-      "announce_channel_label": "Channel ID",
-      "announce_channel_placeholder": "e.g. 123456789",
-      "formula_title": "Edit Level Formula",
-      "formula_label": "Formula (max 50 chars, use 'level' as variable)",
-      "formula_placeholder": "e.g. 100 * level ** 1.5",
-      "formula_fallback_warning": "⚠️ Your formula could not be validated — it will fall back to the default curve (`100 * level ** 1.5`) when computing XP. Check that it only uses `level` as a variable and standard math operators."
     }
   }
 }
