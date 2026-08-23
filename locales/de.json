@@ -83,6 +83,21 @@
     "rps_leaderboard": {
       "title": "🏆 Schere-Stein-Papier Rangliste - {server}",
       "server_only": "Dieser Befehl funktioniert nur auf Servern!"
+    },
+    "guess": {
+      "title": "🔢 Zahlenraten",
+      "start_message": "Ich habe mir eine geheime Zahl zwischen 1 und 100 ausgedacht. Kannst du sie erraten?\\nDu hast **7** Versuche.",
+      "button_label": "Tipp abgeben",
+      "modal_title": "Tipp abgeben",
+      "modal_input_label": "Gib deinen Tipp ein (1-100)",
+      "invalid_input": "Ungültige Eingabe! Bitte gib eine Zahl zwischen 1 und 100 ein.",
+      "win_title": "🎉 Du hast gewonnen!",
+      "win_message": "Herzlichen Glückwunsch! Du hast die Zahl **{number}** in **{attempts}** Versuchen erraten!",
+      "lose_title": "Spiel vorbei",
+      "lose_message": "Du hast keine Versuche mehr! Die geheime Zahl war **{number}**.",
+      "higher": "Die geheime Zahl ist **höher** 📈",
+      "lower": "Die geheime Zahl ist **niedriger** 📉",
+      "progress_message": "Dein Tipp: **{guess}**\\n{hint}\\n\\nVerbleibende Versuche: **{attempts}**"
     }
   },
   "fun": {
@@ -548,7 +563,7 @@
     "leaderboard": {
       "title": "🏆 Rangliste",
       "empty": "Noch keine XP-Daten — Chatte, um XP zu verdienen!",
-      "prev": "◀ Zur\u00fcck",
+      "prev": "◀ Zurück",
       "next": "Weiter ▶"
     },
     "level_up": {
@@ -564,9 +579,9 @@
       "desc": "Das Level von {user} wurde auf **{level}** gesetzt ({xp} Gesamt-XP)."
     },
     "reset_xp": {
-      "title": "XP zur\u00fcckgesetzt",
-      "user_desc": "XP f\u00fcr {user} zur\u00fcckgesetzt.",
-      "all_desc": "XP f\u00fcr alle Nutzer auf diesem Server zur\u00fcckgesetzt."
+      "title": "XP zurückgesetzt",
+      "user_desc": "XP für {user} zurückgesetzt.",
+      "all_desc": "XP für alle Nutzer auf diesem Server zurückgesetzt."
     },
     "error": {
       "disabled_title": "Leveling deaktiviert",
@@ -581,26 +596,26 @@
       "enabled_no": "❌ Deaktiviert",
       "toggle_enable": "Leveling aktivieren",
       "toggle_disable": "Leveling deaktivieren",
-      "overview_desc": "**Status:** {enabled}\n**XP-Bereich:** {xp_min}\u2013{xp_max} pro Nachricht\n**Abk\u00fchlzeit:** {cooldown}s\n**Formel:** `{formula}`\n\n**Ben\u00f6tigte XP (Level 1\u21925):** {sample_xp}",
-      "nav_prev": "◀ Zur\u00fcck",
+      "overview_desc": "**Status:** {enabled}\n**XP-Bereich:** {xp_min}–{xp_max} pro Nachricht\n**Abkühlzeit:** {cooldown}s\n**Formel:** `{formula}`\n\n**Benötigte XP (Level 1→5):** {sample_xp}",
+      "nav_prev": "◀ Zurück",
       "nav_next": "Weiter ▶",
-      "page_overview": "\u00dcbersicht",
+      "page_overview": "Übersicht",
       "page_xp": "XP-Konfiguration",
-      "page_channels": "Kan\u00e4le",
+      "page_channels": "Kanäle",
       "page_roles": "Rollen",
       "page_level_roles": "Level-Rollen",
       "page_announcements": "Ankündigungen",
       "page_formula": "Formel",
       "xp_title": "⚡ XP-Konfiguration",
-      "xp_desc": "**Min. XP pro Nachricht:** {xp_min}\n**Max. XP pro Nachricht:** {xp_max}\n**Abk\u00fchlzeit:** {cooldown} Sekunden\n**Mindest-Nachrichtenl\u00e4nge:** {min_length} Zeichen",
+      "xp_desc": "**Min. XP pro Nachricht:** {xp_min}\n**Max. XP pro Nachricht:** {xp_max}\n**Abkühlzeit:** {cooldown} Sekunden\n**Mindest-Nachrichtenlänge:** {min_length} Zeichen",
       "xp_edit_btn": "XP-Einstellungen bearbeiten",
       "channels_title": "📋 Kanalfilter",
-      "channels_desc": "**Modus:** {mode}\n\n**Kan\u00e4le:**\n{channels}",
-      "channel_mode_blacklist": "Blacklist (XP \u00fcberall au\u00dfer gelisteten Kan\u00e4len)",
-      "channel_mode_whitelist": "Whitelist (XP nur in gelisteten Kan\u00e4len)",
+      "channels_desc": "**Modus:** {mode}\n\n**Kanäle:**\n{channels}",
+      "channel_mode_blacklist": "Blacklist (XP überall außer gelisteten Kanälen)",
+      "channel_mode_whitelist": "Whitelist (XP nur in gelisteten Kanälen)",
       "channel_mode_toggle": "Modus: {mode}",
       "channel_edit_btn": "Kanalliste bearbeiten",
-      "channel_list_empty": "*Keine \u2014 alle Kan\u00e4le gelten*",
+      "channel_list_empty": "*Keine — alle Kanäle gelten*",
       "roles_title": "🎭 Rolleneinstellungen",
       "roles_desc": "**Ignorierte Rollen** (kein XP-Gewinn):\n{ignored}\n\n**XP-Multiplikatoren:**\n{multipliers}",
       "roles_edit_ignored": "Ignorierte Rollen bearbeiten",
@@ -619,17 +634,17 @@
       "announce_cycle_btn": "Modus: {mode} (klicken zum Wechseln)",
       "announce_channel_btn": "Kanal festlegen",
       "formula_title": "📐 Level-Kurven-Formel",
-      "formula_desc": "**Aktuelle Formel:** `{formula}`\n\nVerwende `level` als Variable. Das Ergebnis ist die XP, die ben\u00f6tigt wird, um von einem Level zum n\u00e4chsten aufzusteigen.\n\n**Ben\u00f6tigte XP pro Level:**\n{curve}",
+      "formula_desc": "**Aktuelle Formel:** `{formula}`\n\nVerwende `level` als Variable. Das Ergebnis ist die XP, die benötigt wird, um von einem Level zum nächsten aufzusteigen.\n\n**Benötigte XP pro Level:**\n{curve}",
       "formula_edit_btn": "Formel bearbeiten",
-      "formula_reset_btn": "Auf Standard zur\u00fccksetzen"
+      "formula_reset_btn": "Auf Standard zurücksetzen"
     },
     "modal": {
       "xp_title": "XP-Einstellungen bearbeiten",
       "xp_min_label": "Mindest-XP pro Nachricht",
-      "xp_max_label": "H\u00f6chst-XP pro Nachricht",
-      "cooldown_label": "Abk\u00fchlzeit (Sekunden)",
-      "min_length_label": "Mindest-Nachrichtenl\u00e4nge (Zeichen)",
-      "invalid_number": "Bitte g\u00fcltige Zahlen eingeben.",
+      "xp_max_label": "Höchst-XP pro Nachricht",
+      "cooldown_label": "Abkühlzeit (Sekunden)",
+      "min_length_label": "Mindest-Nachrichtenlänge (Zeichen)",
+      "invalid_number": "Bitte gültige Zahlen eingeben.",
       "channel_title": "Kanalliste bearbeiten",
       "channel_label": "Kanal-IDs (durch Leerzeichen oder Komma getrennt)",
       "channel_placeholder": "z.B. 123456789 987654321",
@@ -648,7 +663,7 @@
       "formula_title": "Level-Formel bearbeiten",
       "formula_label": "Formel (max. 50 Zeichen, 'level' als Variable)",
       "formula_placeholder": "z.B. 100 * level ** 1.5",
-      "formula_fallback_warning": "⚠️ Deine Formel konnte nicht validiert werden — sie f\u00e4llt auf die Standardkurve zur\u00fcck (`100 * level ** 1.5`). \u00dcberpr\u00fcfe, ob du nur `level` als Variable und Standard-Rechenoperatoren verwendest."
+      "formula_fallback_warning": "⚠️ Deine Formel konnte nicht validiert werden — sie fällt auf die Standardkurve zurück (`100 * level ** 1.5`). Überprüfe, ob du nur `level` als Variable und Standard-Rechenoperatoren verwendest."
     }
   }
 }

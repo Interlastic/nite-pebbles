@@ -525,6 +525,89 @@ class ASCIIView(ui.LayoutView):
         self.add_item(ui.TextDisplay(content=f"```\n{ascii_text}```"))
 
 
+
+class GuessGameState:
+    def __init__(self, cog, user, secret_number, lang):
+        self.cog = cog
+        self.user = user
+        self.secret_number = secret_number
+        self.attempts_left = 7
+        self.lang = lang
+
+class GuessButton(discord.ui.Button):
+    def __init__(self, state: GuessGameState):
+        super().__init__(label=get_string("games.guess.button_label", state.lang), style=discord.ButtonStyle.blurple, custom_id="make_guess")
+        self.state = state
+
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.state.user.id:
+            await interaction.response.send_message(get_string("errors.not_in_game", self.state.lang), ephemeral=True)
+            return
+        await interaction.response.send_modal(GuessModal(self.state, self.state.lang))
+
+class GuessModal(discord.ui.Modal):
+    def __init__(self, state: GuessGameState, lang: str):
+        super().__init__(title=get_string("games.guess.modal_title", lang))
+        self.state = state
+        self.lang = lang
+        self.guess_input = discord.ui.TextInput(
+            label=get_string("games.guess.modal_input_label", lang),
+            placeholder="1-100",
+            required=True,
+            min_length=1,
+            max_length=3
+        )
+        self.add_item(self.guess_input)
+
+    async def on_submit(self, interaction: discord.Interaction):
+        try:
+            guess = int(self.guess_input.value)
+            if guess < 1 or guess > 100:
+                raise ValueError
+        except ValueError:
+            await interaction.response.send_message(
+                get_string("games.guess.invalid_input", self.lang), ephemeral=True
+            )
+            return
+
+        from core.db_manager import db
+
+        self.state.attempts_left -= 1
+
+        if guess == self.state.secret_number:
+            # Win
+            stats = await db.get_user_info(self.state.user.id, ["guess_wins", "guess_played"])
+            wins = (stats.get("guess_wins") or 0) + 1
+            played = (stats.get("guess_played") or 0) + 1
+            await db.save_user_info(self.state.user.id, {"guess_wins": wins, "guess_played": played})
+
+            view = template.success(
+                title=get_string("games.guess.win_title", self.lang),
+                message=get_string("games.guess.win_message", self.lang, attempts=7-self.state.attempts_left, number=self.state.secret_number)
+            )
+            await interaction.response.edit_message(view=view)
+        elif self.state.attempts_left == 0:
+            # Lose
+            stats = await db.get_user_info(self.state.user.id, ["guess_played"])
+            played = (stats.get("guess_played") or 0) + 1
+            await db.save_user_info(self.state.user.id, {"guess_played": played})
+
+            view = template.error(
+                title=get_string("games.guess.lose_title", self.lang),
+                message=get_string("games.guess.lose_message", self.lang, number=self.state.secret_number)
+            )
+            await interaction.response.edit_message(view=view)
+        else:
+            # Higher / Lower
+            hint = get_string("games.guess.higher", self.lang) if guess < self.state.secret_number else get_string("games.guess.lower", self.lang)
+            view = template.message(
+                title=get_string("games.guess.title", self.lang),
+                message=get_string("games.guess.progress_message", self.lang, guess=guess, hint=hint, attempts=self.state.attempts_left)
+            )
+            view.add_item(GuessButton(self.state))
+            await interaction.response.edit_message(view=view)
+
+
 # --- Main Cog ---
 class FunCommands(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -1119,6 +1202,23 @@ class FunCommands(commands.Cog):
             ephemeral=False,
             allowed_mentions=discord.AllowedMentions.none(),
         )
+
+
+
+    @app_commands.command(name="guess", description="Play a number guessing minigame (1-100)!")
+    @app_commands.allowed_installs(users=True, guilds=True)
+    @app_commands.allowed_contexts(dms=True, private_channels=True, guilds=True)
+    async def guess(self, interaction: discord.Interaction):
+        lang = await resolve_locale(interaction)
+        secret_number = random.randint(1, 100)
+        state = GuessGameState(self, interaction.user, secret_number, lang)
+
+        view = template.message(
+            title=get_string("games.guess.title", lang),
+            message=get_string("games.guess.start_message", lang)
+        )
+        view.add_item(GuessButton(state))
+        await interaction.response.send_message(view=view)
 
 
 async def setup(bot: commands.Bot):
