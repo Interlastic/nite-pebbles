@@ -6,4 +6,9 @@
   - Target files: `nite-pebbles/fun_commands.py`, `nite-pebbles/locales/*.json`
   - Tests: Verify game flow, higher/lower feedback accuracy, timeout handling, and localization.
 
+- [ ] **Add max and attempts arguments to /guess**
+  - Scope: Max: replaces 100 with the argument for a game with more diversity. Attempts: Replaces the attempt count (7) to anything, to make the game harder or easier.
+  - Target files: `nite-pebbles/fun_commands.py`, `nite-pebbles/locales/*.json`
+  - Tests: Verify the game flow, errors. Run the tests included in this repository.
+
 ## Bugs
