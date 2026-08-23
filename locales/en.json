@@ -83,6 +83,21 @@
     "rps_leaderboard": {
       "title": "🏆 RPS Leaderboard - {server}",
       "server_only": "This command only works in servers!"
+    },
+    "guess": {
+      "title": "🔢 Number Guessing Game",
+      "start_message": "I have picked a secret number between 1 and 100. Can you guess it?\\nYou have **7** attempts.",
+      "button_label": "Make a Guess",
+      "modal_title": "Make a Guess",
+      "modal_input_label": "Enter your guess (1-100)",
+      "invalid_input": "Invalid input! Please enter a number between 1 and 100.",
+      "win_title": "🎉 You Win!",
+      "win_message": "Congratulations! You guessed the number **{number}** in **{attempts}** attempts!",
+      "lose_title": "Game Over",
+      "lose_message": "You've run out of attempts! The secret number was **{number}**.",
+      "higher": "The secret number is **higher** 📈",
+      "lower": "The secret number is **lower** 📉",
+      "progress_message": "Your guess: **{guess}**\\n{hint}\\n\\nAttempts remaining: **{attempts}**"
     }
   },
   "fun": {

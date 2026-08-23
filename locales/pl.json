@@ -83,6 +83,21 @@
     "rps_leaderboard": {
       "title": "🏆 Ranking RPS - {server}",
       "server_only": "Ta komenda działa tylko na serwerach!"
+    },
+    "guess": {
+      "title": "🔢 Zgadywanie Liczb",
+      "start_message": "Wymyśliłem tajną liczbę od 1 do 100. Czy potrafisz ją odgadnąć?\\nMasz **7** prób.",
+      "button_label": "Zgadnij",
+      "modal_title": "Zgadnij liczbę",
+      "modal_input_label": "Wpisz swoją liczbę (1-100)",
+      "invalid_input": "Nieprawidłowe wejście! Proszę wpisać liczbę od 1 do 100.",
+      "win_title": "🎉 Wygrałeś!",
+      "win_message": "Gratulacje! Odgadłeś liczbę **{number}** w **{attempts}** próbach!",
+      "lose_title": "Koniec Gry",
+      "lose_message": "Skończyły ci się próby! Tajna liczba to **{number}**.",
+      "higher": "Tajna liczba jest **większa** 📈",
+      "lower": "Tajna liczba jest **mniejsza** 📉",
+      "progress_message": "Twój typ: **{guess}**\\n{hint}\\n\\nPozostałe próby: **{attempts}**"
     }
   },
   "fun": {
