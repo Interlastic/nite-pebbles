@@ -571,8 +571,6 @@ class GuessModal(discord.ui.Modal):
             )
             return
 
-
-
         self.state.attempts_left -= 1
 
         if guess == self.state.secret_number:
