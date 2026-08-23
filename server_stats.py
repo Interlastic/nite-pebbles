@@ -8,10 +8,8 @@ from locales import get_string, resolve_locale
 class ServerStats(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.rename_throttle = {} # guild_id -> list of timestamps
-
-    async def cog_load(self):
         self.update_stats.start()
+        self.rename_throttle = {} # guild_id -> list of timestamps
 
     def cog_unload(self):
         self.update_stats.cancel()
@@ -41,13 +39,7 @@ class ServerStats(commands.Cog):
 
     @update_stats.before_loop
     async def before_update_stats(self):
-        try:
-            await self.bot.wait_until_ready()
-        except RuntimeError:
-            while not self.bot.is_closed():
-                if getattr(self.bot, "_connection", None) and self.bot.is_ready():
-                    break
-                await asyncio.sleep(1)
+        await self.bot.wait_until_ready()
 
     async def process_guild_updates(self, guild, fetched, me, online_count):
         settings = await self.bot.server_settings.get_settings(guild.id)
@@ -58,7 +50,7 @@ class ServerStats(commands.Cog):
         # 1. Server Name
         template = config.get("server_name_template")
         if template:
-            new_name = render_template(template, fetched, online_count)
+            new_name = render_template(template, fetched, online_count, cached_guild=guild)
             if new_name and guild.name != new_name:
                 # Check throttle (2 per hour)
                 now = datetime.now()
@@ -91,7 +83,7 @@ class ServerStats(commands.Cog):
                 await self.update_channel_name(channel, ch_template, fetched, me, online_count)
 
     async def update_channel_name(self, channel, template, fetched, me, online_count):
-        new_name = render_template(template, fetched, online_count)
+        new_name = render_template(template, fetched, online_count, cached_guild=channel.guild)
         if new_name and channel.name != new_name:
             if channel.permissions_for(me).manage_channels:
                 try:
