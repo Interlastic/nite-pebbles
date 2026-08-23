@@ -604,7 +604,7 @@ class GuessModal(discord.ui.Modal):
                 title=get_string("games.guess.title", self.lang),
                 message=get_string("games.guess.progress_message", self.lang, guess=guess, hint=hint, attempts=self.state.attempts_left)
             )
-            view.add_item(GuessButton(self.state))
+            view.add_item(ui.ActionRow(GuessButton(self.state)))
             await interaction.response.edit_message(view=view)
 
 
@@ -1217,7 +1217,7 @@ class FunCommands(commands.Cog):
             title=get_string("games.guess.title", lang),
             message=get_string("games.guess.start_message", lang)
         )
-        view.add_item(GuessButton(state))
+        view.add_item(ui.ActionRow(GuessButton(state)))
         await interaction.response.send_message(view=view)
 
 
