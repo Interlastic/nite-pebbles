@@ -527,12 +527,14 @@ class ASCIIView(ui.LayoutView):
 
 
 class GuessGameState:
-    def __init__(self, cog, user, secret_number, lang):
+    def __init__(self, cog, user, secret_number, lang, max_num, total_attempts):
         self.cog = cog
         self.user = user
         self.secret_number = secret_number
-        self.attempts_left = 7
         self.lang = lang
+        self.max_num = max_num
+        self.total_attempts = total_attempts
+        self.attempts_left = total_attempts
 
 class GuessButton(discord.ui.Button):
     def __init__(self, state: GuessGameState):
@@ -551,22 +553,22 @@ class GuessModal(discord.ui.Modal):
         self.state = state
         self.lang = lang
         self.guess_input = discord.ui.TextInput(
-            label=get_string("games.guess.modal_input_label", lang),
-            placeholder="1-100",
+            label=get_string("games.guess.modal_input_label", lang, max=self.state.max_num),
+            placeholder=f"1-{self.state.max_num}",
             required=True,
             min_length=1,
-            max_length=3
+            max_length=len(str(self.state.max_num))
         )
         self.add_item(self.guess_input)
 
     async def on_submit(self, interaction: discord.Interaction):
         try:
             guess = int(self.guess_input.value)
-            if guess < 1 or guess > 100:
+            if guess < 1 or guess > self.state.max_num:
                 raise ValueError
         except ValueError:
             await interaction.response.send_message(
-                get_string("games.guess.invalid_input", self.lang), ephemeral=True
+                get_string("games.guess.invalid_input", self.lang, max=self.state.max_num), ephemeral=True
             )
             return
 
@@ -583,7 +585,7 @@ class GuessModal(discord.ui.Modal):
 
             view = template.success(
                 title=get_string("games.guess.win_title", self.lang),
-                message=get_string("games.guess.win_message", self.lang, attempts=7-self.state.attempts_left, number=self.state.secret_number)
+                message=get_string("games.guess.win_message", self.lang, attempts=self.state.total_attempts-self.state.attempts_left, number=self.state.secret_number)
             )
             await interaction.response.edit_message(view=view)
         elif self.state.attempts_left == 0:
@@ -1205,17 +1207,18 @@ class FunCommands(commands.Cog):
 
 
 
-    @app_commands.command(name="guess", description="Play a number guessing minigame (1-100)!")
+    @app_commands.command(name="guess", description="Play a number guessing minigame!")
     @app_commands.allowed_installs(users=True, guilds=True)
     @app_commands.allowed_contexts(dms=True, private_channels=True, guilds=True)
-    async def guess(self, interaction: discord.Interaction):
+    @app_commands.rename(max_val="max")
+    async def guess(self, interaction: discord.Interaction, max_val: app_commands.Range[int, 2, 100000] = 100, attempts: app_commands.Range[int, 1, 100] = 7):
         lang = await resolve_locale(interaction)
-        secret_number = random.randint(1, 100)
-        state = GuessGameState(self, interaction.user, secret_number, lang)
+        secret_number = random.randint(1, max_val)
+        state = GuessGameState(self, interaction.user, secret_number, lang, max_val, attempts)
 
         view = template.message(
             title=get_string("games.guess.title", lang),
-            message=get_string("games.guess.start_message", lang)
+            message=get_string("games.guess.start_message", lang, max=max_val, attempts=attempts)
         )
         view.add_item(ui.ActionRow(GuessButton(state)))
         await interaction.response.send_message(view=view)
