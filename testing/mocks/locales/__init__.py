@@ -33,3 +33,11 @@ def get_string(key, lang="en", **kwargs):
         return val.format(**kwargs)
     except Exception as e:
         return f"[{key}]"
+def get_list(key, lang="en", **kwargs):
+    return []
+
+def resolve_locale(interaction):
+    return "en"
+
+def get_localized(interaction, key, **kwargs):
+    return get_string(key, "en", **kwargs)
