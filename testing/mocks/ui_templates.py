@@ -1,15 +1,19 @@
+class MockView:
+    def add_item(self, item):
+        pass
+
 class Template:
     def message(self, *args, **kwargs):
-        pass
+        return MockView()
     def success(self, *args, **kwargs):
-        pass
+        return MockView()
     def error(self, *args, **kwargs):
-        pass
+        return MockView()
     def warning(self, *args, **kwargs):
-        pass
+        return MockView()
     def confirm(self, *args, **kwargs):
-        pass
+        return MockView()
     def loading(self, *args, **kwargs):
-        pass
+        return MockView()
 
 template = Template()

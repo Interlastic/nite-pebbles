@@ -665,5 +665,42 @@
       "formula_placeholder": "z.B. 100 * level ** 1.5",
       "formula_fallback_warning": "⚠️ Deine Formel konnte nicht validiert werden — sie fällt auf die Standardkurve zurück (`100 * level ** 1.5`). Überprüfe, ob du nur `level` als Variable und Standard-Rechenoperatoren verwendest."
     }
+  },
+  "serverinfo": {
+    "buttons": {
+      "details": "More Info",
+      "images": "Images",
+      "back": "Back"
+    },
+    "titles": {
+      "details": "Server Details",
+      "images": "Server Images"
+    },
+    "labels": {
+      "owner": "Owner",
+      "created": "Created At",
+      "channels": "Channels",
+      "roles": "Roles",
+      "emojis": "Emojis",
+      "stickers": "Stickers",
+      "moderation": "Moderation",
+      "description": "Description",
+      "vanity": "Vanity URL",
+      "icon": "Server Icon",
+      "banner": "Banner",
+      "splash": "Splash",
+      "discovery_splash": "Discovery Splash",
+      "no_images": "No images available for this server.",
+      "tier": "Tier",
+      "boosts": "Boosts",
+      "text": "Text",
+      "voice": "Voice",
+      "category": "Category",
+      "stage_forum": "Stage/Forum",
+      "static": "Static",
+      "animated": "Animated",
+      "verification": "Verification",
+      "content_filter": "Content Filter"
+    }
   }
 }
