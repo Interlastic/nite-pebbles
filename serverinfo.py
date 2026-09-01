@@ -145,7 +145,7 @@ class ServerInfo(commands.Cog):
         boost_icon = self.get_boost_icon()
 
         total_members = getattr(guild, 'approximate_member_count', guild.member_count or 0)
-        online_members = getattr(guild, 'approximate_presence_count', 0) or 0 or 0
+        online_members = getattr(guild, 'approximate_presence_count', 0) or 0
 
         msg = get_string("serverinfo.basic_info", lang,
             name_icon=name_icon,
