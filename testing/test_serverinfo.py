@@ -9,7 +9,7 @@ sys.path.append(str(mocks_path))
 pebbles_root = Path(__file__).parent.parent
 sys.path.append(str(pebbles_root))
 
-from serverinfo import ServerInfo, ServerInfoView, SubmenuView
+from serverinfo import ServerInfo, more_info_callback, images_callback
 
 @pytest.fixture
 def mock_guild():
@@ -24,7 +24,6 @@ def mock_guild():
     guild.icon = MagicMock()
     guild.icon.url = "http://icon.url"
 
-    # Defaults for other stats
     guild.channels = []
     guild.categories = []
     guild.emojis = []
@@ -66,7 +65,6 @@ async def test_serverinfo_main_command(mock_bot, mock_guild):
 
     args, kwargs = interaction.followup.send.call_args
     assert "view" in kwargs
-    # The view should be a template.message returned MagicMock/View equivalent in the mock
 
 @pytest.mark.asyncio
 async def test_serverinfo_more_info_callback(mock_bot, mock_guild):
@@ -77,10 +75,7 @@ async def test_serverinfo_more_info_callback(mock_bot, mock_guild):
     interaction.response.defer = AsyncMock()
     interaction.followup.send = AsyncMock()
 
-    view = ServerInfoView(mock_guild, interaction, "en", cog)
-
-    # Trigger the callback
-    await view.more_info_btn.callback(interaction)
+    await more_info_callback(interaction, mock_guild, "en", cog, interaction.user)
 
     interaction.response.defer.assert_called_once_with(ephemeral=False)
     interaction.followup.send.assert_called_once()
@@ -97,24 +92,10 @@ async def test_serverinfo_images_callback(mock_bot, mock_guild):
     interaction.response.defer = AsyncMock()
     interaction.followup.send = AsyncMock()
 
-    view = ServerInfoView(mock_guild, interaction, "en", cog)
-
-    # Trigger the callback
-    await view.images_btn.callback(interaction)
+    await images_callback(interaction, mock_guild, "en", cog, interaction.user)
 
     interaction.response.defer.assert_called_once_with(ephemeral=False)
     interaction.followup.send.assert_called_once()
 
     args, kwargs = interaction.followup.send.call_args
     assert "view" in kwargs
-
-@pytest.mark.asyncio
-async def test_serverinfo_back_callback():
-    interaction = MagicMock()
-    interaction.message.delete = AsyncMock()
-    interaction.response.defer = AsyncMock()
-
-    view = SubmenuView(None, "en", None, None)
-    await view.back_btn.callback(interaction)
-
-    interaction.message.delete.assert_called_once()

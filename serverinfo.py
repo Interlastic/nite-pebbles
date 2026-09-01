@@ -4,119 +4,94 @@ from discord.ext import commands
 from ui_templates import template
 from locales import get_localized, get_string, resolve_locale
 
-class ServerInfoView(ui.View):
-    def __init__(self, guild: discord.Guild, interaction: discord.Interaction, lang: str, cog):
-        super().__init__(timeout=180)
-        self.guild = guild
-        self.original_interaction = interaction
-        self.lang = lang
-        self.cog = cog
+async def more_info_callback(interaction: discord.Interaction, guild, lang, cog, original_user):
+    await interaction.response.defer(ephemeral=False)
 
-        self.more_info_btn = ui.Button(label=get_string("serverinfo.buttons.more_info", self.lang), style=discord.ButtonStyle.primary)
-        self.more_info_btn.callback = self.more_info_callback
-        self.add_item(self.more_info_btn)
+    channels_text = len([c for c in guild.channels if isinstance(c, discord.TextChannel)])
+    channels_voice = len([c for c in guild.channels if isinstance(c, discord.VoiceChannel)])
+    channels_category = len([c for c in guild.categories])
+    channels_stage = len([c for c in guild.channels if isinstance(c, (discord.StageChannel, discord.ForumChannel))])
 
-        self.images_btn = ui.Button(label=get_string("serverinfo.buttons.images", self.lang), style=discord.ButtonStyle.secondary)
-        self.images_btn.callback = self.images_callback
-        self.add_item(self.images_btn)
+    emojis_static = len([e for e in guild.emojis if not e.animated])
+    emojis_animated = len([e for e in guild.emojis if e.animated])
 
-    async def more_info_callback(self, interaction: discord.Interaction):
-        await interaction.response.defer(ephemeral=False)
-        view = SubmenuView(self.guild, self.lang, self.cog, self.original_interaction.user)
+    description = guild.description
+    vanity = getattr(guild, 'vanity_url_code', None)
 
-        channels_text = len([c for c in self.guild.channels if isinstance(c, discord.TextChannel)])
-        channels_voice = len([c for c in self.guild.channels if isinstance(c, discord.VoiceChannel)])
-        channels_category = len([c for c in self.guild.categories])
-        channels_stage = len([c for c in self.guild.channels if isinstance(c, (discord.StageChannel, discord.ForumChannel))])
+    created_f = f"<t:{int(guild.created_at.timestamp())}:F>"
+    created_r = f"<t:{int(guild.created_at.timestamp())}:R>"
 
-        emojis_static = len([e for e in self.guild.emojis if not e.animated])
-        emojis_animated = len([e for e in self.guild.emojis if e.animated])
+    owner = guild.owner.mention if guild.owner else ""
+    owner_id = guild.owner_id or ""
 
-        description = self.guild.description
-        vanity = getattr(self.guild, 'vanity_url_code', None)
+    desc_part = get_string("serverinfo.description_part", lang, description=description) if description else ""
+    vanity_part = get_string("serverinfo.vanity_part", lang, vanity=f"discord.gg/{vanity}") if vanity else ""
+    community_section = get_string("serverinfo.community_section", lang, description_part=desc_part, vanity_part=vanity_part) if (description or vanity) else ""
 
-        created_f = f"<t:{int(self.guild.created_at.timestamp())}:F>"
-        created_r = f"<t:{int(self.guild.created_at.timestamp())}:R>"
+    msg = get_string("serverinfo.more_info_message", lang,
+        owner=owner,
+        owner_id=owner_id,
+        created_f=created_f,
+        created_r=created_r,
+        channels_text=channels_text,
+        channels_voice=channels_voice,
+        channels_category=channels_category,
+        channels_stage=channels_stage,
+        roles=len(guild.roles),
+        emojis_static=emojis_static,
+        emojis_animated=emojis_animated,
+        stickers=len(guild.stickers),
+        verification=str(guild.verification_level).capitalize(),
+        explicit=str(guild.explicit_content_filter).replace('_', ' ').capitalize(),
+        community_section=community_section
+    )
+    title = get_string("serverinfo.more_info_title", lang, server_name=guild.name)
 
-        owner = self.guild.owner.mention if self.guild.owner else ""
-        owner_id = self.guild.owner_id or ""
+    template_view = template.message(title=title, message=msg, footer=get_string("serverinfo.basic_info_footer", lang, user=original_user.display_name))
 
-        desc_part = get_string("serverinfo.description_part", self.lang, description=description) if description else ""
-        vanity_part = get_string("serverinfo.vanity_part", self.lang, vanity=f"discord.gg/{vanity}") if vanity else ""
-        community_section = get_string("serverinfo.community_section", self.lang, description_part=desc_part, vanity_part=vanity_part) if (description or vanity) else ""
+    back_btn = ui.Button(label=get_string("serverinfo.buttons.back", lang), style=discord.ButtonStyle.danger)
+    async def back_callback(inter):
+        await inter.response.defer()
+        await inter.message.delete()
+    back_btn.callback = back_callback
+    template_view.add_item(back_btn)
 
-        msg = get_string("serverinfo.more_info_message", self.lang,
-            owner=owner,
-            owner_id=owner_id,
-            created_f=created_f,
-            created_r=created_r,
-            channels_text=channels_text,
-            channels_voice=channels_voice,
-            channels_category=channels_category,
-            channels_stage=channels_stage,
-            roles=len(self.guild.roles),
-            emojis_static=emojis_static,
-            emojis_animated=emojis_animated,
-            stickers=len(self.guild.stickers),
-            verification=str(self.guild.verification_level).capitalize(),
-            explicit=str(self.guild.explicit_content_filter).replace('_', ' ').capitalize(),
-            community_section=community_section
-        )
-        title = get_string("serverinfo.more_info_title", self.lang, server_name=self.guild.name)
+    await interaction.followup.send(view=template_view)
 
-        template_view = template.message(title=title, message=msg, footer=get_string("serverinfo.basic_info_footer", self.lang, user=self.original_interaction.user.display_name))
-        for item in list(view.children):
-            view.remove_item(item)
-            template_view.add_item(item)
 
-        await interaction.followup.send(view=template_view)
+async def images_callback(interaction: discord.Interaction, guild, lang, cog, original_user):
+    await interaction.response.defer(ephemeral=False)
 
-    async def images_callback(self, interaction: discord.Interaction):
-        await interaction.response.defer(ephemeral=False)
-        view = SubmenuView(self.guild, self.lang, self.cog, self.original_interaction.user)
+    icon = guild.icon.url if guild.icon else None
+    banner = guild.banner.url if guild.banner else None
+    splash = guild.splash.url if guild.splash else None
+    discovery = guild.discovery_splash.url if guild.discovery_splash else None
 
-        icon = self.guild.icon.url if self.guild.icon else None
-        banner = self.guild.banner.url if self.guild.banner else None
-        splash = self.guild.splash.url if self.guild.splash else None
-        discovery = self.guild.discovery_splash.url if self.guild.discovery_splash else None
+    icon_part = get_string("serverinfo.image_icon", lang, icon=icon) if icon else ""
+    banner_part = get_string("serverinfo.image_banner", lang, banner=banner) if banner else ""
+    splash_part = get_string("serverinfo.image_splash", lang, splash=splash) if splash else ""
+    discovery_part = get_string("serverinfo.image_discovery", lang, discovery=discovery) if discovery else ""
 
-        icon_part = get_string("serverinfo.image_icon", self.lang, icon=icon) if icon else ""
-        banner_part = get_string("serverinfo.image_banner", self.lang, banner=banner) if banner else ""
-        splash_part = get_string("serverinfo.image_splash", self.lang, splash=splash) if splash else ""
-        discovery_part = get_string("serverinfo.image_discovery", self.lang, discovery=discovery) if discovery else ""
+    msg = get_string("serverinfo.images_message", lang,
+        icon_part=icon_part,
+        banner_part=banner_part,
+        splash_part=splash_part,
+        discovery_part=discovery_part
+    )
+    title = get_string("serverinfo.images_title", lang, server_name=guild.name)
 
-        msg = get_string("serverinfo.images_message", self.lang,
-            icon_part=icon_part,
-            banner_part=banner_part,
-            splash_part=splash_part,
-            discovery_part=discovery_part
-        )
-        title = get_string("serverinfo.images_title", self.lang, server_name=self.guild.name)
+    image_url = icon if icon else None
 
-        image_url = icon if icon else None
+    template_view = template.message(title=title, message=msg, footer=get_string("serverinfo.basic_info_footer", lang, user=original_user.display_name), image_url=image_url)
 
-        template_view = template.message(title=title, message=msg, footer=get_string("serverinfo.basic_info_footer", self.lang, user=self.original_interaction.user.display_name), image_url=image_url)
-        for item in list(view.children):
-            view.remove_item(item)
-            template_view.add_item(item)
+    back_btn = ui.Button(label=get_string("serverinfo.buttons.back", lang), style=discord.ButtonStyle.danger)
+    async def back_callback(inter):
+        await inter.response.defer()
+        await inter.message.delete()
+    back_btn.callback = back_callback
+    template_view.add_item(back_btn)
 
-        await interaction.followup.send(view=template_view)
-
-class SubmenuView(ui.View):
-    def __init__(self, guild, lang, cog, user):
-        super().__init__(timeout=180)
-        self.guild = guild
-        self.lang = lang
-        self.cog = cog
-        self.user = user
-
-        self.back_btn = ui.Button(label=get_string("serverinfo.buttons.back", self.lang), style=discord.ButtonStyle.danger)
-        self.back_btn.callback = self.back_callback
-        self.add_item(self.back_btn)
-
-    async def back_callback(self, interaction: discord.Interaction):
-        await interaction.response.defer()
-        await interaction.message.delete()
+    await interaction.followup.send(view=template_view)
 
 
 class ServerInfo(commands.Cog):
@@ -163,11 +138,20 @@ class ServerInfo(commands.Cog):
 
         image_url = guild.icon.url if guild.icon else None
 
-        view_logic = ServerInfoView(guild, interaction, lang, self)
         template_view = template.message(title=title, message=msg, footer=footer, image_url=image_url)
-        for item in list(view_logic.children):
-            view_logic.remove_item(item)
-            template_view.add_item(item)
+
+        more_info_btn = ui.Button(label=get_string("serverinfo.buttons.more_info", lang), style=discord.ButtonStyle.primary)
+        async def wrap_more_info(inter):
+            await more_info_callback(inter, guild, lang, self, interaction.user)
+        more_info_btn.callback = wrap_more_info
+
+        images_btn = ui.Button(label=get_string("serverinfo.buttons.images", lang), style=discord.ButtonStyle.secondary)
+        async def wrap_images(inter):
+            await images_callback(inter, guild, lang, self, interaction.user)
+        images_btn.callback = wrap_images
+
+        template_view.add_item(more_info_btn)
+        template_view.add_item(images_btn)
 
         await interaction.followup.send(view=template_view)
 
