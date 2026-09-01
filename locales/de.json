@@ -665,5 +665,26 @@
       "formula_placeholder": "z.B. 100 * level ** 1.5",
       "formula_fallback_warning": "⚠️ Deine Formel konnte nicht validiert werden — sie fällt auf die Standardkurve zurück (`100 * level ** 1.5`). Überprüfe, ob du nur `level` als Variable und Standard-Rechenoperatoren verwendest."
     }
+  },
+  "serverinfo": {
+    "title": "Server Information",
+    "basic_info": "{name_icon} **{server_name}**\n<:ID:1493663589246963812> {server_id}\n<:uad:1493663591239254046> {total_members} Members ({online_members} Online)\n{boost_icon} Level {boost_tier} ({boost_count} Boosts)",
+    "basic_info_footer": "Requested by {user}",
+    "buttons": {
+      "more_info": "More Info",
+      "images": "Images",
+      "back": "Back"
+    },
+    "more_info_title": "More Info: {server_name}",
+    "more_info_message": "**Owner:** {owner} (`{owner_id}`)\n**Created:** {created_f} ({created_r})\n\n**Channels:** {channels_text} Text, {channels_voice} Voice, {channels_category} Category, {channels_stage} Stage/Forum\n**Roles:** {roles}\n**Emojis:** {emojis_static} Static, {emojis_animated} Animated\n**Stickers:** {stickers}\n\n**Moderation:**\nVerification: {verification}\nExplicit Content: {explicit}{community_section}",
+    "images_title": "Images: {server_name}",
+    "images_message": "{icon_part}{banner_part}{splash_part}{discovery_part}",
+    "description_part": "\nDescription: {description}",
+    "vanity_part": "\nVanity URL: {vanity}",
+    "community_section": "\n\n**Community:**{description_part}{vanity_part}",
+    "image_icon": "**Avatar / Icon:**\n{icon}\n\n",
+    "image_banner": "**Banner:**\n{banner}\n\n",
+    "image_splash": "**Splash:**\n{splash}\n\n",
+    "image_discovery": "**Discovery Splash:**\n{discovery}"
   }
 }

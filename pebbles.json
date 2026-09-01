@@ -12,7 +12,13 @@
       "extension_file": "fun_commands",
       "name": "Fun Commands",
       "description": "Fun Commands to lighten up the mood (I guess)",
-      "dependencies": ["aiohttp", "playwright", "Jinja2", "Pillow", "pyfiglet"],
+      "dependencies": [
+        "aiohttp",
+        "playwright",
+        "Jinja2",
+        "Pillow",
+        "pyfiglet"
+      ],
       "credits": {
         "Creators": [
           {
@@ -32,7 +38,9 @@
       "extension_file": "moderation",
       "name": "Moderation",
       "description": "Moderation features (like banning)",
-      "dependencies": ["rapidfuzz"],
+      "dependencies": [
+        "rapidfuzz"
+      ],
       "credits": {
         "Creators": [
           {
@@ -87,6 +95,21 @@
       "extension_file": "leveling",
       "name": "XP Leveling",
       "description": "Per-server XP and leveling system with fully customizable curve, channel/role filters, multipliers, and level-role rewards.",
+      "dependencies": [],
+      "credits": {
+        "Creators": [
+          {
+            "id": "inter",
+            "contributions": "Initial creation"
+          }
+        ],
+        "Contributers": []
+      }
+    },
+    {
+      "extension_file": "serverinfo",
+      "name": "Server Info",
+      "description": "Fetch and display detailed server information.",
       "dependencies": [],
       "credits": {
         "Creators": [

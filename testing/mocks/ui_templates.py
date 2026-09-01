@@ -1,15 +1,21 @@
 class Template:
     def message(self, *args, **kwargs):
-        pass
+        import discord
+        return discord.ui.View()
     def success(self, *args, **kwargs):
-        pass
+        import discord
+        return discord.ui.View()
     def error(self, *args, **kwargs):
-        pass
+        import discord
+        return discord.ui.View()
     def warning(self, *args, **kwargs):
-        pass
+        import discord
+        return discord.ui.View()
     def confirm(self, *args, **kwargs):
-        pass
+        import discord
+        return discord.ui.View()
     def loading(self, *args, **kwargs):
-        pass
+        import discord
+        return discord.ui.View()
 
 template = Template()
