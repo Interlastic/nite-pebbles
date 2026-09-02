@@ -808,6 +808,14 @@
       "explicit": "Explizit",
       "safe": "Sicher",
       "age_restricted": "Altersbeschränkt"
+    },
+    "boosts": "Boosts",
+    "tier_format": "Stufe {tier}",
+    "user_missing_perm": "[Erfordert Berechtigung: {perm}]",
+    "perms": {
+      "manage_guild": "Server verwalten",
+      "moderate_members": "Mitglieder moderieren",
+      "ban_members": "Mitglieder bannen"
     }
   }
 }

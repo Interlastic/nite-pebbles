@@ -808,6 +808,14 @@
       "explicit": "Jawny",
       "safe": "Bezpieczny",
       "age_restricted": "Ograniczony wiekowo"
+    },
+    "boosts": "Ulepszenia",
+    "tier_format": "Poziom {tier}",
+    "user_missing_perm": "[Wymaga uprawnienia: {perm}]",
+    "perms": {
+      "manage_guild": "Zarządzanie serwerem",
+      "moderate_members": "Moderowanie członków",
+      "ban_members": "Banowanie członków"
     }
   }
 }

@@ -792,6 +792,14 @@
       "explicit": "Explicit",
       "safe": "Safe",
       "age_restricted": "Age Restricted"
+    },
+    "boosts": "Boosts",
+    "tier_format": "Tier {tier}",
+    "user_missing_perm": "[Requires permission: {perm}]",
+    "perms": {
+      "manage_guild": "Manage Server",
+      "moderate_members": "Moderate Members",
+      "ban_members": "Ban Members"
     }
   }
 }

@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from discord import app_commands, ui
-from typing import Optional, List
+from typing import Optional, List, Union
 import datetime
 
 from locales import get_string, resolve_locale
@@ -84,18 +84,24 @@ class ServerInfoRefreshButton(ui.Button):
 
 
 class ServerInfoView(ui.LayoutView):
-    def __init__(self, bot: commands.Bot, guild: discord.Guild, lang: str = "en", author_id: Optional[int] = None):
+    def __init__(
+        self,
+        bot: commands.Bot,
+        guild: discord.Guild,
+        lang: str = "en",
+        author_member: Optional[Union[discord.Member, discord.User]] = None
+    ):
         super().__init__(timeout=600)
         self.bot = bot
         self.guild = guild
         self.lang = lang
-        self.author_id = author_id
+        self.author_member = author_member
+        self.author_id = author_member.id if author_member else None
         self.current_tab = "home"
 
         # Fetched Data attributes
         self.member_count: int = guild.member_count or 0
         self.online_count: int = 0
-        self.bot_count_str: str = ""
         self.integrations: Optional[List] = None
         self.bot_integrations: Optional[List] = None
         self.invites: Optional[List] = None
@@ -131,7 +137,7 @@ class ServerInfoView(ui.LayoutView):
             except (discord.HTTPException, discord.Forbidden):
                 pass
 
-        # 2. Integrations and Bot Count
+        # 2. Integrations and Bot Count (only fetch if bot has manage_guild)
         me = self.guild.me
         if me and me.guild_permissions.manage_guild:
             try:
@@ -143,15 +149,12 @@ class ServerInfoView(ui.LayoutView):
                     or getattr(i, "type", "") in ("bot", "discord")
                     or getattr(i, "application", None) is not None
                 ]
-                self.bot_count_str = f"{len(self.bot_integrations):,}"
             except (discord.HTTPException, discord.Forbidden):
                 self.integrations = None
                 self.bot_integrations = None
-                self.bot_count_str = get_string("serverinfo.missing_perm_general", self.lang)
         else:
             self.integrations = None
             self.bot_integrations = None
-            self.bot_count_str = get_string("serverinfo.missing_perm_general", self.lang)
 
         # 3. Invites
         if me and me.guild_permissions.manage_guild:
@@ -254,6 +257,22 @@ class ServerInfoView(ui.LayoutView):
         guild = self.guild
         created_ts = int(guild.created_at.timestamp())
 
+        # Evaluate User Permissions for Option B (Masked Fields)
+        user_perms = self.author_member.guild_permissions if isinstance(self.author_member, discord.Member) else discord.Permissions.none()
+        can_view_security = user_perms.manage_guild or user_perms.moderate_members or user_perms.administrator
+        can_view_integrations = user_perms.manage_guild or user_perms.administrator
+        can_view_invites = user_perms.manage_guild or user_perms.administrator
+        can_view_bans = user_perms.ban_members or user_perms.administrator
+
+        perm_mod_label = get_string("serverinfo.perms.moderate_members", lang)
+        perm_manage_label = get_string("serverinfo.perms.manage_guild", lang)
+        perm_bans_label = get_string("serverinfo.perms.ban_members", lang)
+
+        user_missing_mod = get_string("serverinfo.user_missing_perm", lang, perm=perm_mod_label)
+        user_missing_manage = get_string("serverinfo.user_missing_perm", lang, perm=perm_manage_label)
+        user_missing_bans = get_string("serverinfo.user_missing_perm", lang, perm=perm_bans_label)
+        bot_missing_perm = get_string("serverinfo.missing_perm_general", lang)
+
         # ==========================================
         # TAB 1: HOME (COMPACT OVERVIEW)
         # ==========================================
@@ -262,13 +281,14 @@ class ServerInfoView(ui.LayoutView):
 
             members_label = get_string("serverinfo.members", lang)
             online_label = get_string("serverinfo.online", lang)
-            bots_label = get_string("serverinfo.bots", lang)
+            boosts_label = get_string("serverinfo.boosts", lang)
+            tier_str = get_string("serverinfo.tier_format", lang, tier=guild.premium_tier)
             owner_label = get_string("serverinfo.owner", lang)
             created_label = get_string("serverinfo.created", lang)
 
             details_lines = [
                 f"{EMOJI_MEMBER} **{members_label}:** {self.member_count:,} ({self.online_count:,} {online_label})",
-                f"{EMOJI_BOT} **{bots_label}:** {self.bot_count_str}",
+                f"{EMOJI_BOOST} **{boosts_label}:** {guild.premium_subscription_count or 0} ({tier_str})",
                 f"{EMOJI_ADMIN} **{owner_label}:** <@{guild.owner_id}>",
                 f"{EMOJI_CLOCK} **{created_label}:** <t:{created_ts}:D> (<t:{created_ts}:R>)",
                 f"-# {EMOJI_ID} ID: {guild.id}",
@@ -453,16 +473,19 @@ class ServerInfoView(ui.LayoutView):
             title = get_string("serverinfo.tabs.security", lang)
             container_items.append(ui.TextDisplay(content=f"# {EMOJI_SECURITY} {guild.name} - {title}"))
 
-            automod_str = (
-                get_string("serverinfo.missing_perm_general", lang)
-                if self.automod_rules is None
-                else get_string("serverinfo.security.active_rules", lang, count=len(self.automod_rules))
-            )
+            filter_str = self._get_filter_level_str() if can_view_security else user_missing_mod
+
+            if not can_view_security:
+                automod_str = user_missing_mod
+            elif self.automod_rules is not None:
+                automod_str = get_string("serverinfo.security.active_rules", lang, count=len(self.automod_rules))
+            else:
+                automod_str = bot_missing_perm
 
             sec_lines = [
                 f"{EMOJI_VERIF} **{get_string('serverinfo.security.verification', lang)}:** {self._get_verif_level_str()}",
                 f"{EMOJI_SECURITY} **{get_string('serverinfo.security.mfa', lang)}:** {self._get_mfa_level_str()}",
-                f"{EMOJI_CLIPBOARD} **{get_string('serverinfo.security.explicit_filter', lang)}:** {self._get_filter_level_str()}",
+                f"{EMOJI_CLIPBOARD} **{get_string('serverinfo.security.explicit_filter', lang)}:** {filter_str}",
                 f"{EMOJI_CLOCK} **{get_string('serverinfo.security.notifications', lang)}:** {self._get_notif_level_str()}",
                 f"{EMOJI_WARNING} **{get_string('serverinfo.security.nsfw', lang)}:** {self._get_nsfw_level_str()}",
                 f"{EMOJI_SECURITY} **{get_string('serverinfo.security.automod', lang)}:** {automod_str}",
@@ -551,24 +574,37 @@ class ServerInfoView(ui.LayoutView):
             title = get_string("serverinfo.tabs.more", lang)
             container_items.append(ui.TextDisplay(content=f"# {EMOJI_INTEGRATION} {guild.name} - {title}"))
 
-            missing_perm = get_string("serverinfo.missing_perm_general", lang)
-
             # Integrations
-            if self.integrations is not None:
+            if not can_view_integrations:
+                integrations_str = user_missing_manage
+                bots_str = user_missing_manage
+                other_str = user_missing_manage
+            elif self.integrations is not None:
                 integrations_str = f"{len(self.integrations):,}"
-                bots_str = f"{len(self.bot_integrations):,}" if self.bot_integrations is not None else missing_perm
+                bots_str = f"{len(self.bot_integrations):,}" if self.bot_integrations is not None else bot_missing_perm
                 other_integrations = len(self.integrations) - (len(self.bot_integrations) if self.bot_integrations else 0)
                 other_str = f"{other_integrations:,}"
             else:
-                integrations_str = missing_perm
-                bots_str = missing_perm
-                other_str = missing_perm
+                integrations_str = bot_missing_perm
+                bots_str = bot_missing_perm
+                other_str = bot_missing_perm
 
             # Invites & Bans
-            invites_str = f"{len(self.invites):,}" if self.invites is not None else missing_perm
-            bans_str = f"{self.bans_count:,}" if self.bans_count is not None else missing_perm
+            if not can_view_invites:
+                invites_str = user_missing_manage
+            elif self.invites is not None:
+                invites_str = f"{len(self.invites):,}"
+            else:
+                invites_str = bot_missing_perm
 
-            # Limits & Locale
+            if not can_view_bans:
+                bans_str = user_missing_bans
+            elif self.bans_count is not None:
+                bans_str = f"{self.bans_count:,}"
+            else:
+                bans_str = bot_missing_perm
+
+            # Limits & Locale (Public Technical Info)
             events_count = len(guild.scheduled_events)
             filesize_mb = guild.filesize_limit // (1024 * 1024)
             bitrate_kbps = guild.bitrate_limit // 1000
@@ -634,7 +670,8 @@ class ServerInfo(commands.Cog):
         await interaction.response.defer()
 
         lang = await resolve_locale(interaction)
-        view = ServerInfoView(self.bot, interaction.guild, lang, author_id=interaction.user.id)
+        author_member = interaction.user if isinstance(interaction.user, discord.Member) else interaction.guild.get_member(interaction.user.id)
+        view = ServerInfoView(self.bot, interaction.guild, lang, author_member=author_member)
         await view.fetch_data()
         await view.build()
         await interaction.followup.send(view=view)
