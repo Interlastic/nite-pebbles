@@ -4,7 +4,7 @@ import re
 from ui_templates import template
 import traceback
 import math
-from pebble_utils import render_template, format_number
+from pebble_utils import render_template, format_number, register_dashboard_button
 
 from locales import get_string, resolve_locale
 
@@ -60,6 +60,10 @@ class ServerStatsButton(ui.Button):
         except Exception as e:
             print(f"[ServerStats] Button Error: {e}")
             traceback.print_exc()
+
+# Register to main dashboard
+register_dashboard_button(ServerStatsButton)
+
 
 class ServerStatsView(ui.LayoutView):
     def __init__(self, bot, server_settings, guild, user, page=1):

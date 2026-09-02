@@ -193,6 +193,7 @@
       "un_timed_out": "un-timed out"
     },
     "logging": {
+      "button_label": "Moderation Logs",
       "header": "Logging",
       "enabled_label": "Enabled",
       "exclude_stats_label": "Exclude Nite Server Stats",
@@ -648,6 +649,149 @@
       "formula_label": "Formula (max 50 chars, use 'level' as variable)",
       "formula_placeholder": "e.g. 100 * level ** 1.5",
       "formula_fallback_warning": "⚠️ Your formula could not be validated — it will fall back to the default curve (`100 * level ** 1.5`) when computing XP. Check that it only uses `level` as a variable and standard math operators."
+    }
+  },
+  "serverinfo": {
+    "title": "Server Information",
+    "members": "Members",
+    "online": "Online",
+    "bots": "Bots",
+    "owner": "Owner",
+    "created": "Created",
+    "id": "ID",
+    "missing_perm": "[Bot is missing required permissions: {perm}]",
+    "missing_perm_general": "[Bot is missing required permissions]",
+    "none": "None",
+    "unlimited": "Unlimited",
+    "unknown": "Unknown",
+    "not_set": "Not Set",
+    "tabs": {
+      "home": "Overview",
+      "assets": "Assets & Images",
+      "channels": "Channels & Categories",
+      "roles": "Roles & Permissions",
+      "security": "Security & Moderation",
+      "boost": "Boost & Features",
+      "emojis": "Emojis & Stickers",
+      "more": "Integrations & Advanced"
+    },
+    "buttons": {
+      "home": "Overview",
+      "assets": "Assets",
+      "channels": "Channels",
+      "roles": "Roles",
+      "security": "Security",
+      "boost": "Boost & Features",
+      "emojis": "Emojis",
+      "more": "More Info",
+      "refresh": "Refresh"
+    },
+    "assets": {
+      "icon": "Server Icon",
+      "banner": "Server Banner",
+      "splash": "Invite Splash",
+      "discovery": "Discovery Splash",
+      "view_image": "View Image",
+      "no_icon": "No Icon Set",
+      "no_banner": "No Banner Set",
+      "no_splash": "No Invite Splash Set",
+      "no_discovery": "No Discovery Splash Set",
+      "links": "Image Links"
+    },
+    "channels": {
+      "total": "Total Channels",
+      "categories": "Categories",
+      "text": "Text Channels",
+      "voice": "Voice Channels",
+      "stage": "Stage Channels",
+      "forum": "Forum Channels",
+      "threads": "Active Threads",
+      "special": "Special Channels",
+      "rules": "Rules Channel",
+      "system": "System Channel",
+      "afk": "AFK Channel",
+      "updates": "Public Updates Channel",
+      "safety": "Safety Alerts Channel",
+      "widget": "Widget Channel"
+    },
+    "roles": {
+      "total": "Total Roles",
+      "highest": "Highest Role",
+      "hoisted": "Hoisted Roles",
+      "managed": "Managed / Bot Roles",
+      "booster": "Booster Role",
+      "top_roles": "Top Roles",
+      "default_perms": "Default Permissions (@everyone)",
+      "send_messages": "Send Messages",
+      "create_invites": "Create Invites",
+      "embed_links": "Embed Links",
+      "attach_files": "Attach Files",
+      "mention_everyone": "Mention Everyone",
+      "administrator": "Administrator"
+    },
+    "security": {
+      "verification": "Verification Level",
+      "mfa": "2FA / MFA Requirement",
+      "explicit_filter": "Explicit Content Filter",
+      "notifications": "Default Notifications",
+      "nsfw": "NSFW Level",
+      "automod": "AutoMod Rules",
+      "active_rules": "{count} Active Rules"
+    },
+    "boost": {
+      "level": "Boost Tier",
+      "count": "Boost Count",
+      "progress": "Progress",
+      "vanity": "Vanity URL",
+      "features": "Server Features"
+    },
+    "emojis": {
+      "static": "Static Emojis",
+      "animated": "Animated Emojis",
+      "total": "Total Emojis",
+      "stickers": "Stickers",
+      "soundboard": "Soundboard Sounds",
+      "preview": "Emoji Preview",
+      "no_emojis": "No custom emojis"
+    },
+    "more": {
+      "integrations": "Integrations",
+      "bots_integrated": "Bot Integrations",
+      "other_integrations": "Other Integrations",
+      "invites": "Active Invites",
+      "bans": "Total Bans",
+      "events": "Scheduled Events",
+      "locale": "Preferred Locale",
+      "max_members": "Max Members",
+      "max_presences": "Max Presences",
+      "filesize_limit": "File Upload Limit",
+      "bitrate_limit": "Voice Bitrate Limit"
+    },
+    "verif_levels": {
+      "none": "None (Unrestricted)",
+      "low": "Low (Must have verified email)",
+      "medium": "Medium (Registered for > 5 mins)",
+      "high": "High (Member for > 10 mins)",
+      "highest": "Highest (Verified phone number)"
+    },
+    "mfa_levels": {
+      "disabled": "Disabled",
+      "enabled": "Enabled (Required for 2FA)"
+    },
+    "filter_levels": {
+      "disabled": "Disabled (Don't scan)",
+      "no_role": "Members without Roles",
+      "all_members": "All Members"
+    },
+    "notif_levels": {
+      "all_messages": "All Messages",
+      "only_mentions": "Only Mentions"
+    },
+    "nsfw_levels": {
+      "default": "Default",
+      "explicit": "Explicit",
+      "safe": "Safe",
+      "age_restricted": "Age Restricted"
     }
   }
 }

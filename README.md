@@ -175,6 +175,118 @@ await interaction.followup.send(
 )
 ```
 
+### Dashboard Integration
+
+If your pebble offers server configurations or interactive management menus, you can hook your sub-menu directly into Nite's main `/dashboard`.
+
+#### 1. Create your Sub-Dashboard View (`LayoutView`)
+Use Discord Components V2 with a dynamic `build()` lifecycle:
+
+```python
+import discord
+from discord import ui
+from locales import get_string
+
+class MyFeatureDashboardView(ui.LayoutView):
+    def __init__(self, bot, server_settings, guild, user):
+        super().__init__(timeout=None)
+        self.bot = bot
+        self.server_settings = server_settings
+        self.guild = guild
+        self.user = user
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        # Enforce user matching and permission checks
+        if interaction.user.id != self.user.id:
+            await interaction.response.send_message("This menu is not for you.", ephemeral=True)
+            return False
+        if not interaction.user.guild_permissions.manage_guild:
+            await interaction.response.send_message("You need Manage Server permissions.", ephemeral=True)
+            return False
+        return True
+
+    async def build(self):
+        self.clear_items()
+        
+        # 1. Fetch current guild settings
+        settings = await self.server_settings.get_settings(self.guild.id)
+        config = settings.get("my_feature", {})
+        enabled = config.get("enabled", False)
+        lang = settings.get("language", "en")
+
+        # 2. Header Container
+        header_children = [
+            ui.TextDisplay(content=f"# {get_string('my_feature.dashboard.title', lang)}"),
+            ui.Separator(visible=True),
+            ui.TextDisplay(content=f"Status: **{'Enabled' if enabled else 'Disabled'}**")
+        ]
+        self.add_item(ui.Container(
+            *header_children,
+            accent_colour=discord.Color.green() if enabled else discord.Color.red()
+        ))
+
+        # 3. Action Buttons
+        toggle_btn = ui.Button(
+            label="Disable" if enabled else "Enable",
+            style=discord.ButtonStyle.danger if enabled else discord.ButtonStyle.success
+        )
+        async def toggle_callback(interaction: discord.Interaction):
+            config["enabled"] = not enabled
+            settings["my_feature"] = config
+            await self.server_settings.update_settings(self.guild.id, settings)
+            
+            # Rebuild and edit
+            await self.build()
+            await interaction.response.edit_message(view=self)
+            
+        toggle_btn.callback = toggle_callback
+
+        # 4. Back Button to return to main dashboard
+        back_btn = ui.Button(label="Back", style=discord.ButtonStyle.secondary)
+        async def back_callback(interaction: discord.Interaction):
+            from dashboard import updateDashboard
+            await interaction.response.defer()
+            await updateDashboard(interaction.message, self.server_settings, self.bot)
+            
+        back_btn.callback = back_callback
+
+        self.add_item(ui.ActionRow(toggle_btn, back_btn))
+```
+
+#### 2. Create and Register the Launcher Button
+Create a `ui.Button` matching the `(bot_instance, server_settings, lang="en")` signature and call `register_dashboard_button`:
+
+```python
+from pebble_utils import register_dashboard_button
+from discord import ui
+import discord
+
+class MyFeatureDashButton(ui.Button):
+    def __init__(self, bot_instance, server_settings, lang="en"):
+        super().__init__(
+            label="My Feature",
+            style=discord.ButtonStyle.secondary,
+            custom_id="my_feature_dash_btn"
+        )
+        self.bot = bot_instance
+        self.server_settings = server_settings
+        self.lang = lang
+
+    async def callback(self, interaction: discord.Interaction):
+        if not interaction.user.guild_permissions.manage_guild:
+            return await interaction.response.send_message("Missing Manage Server permissions.", ephemeral=True)
+
+        await interaction.response.defer(ephemeral=True)
+        view = MyFeatureDashboardView(self.bot, self.server_settings, interaction.guild, interaction.user)
+        await view.build()
+        await interaction.followup.send(view=view, ephemeral=True)
+
+# Register into the main /dashboard view
+register_dashboard_button(MyFeatureDashButton)
+```
+
+> **Note**: Importing the UI file in your extension's `setup` or main file ensures it is registered when Nite loads your pebble.
+
 ### Creating & Registering a Pebble
 
 Pebbles are regular discord.py extensions. This means they should be structured as a standard Cog with a `setup` function.

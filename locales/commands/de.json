@@ -256,5 +256,10 @@
         "description": "Grund für das Aufheben des Timeouts"
       }
     }
+  },
+  "serverinfo": {
+    "name": "serverinfo",
+    "description": "Zeige umfassende Informationen und Statistiken über diesen Server",
+    "parameters": {}
   }
 }

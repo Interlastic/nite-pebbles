@@ -270,3 +270,39 @@ def render_template(template, guild, online_count=0, cached_guild=None):
         return match.group(0)
     
     return re.sub(r"\{(\w+)(,(\w+))?\}", replacer, template)
+
+
+# ---------------------------------------------------------------------------
+# Main Dashboard Button Registry
+# ---------------------------------------------------------------------------
+_REGISTERED_DASHBOARD_BUTTONS = []
+
+
+def register_dashboard_button(button_cls):
+    """
+    Registers a Button class or factory callable to appear in the main /dashboard.
+    
+    The button class/callable must accept the following signature:
+        button_cls(bot_instance, server_settings, lang="en")
+        
+    Example:
+        class MyPebbleButton(discord.ui.Button):
+            def __init__(self, bot, server_settings, lang="en"):
+                super().__init__(label="My Feature", style=discord.ButtonStyle.secondary)
+                ...
+                
+        register_dashboard_button(MyPebbleButton)
+    """
+    if button_cls not in _REGISTERED_DASHBOARD_BUTTONS:
+        _REGISTERED_DASHBOARD_BUTTONS.append(button_cls)
+
+
+def unregister_dashboard_button(button_cls):
+    """Removes a previously registered dashboard button class or factory."""
+    if button_cls in _REGISTERED_DASHBOARD_BUTTONS:
+        _REGISTERED_DASHBOARD_BUTTONS.remove(button_cls)
+
+
+def get_registered_dashboard_buttons():
+    """Returns a copy of all registered dashboard button classes/factories."""
+    return list(_REGISTERED_DASHBOARD_BUTTONS)

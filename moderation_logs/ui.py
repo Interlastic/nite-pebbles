@@ -4,6 +4,12 @@ from locales import get_string, resolve_locale
 from enum import IntFlag
 import traceback
 
+try:
+    from pebble_utils import register_dashboard_button
+except ImportError:
+    from ..pebble_utils import register_dashboard_button
+
+
 class LoggingFlags(IntFlag):
     MESSAGE_CREATE = 1 << 0
     MESSAGE_EDIT = 1 << 1
@@ -380,3 +386,45 @@ class LoggingConfigView(ui.LayoutView):
         except Exception as e:
             print(f"[Moderation Logs] Build View Error: {e}")
             traceback.print_exc()
+
+
+LoggingSettingsView = LoggingConfigView
+
+
+class ModerationLogsDashButton(ui.Button):
+    def __init__(self, bot_instance, server_settings, lang="en"):
+        super().__init__(
+            label=get_string("moderation.logging.button_label", lang),
+            style=discord.ButtonStyle.secondary,
+            custom_id="moderation_logs_main"
+        )
+        self.bot = bot_instance
+        self.server_settings = server_settings
+        self.lang = lang
+
+    async def callback(self, interaction: discord.Interaction):
+        try:
+            if not interaction.user.guild_permissions.manage_guild:
+                return await interaction.response.send_message(
+                    get_string("errors.missing_permission", self.lang, permission="Manage Server"),
+                    ephemeral=True
+                )
+
+            await interaction.response.defer(ephemeral=True)
+            cog = self.bot.get_cog("ModerationLogs")
+            if cog is None:
+                class _DummyCog:
+                    def __init__(self, bot):
+                        self.bot = bot
+                cog = _DummyCog(self.bot)
+
+            view = LoggingSettingsView(cog, interaction.guild, interaction.user)
+            await view.build()
+            await interaction.followup.send(view=view, ephemeral=True)
+        except Exception as e:
+            print(f"[Moderation Logs] Dash Button Error: {e}")
+            traceback.print_exc()
+
+
+register_dashboard_button(ModerationLogsDashButton)
+

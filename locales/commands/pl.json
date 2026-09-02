@@ -256,5 +256,10 @@
         "description": "Powód zdjęcia wyciszenia"
       }
     }
+  },
+  "serverinfo": {
+    "name": "serverinfo",
+    "description": "Wyświetl szczegółowe informacje i statystyki dotyczące tego serwera",
+    "parameters": {}
   }
 }

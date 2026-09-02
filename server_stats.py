@@ -4,6 +4,7 @@ import asyncio
 from datetime import datetime, timedelta
 from pebble_utils import render_template
 from locales import get_string, resolve_locale
+import server_stats_ui
 
 class ServerStats(commands.Cog):
     def __init__(self, bot):
