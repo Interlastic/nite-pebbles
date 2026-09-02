@@ -817,5 +817,196 @@
       "moderate_members": "Mitglieder moderieren",
       "ban_members": "Mitglieder bannen"
     }
+  },
+  "info": {
+    "user": {
+      "title": "{user} — Benutzerinfo",
+      "created": "Account erstellt",
+      "joined": "Server beigetreten",
+      "badges": "Abzeichen",
+      "type": "Kontotyp",
+      "type_bot": "Bot",
+      "type_user": "Benutzer",
+      "roles": "Rollen ({count})",
+      "highest_role": "Höchste Rolle",
+      "boosting_since": "Booster seit",
+      "not_boosting": "Kein Booster",
+      "key_permissions": "Wichtige Berechtigungen",
+      "accent_color": "Akzentfarbe",
+      "btn_avatar": "Avatar ansehen",
+      "btn_banner": "Banner ansehen",
+      "no_roles": "Keine",
+      "no_badges": "Keine"
+    },
+    "avatar": {
+      "title": "Avatar von {user}",
+      "server_avatar": "Server-Avatar",
+      "global_avatar": "Globaler Avatar",
+      "links": "Bild-Links",
+      "btn_server": "Server-Avatar",
+      "btn_global": "Globaler Avatar",
+      "no_avatar": "Dieser Benutzer hat keinen benutzerdefinierten Avatar."
+    },
+    "banner": {
+      "title": "Banner von {user}",
+      "server_banner": "Server-Banner",
+      "global_banner": "Globaler Banner",
+      "links": "Bild-Links",
+      "btn_server": "Server-Banner",
+      "btn_global": "Globaler Banner",
+      "no_banner": "Dieser Benutzer hat kein Profil-Banner festgelegt.",
+      "accent_color": "Profil-Akzentfarbe: `{color}`"
+    },
+    "server": {
+      "title": "Server-Informationen",
+      "members": "Mitglieder",
+      "online": "Online",
+      "bots": "Bots",
+      "owner": "Eigentümer",
+      "created": "Erstellt am",
+      "id": "Server-ID",
+      "missing_perm": "[Dem Bot fehlen erforderliche Berechtigungen: {perm}]",
+      "missing_perm_general": "[Dem Bot fehlen erforderliche Berechtigungen]",
+      "none": "Keine",
+      "unlimited": "Unbegrenzt",
+      "unknown": "Unbekannt",
+      "not_set": "Nicht festgelegt",
+      "tabs": {
+        "home": "Übersicht",
+        "assets": "Assets & Bilder",
+        "channels": "Kanäle & Kategorien",
+        "roles": "Rollen & Berechtigungen",
+        "security": "Sicherheit & Moderation",
+        "boost": "Boosts & Features",
+        "emojis": "Emojis & Sticker",
+        "more": "Integrationen & Erweitert"
+      },
+      "buttons": {
+        "home": "Übersicht",
+        "assets": "Assets",
+        "channels": "Kanäle",
+        "roles": "Rollen",
+        "security": "Sicherheit",
+        "boost": "Boosts & Features",
+        "emojis": "Emojis",
+        "more": "Mehr Infos",
+        "refresh": "Aktualisieren"
+      },
+      "assets": {
+        "icon": "Server-Icon",
+        "banner": "Server-Banner",
+        "splash": "Einladungs-Hintergrund",
+        "discovery": "Entdeckungs-Banner",
+        "view_image": "Bild ansehen",
+        "no_icon": "Kein Icon festgelegt",
+        "no_banner": "Kein Banner festgelegt",
+        "no_splash": "Kein Einladungs-Hintergrund festgelegt",
+        "no_discovery": "Kein Entdeckungs-Banner festgelegt",
+        "links": "Bild-Links"
+      },
+      "channels": {
+        "total": "Kanäle insgesamt",
+        "categories": "Kategorien",
+        "text": "Textkanäle",
+        "voice": "Sprachkanäle",
+        "stage": "Bühnenkanäle",
+        "forum": "Forum-Kanäle",
+        "threads": "Aktive Threads",
+        "special": "Spezielle Kanäle",
+        "rules": "Regelkanal",
+        "system": "Systemkanal",
+        "afk": "AFK-Kanal",
+        "updates": "Öffentlicher Update-Kanal",
+        "safety": "Sicherheits-Warnkanal",
+        "widget": "Widget-Kanal"
+      },
+      "roles": {
+        "total": "Rollen insgesamt",
+        "highest": "Höchste Rolle",
+        "hoisted": "Separat angezeigte Rollen",
+        "managed": "Verwaltete / Bot-Rollen",
+        "booster": "Booster-Rolle",
+        "top_roles": "Top-Rollen",
+        "default_perms": "Standard-Berechtigungen (@everyone)",
+        "send_messages": "Nachrichten senden",
+        "create_invites": "Einladungen erstellen",
+        "embed_links": "Links einbetten",
+        "attach_files": "Dateien anhängen",
+        "mention_everyone": "@everyone erwähnen",
+        "administrator": "Administrator"
+      },
+      "security": {
+        "verification": "Verifizierungsstufe",
+        "mfa": "2FA / MFA-Pflicht",
+        "explicit_filter": "Filter für explizite Inhalte",
+        "notifications": "Standard-Benachrichtigungen",
+        "nsfw": "NSFW-Stufe",
+        "automod": "AutoMod-Regeln",
+        "active_rules": "{count} aktive Regeln"
+      },
+      "boost": {
+        "level": "Boost-Stufe",
+        "count": "Boost-Anzahl",
+        "progress": "Fortschritt",
+        "vanity": "Eigener Einladungslink",
+        "features": "Server-Features"
+      },
+      "emojis": {
+        "static": "Statische Emojis",
+        "animated": "Animierte Emojis",
+        "total": "Emojis insgesamt",
+        "stickers": "Sticker",
+        "soundboard": "Soundboard-Sounds",
+        "preview": "Emoji-Vorschau",
+        "no_emojis": "Keine benutzerdefinierten Emojis"
+      },
+      "more": {
+        "integrations": "Integrationen",
+        "bots_integrated": "Bot-Integrationen",
+        "other_integrations": "Andere Integrationen",
+        "invites": "Aktive Einladungen",
+        "bans": "Banns insgesamt",
+        "events": "Geplante Events",
+        "locale": "Bevorzugte Sprache",
+        "max_members": "Maximale Mitglieder",
+        "max_presences": "Maximale Anwesenheiten",
+        "filesize_limit": "Dateigrößen-Limit",
+        "bitrate_limit": "Sprach-Bitrate-Limit"
+      },
+      "verif_levels": {
+        "none": "Keine (Uneingeschränkt)",
+        "low": "Niedrig (Verifizierte E-Mail)",
+        "medium": "Mittel (Seit > 5 Min registriert)",
+        "high": "Hoch (Seit > 10 Min Mitglied)",
+        "highest": "Höchste (Verifizierte Telefonnummer)"
+      },
+      "mfa_levels": {
+        "disabled": "Deaktiviert",
+        "enabled": "Aktiviert (2FA für Moderatoren erforderlich)"
+      },
+      "filter_levels": {
+        "disabled": "Deaktiviert (Nicht scannen)",
+        "no_role": "Mitglieder ohne Rollen",
+        "all_members": "Alle Mitglieder"
+      },
+      "notif_levels": {
+        "all_messages": "Alle Nachrichten",
+        "only_mentions": "Nur Erwähnungen"
+      },
+      "nsfw_levels": {
+        "default": "Standard",
+        "explicit": "Explizit",
+        "safe": "Sicher",
+        "age_restricted": "Altersbeschränkt"
+      },
+      "boosts": "Boosts",
+      "tier_format": "Stufe {tier}",
+      "user_missing_perm": "[Erfordert Berechtigung: {perm}]",
+      "perms": {
+        "manage_guild": "Server verwalten",
+        "moderate_members": "Mitglieder moderieren",
+        "ban_members": "Mitglieder bannen"
+      }
+    }
   }
 }

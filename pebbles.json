@@ -92,9 +92,9 @@
       }
     },
     {
-      "extension_file": "serverinfo",
-      "name": "Server Info",
-      "description": "Comprehensive server information, assets, statistics, and settings viewer.",
+      "extension_file": "info",
+      "name": "Info Commands",
+      "description": "Comprehensive server, user, avatar, and banner information viewer.",
       "dependencies": [],
       "credits": {
         "Creators": [

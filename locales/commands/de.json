@@ -261,5 +261,45 @@
     "name": "serverinfo",
     "description": "Zeige umfassende Informationen und Statistiken über diesen Server",
     "parameters": {}
+  },
+  "info": {
+    "name": "info",
+    "description": "Informationen über Server, Benutzer, Avatare und Banner",
+    "parameters": {}
+  },
+  "info server": {
+    "name": "server",
+    "description": "Umfassende Statistiken und Einstellungen dieses Servers anzeigen",
+    "parameters": {}
+  },
+  "info user": {
+    "name": "benutzer",
+    "description": "Informationen über einen Benutzer oder ein Mitglied anzeigen",
+    "parameters": {
+      "user": {
+        "name": "benutzer",
+        "description": "Der Benutzer, über den Informationen angezeigt werden sollen"
+      }
+    }
+  },
+  "info avatar": {
+    "name": "avatar",
+    "description": "Avatar eines Benutzers anzeigen und herunterladen",
+    "parameters": {
+      "user": {
+        "name": "benutzer",
+        "description": "Der Benutzer, dessen Avatar angezeigt werden soll"
+      }
+    }
+  },
+  "info banner": {
+    "name": "banner",
+    "description": "Profil-Banner eines Benutzers anzeigen und herunterladen",
+    "parameters": {
+      "user": {
+        "name": "benutzer",
+        "description": "Der Benutzer, dessen Banner angezeigt werden soll"
+      }
+    }
   }
 }

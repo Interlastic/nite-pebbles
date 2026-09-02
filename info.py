@@ -7,7 +7,7 @@ import datetime
 from locales import get_string, resolve_locale
 from pebble_utils import make_loading_bar
 
-# Custom Emojis (Discord Native from emojis.json)
+# Custom Emojis (Discord Native from emojis.json & moderation-icons/emojis.json)
 EMOJI_ID = "<:ID:1493663589246963812>"
 EMOJI_DISCORD = "<:dc:1493663575548362842>"
 EMOJI_COMMUNITY = "<:cono:1493663579700989972>"
@@ -19,7 +19,8 @@ EMOJI_CHECK = "<:ch:1481722599590334565>"
 EMOJI_CROSS = "<:cr:1481722596327297177>"
 EMOJI_CLOCK = "<:cl:1481722597312958485>"
 EMOJI_CLIPBOARD = "<:cb:1494012289601503324>"
-EMOJI_BOT = "<:ba:1494051604289032272>"
+EMOJI_BOT_TAG = "<:bot:1544751622964383774>"
+EMOJI_BOT_VERIFIED = "<:botv:1544751687527567472>"
 EMOJI_MEMBER = "<:mea:1494051555408740472>"
 EMOJI_CHANNEL = "<:ca:1494051594877272145>"
 EMOJI_ROLE = "<:ra:1494051542922166302>"
@@ -62,7 +63,46 @@ FEATURE_NAMES = {
     "WELCOME_SCREEN_ENABLED": "Welcome Screen",
 }
 
+BADGE_NAMES = {
+    "staff": "Discord Staff",
+    "partner": "Partnered Server Owner",
+    "hypesquad": "HypeSquad Events",
+    "bug_hunter": "Bug Hunter Level 1",
+    "bug_hunter_level_2": "Bug Hunter Level 2",
+    "hypesquad_bravery": "HypeSquad Bravery",
+    "hypesquad_brilliance": "HypeSquad Brilliance",
+    "hypesquad_balance": "HypeSquad Balance",
+    "early_supporter": "Early Supporter",
+    "verified_bot_developer": "Early Verified Bot Developer",
+    "active_developer": "Active Developer",
+    "certified_moderator": "Discord Certified Moderator",
+}
 
+
+def get_bot_badge(user: Union[discord.User, discord.Member]) -> str:
+    """Return verified bot emoji, regular bot emoji, or empty string."""
+    if not getattr(user, "bot", False):
+        return ""
+    is_verified = False
+    if hasattr(user, "public_flags") and user.public_flags:
+        is_verified = getattr(user.public_flags, "verified_bot", False)
+    return EMOJI_BOT_VERIFIED if is_verified else EMOJI_BOT_TAG
+
+
+def format_title_with_badge(title_template: str, user: Union[discord.User, discord.Member]) -> str:
+    """Format title according to whether 's is present: left if 's exists, right otherwise."""
+    badge = get_bot_badge(user)
+    if not badge:
+        return title_template.format(user=user.display_name)
+    if "'s" in title_template:
+        return title_template.replace("{user}", f"{badge} {user.display_name}")
+    else:
+        return title_template.replace("{user}", f"{user.display_name} {badge}")
+
+
+# ====================================================================
+# SERVER INFO COMPONENTS & VIEW
+# ====================================================================
 class ServerInfoTabButton(ui.Button):
     def __init__(self, view_ref: "ServerInfoView", tab_id: str, label: str, emoji: str, is_active: bool = False):
         style = discord.ButtonStyle.primary if is_active else discord.ButtonStyle.secondary
@@ -117,9 +157,6 @@ class ServerInfoView(ui.LayoutView):
         return True
 
     async def fetch_data(self):
-        """
-        Fetch dynamic data without relying on member caching.
-        """
         # 1. Members and Online Presence Count
         self.member_count = self.guild.member_count or 0
         self.online_count = 0
@@ -137,7 +174,7 @@ class ServerInfoView(ui.LayoutView):
             except (discord.HTTPException, discord.Forbidden):
                 pass
 
-        # 2. Integrations and Bot Count (only fetch if bot has manage_guild)
+        # 2. Integrations and Bot Count
         me = self.guild.me
         if me and me.guild_permissions.manage_guild:
             try:
@@ -296,7 +333,6 @@ class ServerInfoView(ui.LayoutView):
 
             content_text = f"# {guild.name}\n" + "\n".join(details_lines)
 
-            # Compact layout: icon as accessory thumbnail
             if guild.icon:
                 container_items.append(
                     ui.Section(
@@ -427,7 +463,6 @@ class ServerInfoView(ui.LayoutView):
             managed_count = len([r for r in guild.roles if r.is_bot_managed() or r.is_integration()])
             booster_role = guild.premium_subscriber_role.mention if guild.premium_subscriber_role else get_string("serverinfo.none", lang)
 
-            # Top Roles display (sorted descending by position, excluding @everyone)
             top_roles = [r for r in reversed(guild.roles) if not r.is_default()]
             top_roles_display = " ".join([r.mention for r in top_roles[:15]])
             if len(top_roles) > 15:
@@ -435,7 +470,6 @@ class ServerInfoView(ui.LayoutView):
             if not top_roles_display:
                 top_roles_display = get_string("serverinfo.none", lang)
 
-            # Default @everyone perms
             def_perms = guild.default_role.permissions
             perm_checks = [
                 (def_perms.send_messages, get_string("serverinfo.roles.send_messages", lang)),
@@ -507,12 +541,10 @@ class ServerInfoView(ui.LayoutView):
             boost_count = guild.premium_subscription_count or 0
             vanity_url = f"discord.gg/{guild.vanity_url_code}" if guild.vanity_url_code else get_string("serverinfo.none", lang)
 
-            # Boost progress calculation (Tier 1 = 2, Tier 2 = 7, Tier 3 = 14)
             req_boosts = 14 if tier >= 2 else (7 if tier == 1 else 2)
             progress_ratio = min(1.0, boost_count / req_boosts)
             loading_bar = make_loading_bar(progress_ratio * 100, 10)
 
-            # Features formatting
             features_list = []
             for feat in guild.features:
                 name = FEATURE_NAMES.get(feat, feat.replace("_", " ").title())
@@ -544,7 +576,6 @@ class ServerInfoView(ui.LayoutView):
             animated_emojis = [e for e in self.emojis_list if e.animated]
             soundboard_count = len(getattr(guild, "soundboard_sounds", []))
 
-            # Sample Preview (up to 25 emojis)
             if self.emojis_list:
                 sample_emojis = " ".join([str(e) for e in self.emojis_list[:25]])
                 if len(self.emojis_list) > 25:
@@ -635,7 +666,6 @@ class ServerInfoView(ui.LayoutView):
         # ==========================================
         # CONTAINER 2: BUTTONS & NAVIGATION
         # ==========================================
-        # Row 1: Overview (emoji: pending), Assets, Channels, Roles
         row1 = ui.ActionRow(
             ServerInfoTabButton(self, "home", get_string("serverinfo.buttons.home", lang), EMOJI_PENDING, is_active=(self.current_tab == "home")),
             ServerInfoTabButton(self, "assets", get_string("serverinfo.buttons.assets", lang), EMOJI_CLIPBOARD, is_active=(self.current_tab == "assets")),
@@ -643,7 +673,6 @@ class ServerInfoView(ui.LayoutView):
             ServerInfoTabButton(self, "roles", get_string("serverinfo.buttons.roles", lang), EMOJI_ROLE, is_active=(self.current_tab == "roles")),
         )
 
-        # Row 2: Security, Boost, Emojis, More Info, Refresh (emoji: guild)
         row2 = ui.ActionRow(
             ServerInfoTabButton(self, "security", get_string("serverinfo.buttons.security", lang), EMOJI_SECURITY, is_active=(self.current_tab == "security")),
             ServerInfoTabButton(self, "boost", get_string("serverinfo.buttons.boost", lang), EMOJI_BOOST, is_active=(self.current_tab == "boost")),
@@ -656,13 +685,351 @@ class ServerInfoView(ui.LayoutView):
         self.add_item(buttons_container)
 
 
-class ServerInfo(commands.Cog):
+# ====================================================================
+# USER INFO COMPONENTS & VIEW
+# ====================================================================
+class UserInfoView(ui.LayoutView):
+    def __init__(
+        self,
+        bot: commands.Bot,
+        target_user: Union[discord.Member, discord.User],
+        lang: str = "en",
+        author_id: Optional[int] = None
+    ):
+        super().__init__(timeout=600)
+        self.bot = bot
+        self.target_user = target_user
+        self.lang = lang
+        self.author_id = author_id
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if self.author_id and interaction.user.id != self.author_id:
+            await interaction.response.send_message(get_string("errors.not_button_owner", self.lang), ephemeral=True)
+            return False
+        return True
+
+    async def build(self):
+        self.clear_items()
+        user = self.target_user
+        lang = self.lang
+        created_ts = int(user.created_at.timestamp())
+
+        # Determine Badges
+        badges = []
+        if hasattr(user, "public_flags"):
+            for flag, name in BADGE_NAMES.items():
+                if getattr(user.public_flags, flag, False):
+                    badges.append(f"{EMOJI_CHECK} {name}")
+        badges_str = ", ".join(badges) if badges else get_string("info.user.no_badges", lang)
+
+        # Build Details (Bot badge is shown in title next to name)
+        details_lines = [
+            f"{EMOJI_CLOCK} **{get_string('info.user.created', lang)}:** <t:{created_ts}:D> (<t:{created_ts}:R>)",
+        ]
+
+        is_member = isinstance(user, discord.Member)
+        if is_member:
+            if user.joined_at:
+                joined_ts = int(user.joined_at.timestamp())
+                details_lines.append(f"{EMOJI_INVITE} **{get_string('info.user.joined', lang)}:** <t:{joined_ts}:D> (<t:{joined_ts}:R>)")
+
+            # Booster status
+            if user.premium_since:
+                boost_ts = int(user.premium_since.timestamp())
+                details_lines.append(f"{EMOJI_BOOST} **{get_string('info.user.boosting_since', lang)}:** <t:{boost_ts}:R>")
+
+            # Highest Role & Roles Preview
+            non_def_roles = [r for r in reversed(user.roles) if not r.is_default()]
+            roles_count = len(non_def_roles)
+            if non_def_roles:
+                details_lines.append(f"{EMOJI_ROLE} **{get_string('info.user.highest_role', lang)}:** {user.top_role.mention}")
+                preview_roles = " ".join([r.mention for r in non_def_roles[:10]])
+                if roles_count > 10:
+                    preview_roles += f" ... (+{roles_count - 10})"
+                roles_label = get_string("info.user.roles", lang, count=roles_count)
+                details_lines.append(f"{EMOJI_ROLE} **{roles_label}:** {preview_roles}")
+
+            # Key Permissions
+            key_perms = []
+            gp = user.guild_permissions
+            if gp.administrator:
+                key_perms.append("Administrator")
+            else:
+                if gp.manage_guild:
+                    key_perms.append("Manage Server")
+                if gp.manage_channels:
+                    key_perms.append("Manage Channels")
+                if gp.manage_roles:
+                    key_perms.append("Manage Roles")
+                if gp.manage_messages:
+                    key_perms.append("Manage Messages")
+                if gp.kick_members:
+                    key_perms.append("Kick Members")
+                if gp.ban_members:
+                    key_perms.append("Ban Members")
+                if gp.mention_everyone:
+                    key_perms.append("Mention Everyone")
+
+            if key_perms:
+                details_lines.append(f"{EMOJI_SECURITY} **{get_string('info.user.key_permissions', lang)}:** {', '.join(key_perms)}")
+
+        details_lines.append(f"{EMOJI_CLIPBOARD} **{get_string('info.user.badges', lang)}:** {badges_str}")
+        details_lines.append(f"-# {EMOJI_ID} ID: {user.id}")
+
+        bot_badge = get_bot_badge(user)
+        name_line = f"{user.display_name} {bot_badge}".strip() if bot_badge else user.display_name
+        title_text = f"# {name_line}\n-# @{user.name}\n" + "\n".join(details_lines)
+
+        avatar_url = user.display_avatar.url
+        section = ui.Section(
+            ui.TextDisplay(content=title_text),
+            accessory=ui.Thumbnail(avatar_url)
+        )
+
+        content_container = ui.Container(section, ui.Separator(visible=True))
+        self.add_item(content_container)
+
+
+# ====================================================================
+# AVATAR VIEW
+# ====================================================================
+class AvatarView(ui.LayoutView):
+    def __init__(
+        self,
+        bot: commands.Bot,
+        target_user: Union[discord.Member, discord.User],
+        lang: str = "en",
+        author_id: Optional[int] = None
+    ):
+        super().__init__(timeout=600)
+        self.bot = bot
+        self.target_user = target_user
+        self.lang = lang
+        self.author_id = author_id
+        # "server" or "global"
+        self.avatar_mode = "server" if getattr(target_user, "guild_avatar", None) else "global"
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if self.author_id and interaction.user.id != self.author_id:
+            await interaction.response.send_message(get_string("errors.not_button_owner", self.lang), ephemeral=True)
+            return False
+        return True
+
+    def get_current_avatar_asset(self) -> discord.Asset:
+        if self.avatar_mode == "server" and getattr(self.target_user, "guild_avatar", None):
+            return self.target_user.guild_avatar
+        return self.target_user.avatar or self.target_user.default_avatar
+
+    async def set_mode(self, interaction: discord.Interaction, mode: str):
+        self.avatar_mode = mode
+        await self.build()
+        await interaction.response.edit_message(view=self)
+
+    async def build(self):
+        self.clear_items()
+        user = self.target_user
+        lang = self.lang
+        asset = self.get_current_avatar_asset()
+
+        mode_label = (
+            get_string("info.avatar.server_avatar", lang)
+            if self.avatar_mode == "server" and getattr(user, "guild_avatar", None)
+            else get_string("info.avatar.global_avatar", lang)
+        )
+
+        title_template = get_string("info.avatar.title", lang)
+        title = format_title_with_badge(title_template, user)
+        links_label = get_string("info.avatar.links", lang)
+
+        png_url = asset.with_format("png").url
+        webp_url = asset.with_format("webp").url
+        dl_links = f"[PNG]({png_url}) | [WEBP]({webp_url})"
+        if asset.is_animated():
+            gif_url = asset.with_format("gif").url
+            dl_links += f" | [GIF]({gif_url})"
+
+        header_lines = [
+            f"# {title}",
+            f"{EMOJI_PENDING} **{mode_label}**",
+            f"{EMOJI_CLIPBOARD} **{links_label}:** {dl_links}",
+        ]
+
+        container_items = [
+            ui.TextDisplay(content="\n".join(header_lines)),
+            ui.MediaGallery(discord.MediaGalleryItem(asset.url)),
+            ui.Separator(visible=True)
+        ]
+        self.add_item(ui.Container(*container_items))
+
+        # Add toggle buttons if user has both server and global avatar
+        has_guild_av = bool(getattr(user, "guild_avatar", None))
+        if has_guild_av:
+            btn_server = ui.Button(
+                label=get_string("info.avatar.btn_server", lang),
+                emoji=EMOJI_GUILD,
+                style=discord.ButtonStyle.primary if self.avatar_mode == "server" else discord.ButtonStyle.secondary,
+                custom_id="btn_av_server"
+            )
+            btn_global = ui.Button(
+                label=get_string("info.avatar.btn_global", lang),
+                emoji=EMOJI_DISCORD,
+                style=discord.ButtonStyle.primary if self.avatar_mode == "global" else discord.ButtonStyle.secondary,
+                custom_id="btn_av_global"
+            )
+
+            async def on_server(interaction: discord.Interaction):
+                await self.set_mode(interaction, "server")
+
+            async def on_global(interaction: discord.Interaction):
+                await self.set_mode(interaction, "global")
+
+            btn_server.callback = on_server
+            btn_global.callback = on_global
+
+            row = ui.ActionRow(btn_server, btn_global)
+            buttons_container = ui.Container(row, accent_colour=discord.Colour.blurple())
+            self.add_item(buttons_container)
+
+
+# ====================================================================
+# BANNER VIEW
+# ====================================================================
+class BannerView(ui.LayoutView):
+    def __init__(
+        self,
+        bot: commands.Bot,
+        target_user: Union[discord.Member, discord.User],
+        fetched_user: discord.User,
+        lang: str = "en",
+        author_id: Optional[int] = None
+    ):
+        super().__init__(timeout=600)
+        self.bot = bot
+        self.target_user = target_user
+        self.fetched_user = fetched_user
+        self.lang = lang
+        self.author_id = author_id
+        # "server" or "global"
+        has_guild_banner = bool(getattr(target_user, "guild_banner", None))
+        self.banner_mode = "server" if has_guild_banner else "global"
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if self.author_id and interaction.user.id != self.author_id:
+            await interaction.response.send_message(get_string("errors.not_button_owner", self.lang), ephemeral=True)
+            return False
+        return True
+
+    def get_current_banner_asset(self) -> Optional[discord.Asset]:
+        if self.banner_mode == "server" and getattr(self.target_user, "guild_banner", None):
+            return self.target_user.guild_banner
+        return self.fetched_user.banner
+
+    async def set_mode(self, interaction: discord.Interaction, mode: str):
+        self.banner_mode = mode
+        await self.build()
+        await interaction.response.edit_message(view=self)
+
+    async def build(self):
+        self.clear_items()
+        user = self.target_user
+        lang = self.lang
+        asset = self.get_current_banner_asset()
+        title_template = get_string("info.banner.title", lang)
+        title = format_title_with_badge(title_template, user)
+
+        if asset:
+            mode_label = (
+                get_string("info.banner.server_banner", lang)
+                if self.banner_mode == "server" and getattr(user, "guild_banner", None)
+                else get_string("info.banner.global_banner", lang)
+            )
+            links_label = get_string("info.banner.links", lang)
+
+            png_url = asset.with_format("png").url
+            webp_url = asset.with_format("webp").url
+            dl_links = f"[PNG]({png_url}) | [WEBP]({webp_url})"
+            if asset.is_animated():
+                gif_url = asset.with_format("gif").url
+                dl_links += f" | [GIF]({gif_url})"
+
+            header_lines = [
+                f"# {title}",
+                f"{EMOJI_PENDING} **{mode_label}**",
+                f"{EMOJI_CLIPBOARD} **{links_label}:** {dl_links}",
+            ]
+
+            container_items = [
+                ui.TextDisplay(content="\n".join(header_lines)),
+                ui.MediaGallery(discord.MediaGalleryItem(asset.url)),
+                ui.Separator(visible=True)
+            ]
+            self.add_item(ui.Container(*container_items))
+
+            # Add toggle buttons if user has both server and global banner
+            has_guild_banner = bool(getattr(user, "guild_banner", None))
+            has_global_banner = bool(self.fetched_user.banner)
+            if has_guild_banner and has_global_banner:
+                btn_server = ui.Button(
+                    label=get_string("info.banner.btn_server", lang),
+                    emoji=EMOJI_GUILD,
+                    style=discord.ButtonStyle.primary if self.banner_mode == "server" else discord.ButtonStyle.secondary,
+                    custom_id="btn_bn_server"
+                )
+                btn_global = ui.Button(
+                    label=get_string("info.banner.btn_global", lang),
+                    emoji=EMOJI_DISCORD,
+                    style=discord.ButtonStyle.primary if self.banner_mode == "global" else discord.ButtonStyle.secondary,
+                    custom_id="btn_bn_global"
+                )
+
+                async def on_server(interaction: discord.Interaction):
+                    await self.set_mode(interaction, "server")
+
+                async def on_global(interaction: discord.Interaction):
+                    await self.set_mode(interaction, "global")
+
+                btn_server.callback = on_server
+                btn_global.callback = on_global
+
+                row = ui.ActionRow(btn_server, btn_global)
+                buttons_container = ui.Container(row, accent_colour=discord.Colour.blurple())
+                self.add_item(buttons_container)
+        else:
+            # No custom banner set
+            lines = [
+                f"# {title}",
+                f"{EMOJI_PENDING} {get_string('info.banner.no_banner', lang)}",
+            ]
+            if self.fetched_user.accent_color:
+                hex_color = f"#{self.fetched_user.accent_color.value:06X}"
+                lines.append(f"{EMOJI_CLIPBOARD} {get_string('info.banner.accent_color', lang, color=hex_color)}")
+
+            container_items = [
+                ui.TextDisplay(content="\n".join(lines)),
+                ui.Separator(visible=True)
+            ]
+            accent = self.fetched_user.accent_color or discord.Colour.blurple()
+            self.add_item(ui.Container(*container_items, accent_colour=accent))
+
+
+# ====================================================================
+# INFO COG & COMMAND GROUP
+# ====================================================================
+class Info(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @app_commands.command(name="serverinfo", description="View comprehensive information and statistics about this server")
+    info_group = app_commands.Group(
+        name="info",
+        description="View comprehensive information about the server, users, avatars, and banners"
+    )
+
+    # ----------------------------------------------------------------
+    # /info server
+    # ----------------------------------------------------------------
+    @info_group.command(name="server", description="View comprehensive information and statistics about this server")
     @app_commands.guild_only()
-    async def serverinfo(self, interaction: discord.Interaction):
+    async def server(self, interaction: discord.Interaction):
         if not interaction.guild:
             return
 
@@ -676,6 +1043,80 @@ class ServerInfo(commands.Cog):
         await view.build()
         await interaction.followup.send(view=view)
 
+    # ----------------------------------------------------------------
+    # /info user [user]
+    # ----------------------------------------------------------------
+    @info_group.command(name="user", description="View detailed information about a user or server member")
+    @app_commands.describe(user="The user to get information about (defaults to yourself)")
+    async def user(
+        self,
+        interaction: discord.Interaction,
+        user: Optional[Union[discord.Member, discord.User]] = None
+    ):
+        await interaction.response.defer()
+
+        target = user or interaction.user
+        if interaction.guild and not isinstance(target, discord.Member):
+            member = interaction.guild.get_member(target.id)
+            if member:
+                target = member
+
+        lang = await resolve_locale(interaction)
+        view = UserInfoView(self.bot, target, lang, author_id=interaction.user.id)
+        await view.build()
+        await interaction.followup.send(view=view)
+
+    # ----------------------------------------------------------------
+    # /info avatar [user]
+    # ----------------------------------------------------------------
+    @info_group.command(name="avatar", description="View and download a user's avatar")
+    @app_commands.describe(user="The user whose avatar to view (defaults to yourself)")
+    async def avatar(
+        self,
+        interaction: discord.Interaction,
+        user: Optional[Union[discord.Member, discord.User]] = None
+    ):
+        await interaction.response.defer()
+
+        target = user or interaction.user
+        if interaction.guild and not isinstance(target, discord.Member):
+            member = interaction.guild.get_member(target.id)
+            if member:
+                target = member
+
+        lang = await resolve_locale(interaction)
+        view = AvatarView(self.bot, target, lang, author_id=interaction.user.id)
+        await view.build()
+        await interaction.followup.send(view=view)
+
+    # ----------------------------------------------------------------
+    # /info banner [user]
+    # ----------------------------------------------------------------
+    @info_group.command(name="banner", description="View and download a user's profile banner")
+    @app_commands.describe(user="The user whose banner to view (defaults to yourself)")
+    async def banner(
+        self,
+        interaction: discord.Interaction,
+        user: Optional[Union[discord.Member, discord.User]] = None
+    ):
+        await interaction.response.defer()
+
+        target = user or interaction.user
+        if interaction.guild and not isinstance(target, discord.Member):
+            member = interaction.guild.get_member(target.id)
+            if member:
+                target = member
+
+        try:
+            fetched = await self.bot.fetch_user(target.id)
+        except (discord.HTTPException, discord.NotFound):
+            fetched = target if isinstance(target, discord.User) else target._user
+
+        lang = await resolve_locale(interaction)
+        view = BannerView(self.bot, target, fetched, lang, author_id=interaction.user.id)
+        await view.build()
+        await interaction.followup.send(view=view)
+
 
 async def setup(bot: commands.Bot):
-    await bot.add_cog(ServerInfo(bot))
+    await bot.add_cog(Info(bot))

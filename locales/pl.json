@@ -817,5 +817,196 @@
       "moderate_members": "Moderowanie członków",
       "ban_members": "Banowanie członków"
     }
+  },
+  "info": {
+    "user": {
+      "title": "{user} — Informacje o użytkowniku",
+      "created": "Utworzenie konta",
+      "joined": "Dołączenie do serwera",
+      "badges": "Odznaki",
+      "type": "Typ konta",
+      "type_bot": "Bot",
+      "type_user": "Użytkownik",
+      "roles": "Role ({count})",
+      "highest_role": "Najwyższa rola",
+      "boosting_since": "Ulepsza od",
+      "not_boosting": "Nie ulepsza",
+      "key_permissions": "Główne uprawnienia",
+      "accent_color": "Kolor akcentu",
+      "btn_avatar": "Zobacz awatar",
+      "btn_banner": "Zobacz baner",
+      "no_roles": "Brak",
+      "no_badges": "Brak"
+    },
+    "avatar": {
+      "title": "Awatar użytkownika {user}",
+      "server_avatar": "Awatar serwerowy",
+      "global_avatar": "Awatar globalny",
+      "links": "Linki do obrazu",
+      "btn_server": "Awatar serwerowy",
+      "btn_global": "Awatar globalny",
+      "no_avatar": "Ten użytkownik nie posiada własnego awatara."
+    },
+    "banner": {
+      "title": "Baner użytkownika {user}",
+      "server_banner": "Baner serwerowy",
+      "global_banner": "Baner globalny",
+      "links": "Linki do obrazu",
+      "btn_server": "Baner serwerowy",
+      "btn_global": "Baner globalny",
+      "no_banner": "Ten użytkownik nie ma ustawionego banera profilu.",
+      "accent_color": "Kolor akcentu profilu: `{color}`"
+    },
+    "server": {
+      "title": "Informacje o serwerze",
+      "members": "Członkowie",
+      "online": "Online",
+      "bots": "Boty",
+      "owner": "Właściciel",
+      "created": "Utworzono",
+      "id": "ID serwera",
+      "missing_perm": "[Bot nie ma wymaganych uprawnień: {perm}]",
+      "missing_perm_general": "[Bot nie ma wymaganych uprawnień]",
+      "none": "Brak",
+      "unlimited": "Bez limitu",
+      "unknown": "Nieznane",
+      "not_set": "Nie ustawiono",
+      "tabs": {
+        "home": "Przegląd",
+        "assets": "Zasoby i grafiki",
+        "channels": "Kanały i kategorie",
+        "roles": "Role i uprawnienia",
+        "security": "Bezpieczeństwo i moderacja",
+        "boost": "Ulepszenia i funkcje",
+        "emojis": "Emoji i naklejki",
+        "more": "Integracje i zaawansowane"
+      },
+      "buttons": {
+        "home": "Przegląd",
+        "assets": "Zasoby",
+        "channels": "Kanały",
+        "roles": "Role",
+        "security": "Bezpieczeństwo",
+        "boost": "Ulepszenia i funkcje",
+        "emojis": "Emoji",
+        "more": "Więcej informacji",
+        "refresh": "Odśwież"
+      },
+      "assets": {
+        "icon": "Ikona serwera",
+        "banner": "Baner serwera",
+        "splash": "Tło zaproszenia",
+        "discovery": "Baner odkrywania",
+        "view_image": "Zobacz grafikę",
+        "no_icon": "Brak ikony",
+        "no_banner": "Brak banera",
+        "no_splash": "Brak tła zaproszenia",
+        "no_discovery": "Brak banera odkrywania",
+        "links": "Linki do grafik"
+      },
+      "channels": {
+        "total": "Wszystkie kanały",
+        "categories": "Kategorie",
+        "text": "Kanały tekstowe",
+        "voice": "Kanały głosowe",
+        "stage": "Kanały sceny",
+        "forum": "Kanały forum",
+        "threads": "Aktywne wątki",
+        "special": "Kanały specjalne",
+        "rules": "Kanał regulaminu",
+        "system": "Kanał systemowy",
+        "afk": "Kanał AFK",
+        "updates": "Kanał ogłoszeń publicznych",
+        "safety": "Kanał alertów bezpieczeństwa",
+        "widget": "Kanał widżetu"
+      },
+      "roles": {
+        "total": "Wszystkie role",
+        "highest": "Najwyższa rola",
+        "hoisted": "Wyświetlane osobno",
+        "managed": "Zarządzane / Boty",
+        "booster": "Rola ulepszającego",
+        "top_roles": "Główne role",
+        "default_perms": "Domyślne uprawnienia (@everyone)",
+        "send_messages": "Wysyłanie wiadomości",
+        "create_invites": "Tworzenie zaproszeń",
+        "embed_links": "Osadzanie linków",
+        "attach_files": "Załączanie plików",
+        "mention_everyone": "Wzmianka @everyone",
+        "administrator": "Administrator"
+      },
+      "security": {
+        "verification": "Poziom weryfikacji",
+        "mfa": "Wymóg 2FA / MFA",
+        "explicit_filter": "Filtr nieodpowiednich treści",
+        "notifications": "Domyślne powiadomienia",
+        "nsfw": "Poziom NSFW",
+        "automod": "Reguły AutoMod",
+        "active_rules": "{count} aktywnych reguł"
+      },
+      "boost": {
+        "level": "Poziom ulepszeń",
+        "count": "Liczba ulepszeń",
+        "progress": "Postęp",
+        "vanity": "Własny link zaproszenia",
+        "features": "Funkcje serwera"
+      },
+      "emojis": {
+        "static": "Statyczne emoji",
+        "animated": "Animowane emoji",
+        "total": "Wszystkie emoji",
+        "stickers": "Naklejki",
+        "soundboard": "Dźwięki Soundboard",
+        "preview": "Podgląd emoji",
+        "no_emojis": "Brak własnych emoji"
+      },
+      "more": {
+        "integrations": "Integracje",
+        "bots_integrated": "Integracje botów",
+        "other_integrations": "Inne integracje",
+        "invites": "Aktywne zaproszenia",
+        "bans": "Wszystkie bany",
+        "events": "Zaplanowane wydarzenia",
+        "locale": "Preferowany język",
+        "max_members": "Maks. członków",
+        "max_presences": "Maks. obecności",
+        "filesize_limit": "Limit rozmiaru pliku",
+        "bitrate_limit": "Limit bitrate audio"
+      },
+      "verif_levels": {
+        "none": "Brak (Bez ograniczeń)",
+        "low": "Niski (Weryfikacja e-mail)",
+        "medium": "Średni (Konto > 5 min)",
+        "high": "Wysoki (Na serwerze > 10 min)",
+        "highest": "Najwyższy (Weryfikacja numerem tel.)"
+      },
+      "mfa_levels": {
+        "disabled": "Wyłączone",
+        "enabled": "Włączone (Wymagane 2FA dla moderatorów)"
+      },
+      "filter_levels": {
+        "disabled": "Wyłączony (Nie skanuj)",
+        "no_role": "Członkowie bez ról",
+        "all_members": "Wszyscy członkowie"
+      },
+      "notif_levels": {
+        "all_messages": "Wszystkie wiadomości",
+        "only_mentions": "Tylko wzmianki"
+      },
+      "nsfw_levels": {
+        "default": "Domyślny",
+        "explicit": "Jawny",
+        "safe": "Bezpieczny",
+        "age_restricted": "Ograniczony wiekowo"
+      },
+      "boosts": "Ulepszenia",
+      "tier_format": "Poziom {tier}",
+      "user_missing_perm": "[Wymaga uprawnienia: {perm}]",
+      "perms": {
+        "manage_guild": "Zarządzanie serwerem",
+        "moderate_members": "Moderowanie członków",
+        "ban_members": "Banowanie członków"
+      }
+    }
   }
 }
