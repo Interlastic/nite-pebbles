@@ -1,5 +1,7 @@
 # Nite Pebbles
 
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
+
 Nite Pebbles is the open-source extension library for NiteBot. It’s essentially the playground where we keep the fun commands, modular components, and those extra utilities that give the bot its personality.
 
 ---
@@ -267,3 +269,9 @@ While Nite Pebbles are open-source, it does rely on some closed-source component
 Anything unclear? Open an issue or DM me on Discord (DMs open): @interlastical
 
 > If your pebble or edit needs a custom emoji, DM me on Discord, I'll add it and give you the ID.
+
+---
+
+## License
+
+This project is licensed under the **GNU Affero General Public License v3.0 (AGPLv3)** — see the [LICENSE](LICENSE) file for details.
