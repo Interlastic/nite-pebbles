@@ -48,7 +48,16 @@ async def handle_guild_update(bot, before, after):
                     reason = entry.reason or "**No Reason**"
                     break
 
-        if settings.get("logging_exclude_nite_stats", False) and (reason == "Nite Server Stats Update" or (action_by and action_by.id == bot.user.id)):
+        user_id = getattr(action_by, 'id', None)
+        stats_config = settings.get("server_stats", {})
+        has_server_name_template = bool(stats_config.get("server_name_template"))
+
+        if settings.get("logging_exclude_nite_stats", True) and (
+            reason == "Nite Server Stats Update"
+            or "Server Stats" in reason
+            or (user_id and bot.user and int(user_id) == bot.user.id)
+            or has_server_name_template
+        ):
             return
 
         content = "\n".join(changes)

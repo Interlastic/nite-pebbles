@@ -76,7 +76,26 @@ async def handle_channel_update(bot, before, after):
                     reason = entry.reason or "**No Reason**"
                     break
 
-        if settings.get("logging_exclude_nite_stats", False) and (reason == "Nite Server Stats Update" or (action_by and action_by.id == bot.user.id)):
+        user_id = getattr(action_by, 'id', None)
+        stats_config = settings.get("server_stats", {})
+        stat_channels = stats_config.get("stat_channels", {})
+        overrides = stats_config.get("channel_overrides", {})
+        stats_cat_id = str(stats_config.get("stats_category_id", ""))
+        target_str = str(after.id)
+        is_stats_channel = bool(
+            target_str and (
+                any(str(k) == target_str for k in stat_channels.keys())
+                or any(str(k) == target_str for k in overrides.keys())
+                or (stats_cat_id and target_str == stats_cat_id)
+            )
+        )
+
+        if settings.get("logging_exclude_nite_stats", True) and (
+            reason == "Nite Server Stats Update"
+            or "Server Stats" in reason
+            or is_stats_channel
+            or (user_id and bot.user and int(user_id) == bot.user.id)
+        ):
             return
 
         content = "\n".join(changes)

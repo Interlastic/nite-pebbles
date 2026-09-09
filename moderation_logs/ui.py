@@ -252,7 +252,7 @@ class LoggingConfigView(ui.LayoutView):
             settings = await self.cog.bot.server_settings.get_settings(self.guild.id)
             self.flags = settings.get("logging_flags_bitfield", 0)
             self.enabled = settings.get("logging_enabled", False)
-            self.exclude_stats = settings.get("logging_exclude_nite_stats", False)
+            self.exclude_stats = settings.get("logging_exclude_nite_stats", True)
             self.channel_id = settings.get("logging_channel")
 
             container_children = [

@@ -238,12 +238,59 @@ async def handle_subscription_create(bot, subscription):
 
 async def handle_audit_log_entry_create(bot, entry):
     try:
-        settings = await bot.server_settings.get_settings(entry.guild.id)
+        guild_id = entry.guild.id if entry.guild else None
+        if not guild_id: return
+
+        settings = await bot.server_settings.get_settings(guild_id)
         if not settings.get("logging_enabled"): return
         from ..ui import LoggingFlags
         if not (settings.get("logging_flags_bitfield", 0) & LoggingFlags.AUDIT_LOG): return
+
+        user_id = getattr(entry, 'user_id', None) or (entry.user.id if entry.user else None)
+        action_by = entry.user
+        if not action_by and user_id:
+            if entry.guild:
+                action_by = entry.guild.get_member(user_id)
+            if not action_by:
+                action_by = bot.get_user(user_id)
+
+        exclude_stats = settings.get("logging_exclude_nite_stats", True)
+        if exclude_stats:
+            reason = entry.reason or ""
+            is_stats_reason = reason == "Nite Server Stats Update" or "Server Stats" in reason
+            is_nite = bool(
+                bot.user and (
+                    (user_id and int(user_id) == bot.user.id) or
+                    (action_by and action_by.id == bot.user.id)
+                )
+            )
+
+            stats_config = settings.get("server_stats", {})
+            target_id = getattr(entry, '_target_id', None) or (entry.target.id if getattr(entry, 'target', None) else None)
+            target_str = str(target_id) if target_id else ""
+            stat_channels = stats_config.get("stat_channels", {})
+            overrides = stats_config.get("channel_overrides", {})
+            stats_cat_id = str(stats_config.get("stats_category_id", ""))
+
+            is_stats_channel = bool(
+                target_str and (
+                    any(str(k) == target_str for k in stat_channels.keys())
+                    or any(str(k) == target_str for k in overrides.keys())
+                    or (stats_cat_id and target_str == stats_cat_id)
+                )
+            )
+
+            action_name = getattr(entry.action, 'name', str(entry.action))
+            is_channel_or_guild_update = (
+                action_name in ("channel_update", "guild_update")
+                or entry.action in (discord.AuditLogAction.channel_update, discord.AuditLogAction.guild_update)
+            )
+
+            if is_stats_reason or is_stats_channel or (is_nite and is_channel_or_guild_update):
+                return
+
         lang = settings.get("language", "en")
-        await send_log_message(bot, entry.guild.id, "id", get_string("moderation.logging.event_formats.audit_entry", lang, action=entry.action.name), action_by=entry.user)
+        await send_log_message(bot, guild_id, "id", get_string("moderation.logging.event_formats.audit_entry", lang, action=entry.action.name), action_by=action_by)
     except:
         traceback.print_exc()
 
