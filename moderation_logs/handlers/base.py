@@ -10,6 +10,7 @@ from discord.utils import utcnow
 _MAX_CONTAINERS_PER_MESSAGE = 10
 _BATCH_DELAY_SECONDS = 0.25
 _batchers = {}
+_webhooks = {}
 
 
 class _LogBatcher:
@@ -58,34 +59,61 @@ async def _send_log_batch(bot, guild_id, items):
         with open(emoji_path, "r") as f:
             emojis = json.load(f)
 
-        view = ui.LayoutView()
-        files = []
+        # LayoutView has a 40-descendant limit. Build each message by trial so
+        # containers with galleries/accessories cannot overflow that limit.
+        view_batches = []
+        current_view = ui.LayoutView()
+        current_files = []
         for item in items:
-            view.add_item(item["container"])
+            try:
+                current_view.add_item(item["container"])
+            except ValueError:
+                if not current_view.children:
+                    raise
+                view_batches.append((current_view, current_files))
+                current_view = ui.LayoutView()
+                current_files = []
+                current_view.add_item(item["container"])
             if item["file"]:
-                files.append(item["file"])
+                current_files.append(item["file"])
+        if current_view.children:
+            view_batches.append((current_view, current_files))
 
-        webhooks = await channel.webhooks()
-        webhook = discord.utils.get(webhooks, name="Mod-Logs", user=bot.user)
+        webhook_key = (id(bot), guild_id, int(channel_id))
+        webhook = _webhooks.get(webhook_key)
+        if webhook is None:
+            webhooks = await channel.webhooks()
+            webhook = discord.utils.get(webhooks, name="Mod-Logs", user=bot.user)
+            if not webhook:
+                avatar_val = emojis.get("moderation_png", "moderation.png")
+                avatar_path = base_path / "moderation-icons" / avatar_val
+                with open(avatar_path, "rb") as f:
+                    webhook = await channel.create_webhook(name="Mod-Logs", avatar=f.read())
+            _webhooks[webhook_key] = webhook
 
-        if not webhook:
-            avatar_val = emojis.get("moderation_png", "moderation.png")
-            avatar_path = base_path / "moderation-icons" / avatar_val
-            with open(avatar_path, "rb") as f:
-                webhook = await channel.create_webhook(name="Mod-Logs", avatar=f.read())
+        for view, files in view_batches:
+            send_kwargs = {
+                "view": view,
+                "username": "Nite Mod-Logs",
+                "avatar_url": bot.user.display_avatar.url,
+                "allowed_mentions": discord.AllowedMentions.none()
+            }
+            if len(files) == 1:
+                send_kwargs["file"] = files[0]
+            elif files:
+                send_kwargs["files"] = files
 
-        send_kwargs = {
-            "view": view,
-            "username": "Nite Mod-Logs",
-            "avatar_url": bot.user.display_avatar.url,
-            "allowed_mentions": discord.AllowedMentions.none()
-        }
-        if len(files) == 1:
-            send_kwargs["file"] = files[0]
-        elif files:
-            send_kwargs["files"] = files
-
-        await webhook.send(**send_kwargs)
+            for attempt in range(3):
+                try:
+                    await webhook.send(**send_kwargs)
+                    break
+                except discord.HTTPException as error:
+                    if error.status != 429 or attempt == 2:
+                        raise
+                    retry_after = getattr(error, "retry_after", None)
+                    if retry_after is None:
+                        retry_after = float(error.response.headers.get("X-RateLimit-Reset-After", 1.0))
+                    await asyncio.sleep(max(float(retry_after), 0.5))
     except Exception as e:
         print(f"[Moderation Logs] Error sending log message in guild {guild_id}: {e}")
         traceback.print_exc()
