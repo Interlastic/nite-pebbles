@@ -338,6 +338,33 @@ To make NiteBot load your extension on startup, add it to the `entries` list in 
 }
 ```
 
+### Top.gg Integration (`core.topgg`)
+
+NiteBot provides a centralized Top.gg v1 integration featuring an automatic vote tracker, event dispatcher, and offline catch-up. Any Pebble module can hook into votes or check user voting status directly:
+
+```python
+from core.topgg import topgg, VoteData
+
+# 1. Listen for incoming votes (both live votes and offline backlog catch-up)
+@topgg.on_vote
+async def on_user_voted(vote: VoteData):
+    discord_id = vote.discord_id    # int Discord user ID (or None)
+    weight = vote.weight            # 1 or 2 (weekend multiplier)
+    is_weekend = vote.is_weekend    # True if 2x multiplier
+    is_catchup = vote.is_catchup    # True if caught up from offline downtime
+
+    print(f"Vote received from {discord_id}! Weekend: {is_weekend}, Catch-up: {is_catchup}")
+    # Award mini-game currency, XP, or voter perks...
+
+# 2. Check if a user has an active vote within the 12-hour window
+has_voted = await topgg.has_voted(interaction.user.id)
+if has_voted:
+    # Grant active voter bonus
+    pass
+```
+
+---
+
 ## Pebble Credits
 
 Nite Pebbles tracks contributions at a modular level. Every contributor is recognized for their specific work, which is visible in Discord via the `/help -> Credits` menu.
