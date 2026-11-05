@@ -1083,12 +1083,12 @@ class FunCommands(commands.Cog):
     async def reverse(self, interaction: discord.Interaction, text: str):
         await interaction.response.send_message(text[::-1], ephemeral=False)
 
-    @message_group.command(name="epstein", description="⬛almost⬛⬛⬛files⬛")
+    @message_group.command(name="redact", description="⬛almost⬛⬛⬛files⬛")
     @app_commands.describe(text="The ⬛⬛⬛ into ⬛⬛")
     @app_commands.describe(chance="Chance for a word to be replaced with ⬛")
     @app_commands.allowed_installs(users=True, guilds=True)
     @app_commands.allowed_contexts(dms=True, private_channels=True, guilds=True)
-    async def epstein(
+    async def redact(
         self, interaction: discord.Interaction, text: str, chance: int = 15
     ):
         chunks = text.split(" ")

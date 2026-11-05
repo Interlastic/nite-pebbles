@@ -79,8 +79,8 @@
       }
     }
   },
-  "message epstein": {
-    "name": "epstein",
+  "message redact": {
+    "name": "redact",
     "description": "⬛fast⬛⬛⬛dateien⬛",
     "parameters": {
       "text": {
